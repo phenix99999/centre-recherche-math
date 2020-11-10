@@ -3,9 +3,7 @@ export interface Record<T> {
     id: number
 }
 
-
 export interface Heure {
-
     "pk_ID":string,
     "_link":string,
     "_found_Count":string,

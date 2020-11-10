@@ -3,7 +3,8 @@ import AuthStore from './AuthStore';
 import TimeStore from './TimeStore'
 import { create } from 'mobx-persist'
 import { AsyncStorage } from 'react-native';
-import FMClient from '../services/FMClient/Client';
+//import FMClient from '../services/FMClient/Client';
+import FilemakerClient from 'filemaker-api';
 
 const hydrate = create({
   storage: AsyncStorage,
@@ -14,11 +15,11 @@ export class RootStore {
 
   timeStore: TimeStore;
   authStore: AuthStore;
-  api: FMClient;
+  api: FilemakerClient;
 
   constructor() {
     this.authStore = new AuthStore(this);
-    this.api = new FMClient('vhmsoft.com', 'vhmsoft', this.authStore.getAuthHeader.bind(this.authStore))
+    this.api = new FilemakerClient('vhmsoft.com', 'vhmsoft', this.authStore.getAuthHeader.bind(this.authStore))
     this.timeStore = new TimeStore(this);
     hydrate('auth', this.authStore)
   }

@@ -1,10 +1,8 @@
 import { observable, toJS, action, computed, ObservableMap } from 'mobx';
 import { Record } from './FMObjectTypes'
-import FMClient from '../services/FMClient/Client';
+//import FMClient from '../services/FMClient/Client';
+import FilemakerClient from "filemaker-api" 
 
-type GenericFields = {
-   [key: string] : string | number
-}
 export type SearchOptions<Fields> = Partial<{
  [key in keyof Fields]: (string|number)[]
 }>
@@ -16,7 +14,7 @@ type Operation  = 'create' | 'update'
 
 export default class CrudResource<Fields >{
     layout:string;
-    client:FMClient;
+    client:FilemakerClient;
 
     @observable isFetching: boolean;
     @observable isSaving: boolean;
@@ -27,7 +25,7 @@ export default class CrudResource<Fields >{
 
     onError: (reason:any) => void 
 
-    constructor(FMlayout: string, client: FMClient, onError: (reason:any) => void){
+    constructor(FMlayout: string, client: FilemakerClient, onError: (reason:any) => void){
         this.layout = FMlayout
         this.client = client
         this.onError = onError
