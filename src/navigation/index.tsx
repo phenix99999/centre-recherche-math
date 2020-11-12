@@ -43,6 +43,7 @@ const DrawerStack = createDrawerNavigator<DrawerStackParamList>();
 function DrawerNavigator() {
     return (
         <DrawerStack.Navigator
+            screenOptions={{ headerShown: false }}
             drawerContent={(props: DrawerContentComponentProps<DrawerContentOptions>) => <Sidebar {...props} />}
         >
             <DrawerStack.Screen name="MainDrawer" component={MainNavigator} />
@@ -66,7 +67,7 @@ function RootNavigator({ initialRouteName }: { initialRouteName: InitialRouteNam
     return (
         <RootStack.Navigator screenOptions={{ headerShown: false }} initialRouteName={initialRouteName}>
             <RootStack.Screen options={{ animationEnabled: false }} name="Logout" component={LoginNavigator} />
-            <RootStack.Screen options={{ animationEnabled: false }} name="Login" component={DrawerNavigator} />
+            <RootStack.Screen options={{ animationEnabled: false }} name="Login" component={MainNavigator} />
         </RootStack.Navigator>
     );
 }

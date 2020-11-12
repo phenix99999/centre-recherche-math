@@ -29,9 +29,9 @@ type Props = {
 } & StackScreenProps<MainStackParamList, "Main">;
 
 const TempsDetails = ({ navigation, timeStore }: Props) => {
-    const record = timeStore.selectedHeure;
     const editionMode = timeStore.resources.heure.editionMode;
     const crud = timeStore.resources.heure;
+    const record = crud.selectedRecord;
 
     React.useEffect(() => {
         timeStore.loadPickerData();
@@ -72,78 +72,101 @@ const TempsDetails = ({ navigation, timeStore }: Props) => {
             </Header>
 
             <Content style={{ flex: 1, flexDirection: "column" }}>
-                <CustomPickerRow<Client>
-                    records={timeStore.resources.client.records}
-                    valueKey={"pk_ID"}
-                    getLabel={(client: Record<Client>) => client.fields.Nom}
-                    selectedValue={Number(crud.shownValue("fk_client"))}
-                    onChange={(value) => {
-                        crud.updateValue("fk_client", value, true);
-                        timeStore.loadPickerData();
-                        if (editionMode === "update") {
-                            timeStore.fetchHeures();
-                        }
-                    }}
-                    placeholder={"Client"}
-                />
-                <CustomPickerRow<Projet>
-                    records={timeStore.resources.projet.records}
-                    valueKey={"pk_ID"}
-                    getLabel={(projet: Record<Projet>) => projet.fields.Nom}
-                    selectedValue={Number(crud.shownValue("fk_projet"))}
-                    onChange={(value) => {
-                        crud.updateValue("fk_projet", value, true);
-                        if (editionMode === "update") {
-                            timeStore.fetchHeures();
-                        }
-                    }}
-                    placeholder={"Projets"}
-                />
-                <CustomPickerRow<Activite>
-                    records={timeStore.resources.activite.records}
-                    valueKey={"pk_ID"}
-                    getLabel={(activite: Record<Activite>) => activite.fields.Nom}
-                    selectedValue={Number(crud.shownValue("fk_activites"))}
-                    onChange={(value) => {
-                        crud.updateValue("fk_activites", value, true);
-                        if (editionMode === "update") {
-                            timeStore.fetchHeures();
-                        }
-                    }}
-                    placeholder={"Activités"}
-                />
-                <Text>Description</Text>
-                <Textarea
-                    placeholder={"Écrivez la description ici"}
-                    bordered
-                    underline
-                    style={{ backgroundColor: "rgb(222, 222, 222)" }}
-                    rowSpan={5}
-                    value={crud.shownValue("Description")}
-                    onChangeText={(text) => crud.updateValue("Description", text)}
-                    onBlur={() => {
-                        if (editionMode == "update") {
-                            crud.save();
-                            timeStore.fetchHeures();
-                        }
-                    }}
-                />
-                <Form>
-                    <Item floatingLabel last>
-                        <Label>Nombre d'heures</Label>
-                        <Input
-                            value={crud.shownValue("Minutes")}
-                            onChangeText={(text) => crud.updateValue("Minutes", text)}
-                            keyboardType={"numeric"}
-                            onBlur={() => {
-                                if (editionMode == "update") {
-                                    crud.save();
-                                    timeStore.fetchHeures();
-                                }
-                            }}
-                        />
-                    </Item>
-                </Form>
+                <View style={styles.inputWrapper}>
+                    <CustomPickerRow<Client>
+                        records={timeStore.resources.client.records}
+                        valueKey={"pk_ID"}
+                        getLabel={(client: Record<Client>) => client.fields.Nom}
+                        selectedValue={Number(crud.shownValue("fk_client"))}
+                        onChange={(value) => {
+                            crud.updateValue("fk_client", value, true);
+                            timeStore.loadPickerData();
+                            if (editionMode === "update") {
+                                timeStore.fetchHeures();
+                            }
+                        }}
+                        placeholder={"Client"}
+                    />
+                </View>
+                <View style={styles.inputWrapper}>
+                    <CustomPickerRow<Projet>
+                        records={timeStore.resources.projet.records}
+                        valueKey={"pk_ID"}
+                        getLabel={(projet: Record<Projet>) => projet.fields.Nom}
+                        selectedValue={Number(crud.shownValue("fk_projet"))}
+                        onChange={(value) => {
+                            crud.updateValue("fk_projet", value, true);
+                            if (editionMode === "update") {
+                                timeStore.fetchHeures();
+                            }
+                        }}
+                        placeholder={"Projets"}
+                    />
+                </View>
+
+                <View style={styles.inputWrapper}>
+                    <CustomPickerRow<Activite>
+                        records={timeStore.resources.activite.records}
+                        valueKey={"pk_ID"}
+                        getLabel={(activite: Record<Activite>) => activite.fields.Nom}
+                        selectedValue={Number(crud.shownValue("fk_activites"))}
+                        onChange={(value) => {
+                            crud.updateValue("fk_activites", value, true);
+                            if (editionMode === "update") {
+                                timeStore.fetchHeures();
+                            }
+                        }}
+                        placeholder={"Activités"}
+                    />
+                </View>
+
+                <View style={styles.inputWrapper}>
+                    <Text>Description:</Text>
+                    <Textarea
+                        placeholder={"Écrivez la description ici"}
+                        bordered
+                        underline
+                        style={styles.inputBorder}
+                        rowSpan={5}
+                        value={crud.shownValue("Description")}
+                        onChangeText={(text) => crud.updateValue("Description", text)}
+                        onBlur={() => {
+                            if (editionMode == "update") {
+                                crud.save();
+                                timeStore.fetchHeures();
+                            }
+                        }}
+                    />
+                </View>
+                <View style={styles.inputWrapper}>
+                    <Text>Nombre d'heures:</Text>
+                    <Input
+                        style={styles.inputBorder}
+                        placeholder={"Écrivez ici"}
+                        value={crud.shownValue("Minutes")}
+                        onChangeText={(text) => crud.updateValue("Minutes", text)}
+                        keyboardType={"numeric"}
+                        onBlur={() => {
+                            if (editionMode == "update") {
+                                crud.save();
+                                timeStore.fetchHeures();
+                            }
+                        }}
+                    />
+                </View>
+                {record !== undefined && editionMode === "update" ? (
+                    <Button
+                        danger
+                        transparent
+                        style={{ alignSelf: "center" }}
+                        onPress={() => {
+                            timeStore.delete(record);
+                            navigation.goBack();
+                        }}
+                    >
+                        <Text>Supprimer</Text>
+                    </Button>
+                ) : null}
             </Content>
         </Container>
     );
@@ -153,5 +176,13 @@ export default inject("timeStore")(observer(TempsDetails));
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+    },
+
+    inputWrapper: {
+        padding: 20,
+    },
+    inputBorder: {
+        borderWidth: 1,
+        borderColor: "black",
     },
 });

@@ -2,7 +2,7 @@ import { StackScreenProps } from "@react-navigation/stack";
 import { DrawerActions } from "@react-navigation/core";
 import { inject, observer } from "mobx-react";
 import * as React from "react";
-import { StyleSheet, View } from "react-native";
+import { RefreshControl, StyleSheet, View } from "react-native";
 import TimeStore from "../stores/TimeStore";
 import { MainStackParamList } from "../types";
 import DateSlider from "../components/DateSlider";
@@ -26,6 +26,8 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
         setIsRefreshing(true);
     }, []);
     const crud = timeStore.resources.heure;
+    const heures = timeStore.selectedHeures;
+
     return (
         <Container style={{ flex: 1 }}>
             <Header>
@@ -38,7 +40,8 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
                             setNavigationState("Logout");
                         }}
                     >
-                        <Text>Déconnexion</Text>
+                        <Icon name="logout" type={"AntDesign"} style={{ fontSize: 14, marginLeft: 2 }} />
+                        <Text style={{ fontSize: 14 }}>Déconnexion</Text>
                     </Button>
                 </Left>
             </Header>
@@ -55,9 +58,9 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
                 selected={timeStore.selectedDate}
                 onSelect={(date: Date) => timeStore.selectDate(date)}
             />
-            <View style={{ maxHeight: 50, flex: 1, flexDirection: "row", paddingLeft: 15 }}>
+            <View style={{ maxHeight: 40, flex: 1, flexDirection: "row", paddingLeft: 20 }}>
                 <View style={{ height: 50, flex: 1, justifyContent: "center" }}>
-                    <Text>{dateToFrench(timeStore.selectedDate)}</Text>
+                    <Text style={{ fontWeight: "bold" }}>{dateToFrench(timeStore.selectedDate)}</Text>
                 </View>
                 <View style={{ height: 50, flex: 1, justifyContent: "center" }}>
                     <Button
@@ -68,25 +71,39 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
                             navigation.navigate("TempsDetails");
                         }}
                     >
-                        <Text>Nouvelle entrée</Text>
+                        <Text>+ Nouvelle entrée</Text>
                     </Button>
                 </View>
             </View>
-            <ScrollView style={{ flexGrow: 1, flex: 1 }}>
-                {timeStore.selectedHeures.map((record) => (
-                    <TouchableOpacity
-                        onPress={() => {
-                            crud.updateEditionMode("update");
-                            crud.select(record);
-                            navigation.navigate("TempsDetails");
+            <ScrollView
+                style={styles.scrollview}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={timeStore.resources.heure.isFetching}
+                        onRefresh={() => {
+                            timeStore.fetchHeures();
                         }}
-                        style={styles.item}
-                        key={record.fields.pk_ID}
-                    >
-                        <Text>{record.fields.Nom_projet}</Text>
-                        <Text>{record.fields.Minutes} h</Text>
-                    </TouchableOpacity>
-                ))}
+                    />
+                }
+            >
+                {heures.length === 0 ? (
+                    <Text style={styles.noItemText}>Aucune entrée de temps ne correspond à la date sélectionnée</Text>
+                ) : (
+                    heures.map((record) => (
+                        <TouchableOpacity
+                            onPress={() => {
+                                crud.updateEditionMode("update");
+                                crud.select(record);
+                                navigation.navigate("TempsDetails");
+                            }}
+                            style={styles.item}
+                            key={record.fields.pk_ID}
+                        >
+                            <Text>{record.fields.Nom_projet}</Text>
+                            <Text>{record.fields.Minutes} h</Text>
+                        </TouchableOpacity>
+                    ))
+                )}
             </ScrollView>
         </Container>
     );
@@ -117,9 +134,17 @@ const styles = StyleSheet.create({
     },
 
     item: {
-        backgroundColor: "rgb(200, 200, 200)",
-        padding: 20,
+        backgroundColor: "rgb(240, 240, 240)",
         marginVertical: 8,
-        marginHorizontal: 16,
+        padding: 10,
+        margin: 20,
+    },
+    noItemText: {
+        margin: 20,
+        textAlign: "center",
+    },
+    scrollview: {
+        flexGrow: 1,
+        flex: 1,
     },
 });

@@ -17,7 +17,7 @@ interface CustomPickerProps<Fields> {
 export const CustomPicker = inject("timeStore")(<Fields,>(props: CustomPickerProps<Fields>) => {
     return (
         <Picker
-            style={{ minWidth: 150, height: 40 }}
+            style={{ height: 40 }}
             selectedValue={props.selectedValue}
             onValueChange={(itemValue, itemIndex) => {
                 props.onChange(itemValue);
@@ -61,7 +61,7 @@ export const CustomPickerRow = <Fields,>(props: CustomPickerProps<Fields>) => (
 const styles = StyleSheet.create({
     pickerRow: {
         flexDirection: "row",
-        padding: 20,
+        padding: 0,
     },
     pickerText: {
         lineHeight: 40,

@@ -1,7 +1,6 @@
-import { rgb } from "color";
+import { Icon } from "native-base";
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { areSameDates, getDaysInMonth, groupDaysByWeek } from "../utils/date";
 type OnSelect = (date: Date) => void;
 const FIRST_DAY = 0;
@@ -91,13 +90,28 @@ export default (props: DateSliderProps) => {
         <View style={styles.container}>
             <View style={styles.monthRow}>
                 <TouchableOpacity onPress={() => slide(-1)} style={styles.monthButton}>
-                    <Text>{numberToMonth(props.month - 1)}</Text>
+                    <Icon name="arrow-back" style={[styles.monthButtonText, { paddingRight: 10 }]}></Icon>
+                    <Text style={styles.monthButtonText}>{numberToMonth(props.month - 1)}</Text>
                 </TouchableOpacity>
-                <Text style={styles.currentMonth}>{numberToMonth(props.month) + " " + props.year}</Text>
+                <View style={styles.monthButton}>
+                    <Text style={styles.currentMonth}>{numberToMonth(props.month) + " " + props.year}</Text>
+                </View>
 
-                <TouchableOpacity onPress={() => slide(1)} style={[styles.monthButton, { alignItems: "flex-end" }]}>
-                    <Text>{numberToMonth(props.month + 1)}</Text>
+                <TouchableOpacity onPress={() => slide(1)} style={[styles.monthButton]}>
+                    <Text style={[styles.monthButtonText, { textAlign: "right", flex: 1 }]}>
+                        {numberToMonth(props.month + 1)}
+                    </Text>
+                    <Icon name="arrow-forward" style={[styles.monthButtonText, { paddingLeft: 10 }]}></Icon>
                 </TouchableOpacity>
+            </View>
+            <View style={{ flexDirection: "row" }}>
+                <Text style={styles.weekDay}>D</Text>
+                <Text style={styles.weekDay}>L</Text>
+                <Text style={styles.weekDay}>M</Text>
+                <Text style={styles.weekDay}>M</Text>
+                <Text style={styles.weekDay}>J</Text>
+                <Text style={styles.weekDay}>V</Text>
+                <Text style={styles.weekDay}>S</Text>
             </View>
             <View style={styles.calendar}>
                 {weeks.map((week) => (
@@ -128,13 +142,19 @@ export default (props: DateSliderProps) => {
 
 const styles = StyleSheet.create({
     container: {
-        marginTop: 0,
+        marginTop: 10,
     },
     baseCell: {
         justifyContent: "center", //Centered vertically
         alignItems: "center", // Centered horizontally
         flex: 1,
         padding: 3,
+    },
+    weekDay: {
+        flex: 1,
+        textAlign: "center",
+        fontWeight: "bold",
+        marginBottom: 10,
     },
     cellWeekday: {
         color: "black",
@@ -194,11 +214,17 @@ const styles = StyleSheet.create({
         height: 30,
         flex: 1,
         margin: 10,
+        flexDirection: "row",
+        alignItems: "center",
+    },
+    monthButtonText: {
+        fontSize: 17,
+        color: "rgb(23,125,247)",
     },
     currentMonth: {
         flex: 1,
+        fontSize: 17,
         fontWeight: "bold",
         textAlign: "center",
-        padding: 10,
     },
 });

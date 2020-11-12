@@ -39,6 +39,46 @@ export default class TransportStore {
     }
 
     @action
+    create(){
+        this.resources.heure.create({
+            fk_assignation:this.currentAccountKey(),
+            StartDate: dateToFMDate(this.selectedDate),
+            flag_actif:'1'
+        }).then(res => {
+            console.log(res)
+        })
+
+    }
+
+    @action
+    async fetchHeures() {
+        const assignation = this.currentAccountKey()
+        const _this = this;
+
+        if (! assignation) return
+        await this.resources.heure.list({
+            fk_assignation:[assignation],
+            StartDate:[(this.activeMonth+1) + '/' + this.activeYear],
+            flag_actif:[1]
+        })
+        .then(() => {
+            _this.notEmptyDates
+
+        })
+    }
+
+    @action
+    async delete(record: Record<Heure>) {
+        const assignation = this.currentAccountKey()
+        if (! assignation) return
+        const fields:Partial<Heure> = {
+            flag_actif: "0"
+        }
+        await this.resources.heure.save(record.id, fields)
+        this.fetchHeures()
+    }
+
+    @action
     handleError(err: any) {
     }
 
@@ -57,37 +97,12 @@ export default class TransportStore {
         this.loadPickerData()
     }
 
-    @action
-    create(){
-        this.resources.heure.create({
-            fk_assignation:this.currentAccountKey(),
-            StartDate: dateToFMDate(this.selectedDate)
-        }).then(res => {
-            console.log(res)
-        })
-
-    }
 
     @computed
     get selectedHeure(){
         return this.resources.heure.records.find(record => record.id === this.selectedTimeId)
     }
 
-    @action
-    async fetchHeures() {
-        const assignation = this.currentAccountKey()
-        const _this = this;
-
-        if (! assignation) return
-        await this.resources.heure.list({
-            fk_assignation:[assignation],
-            StartDate:[(this.activeMonth+1) + '/' + this.activeYear]
-        })
-        .then(() => {
-            _this.notEmptyDates
-
-        })
-    }
 
     
     @action
