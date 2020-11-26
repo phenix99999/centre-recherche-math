@@ -219,7 +219,7 @@ const TempsDetails = ({ navigation, timeStore }: Props) => {
 
                 {isProjectRunningBill(selectedProjet) ? (
                     <View style={styles.inputWrapper}>
-                        <Text>Nombre d'heures restantes:</Text>
+                        <Text>Nombre d'heures restantes pour accomplir la tâche:</Text>
                         <Input
                             style={styles.inputBorder}
                             placeholder={"Écrivez ici"}

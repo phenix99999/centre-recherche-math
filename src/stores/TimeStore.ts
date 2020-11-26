@@ -188,6 +188,5 @@ export default class TransportStore {
         return user?.fields.pk_ID
     }
 
-
 }
 
