@@ -59,7 +59,7 @@ export default class TransportStore {
         await this.resources.heure.list({
             fk_assignation: [assignation],
             StartDate: [(this.activeMonth + 1) + '/' + this.activeYear],
-            flag_actif: [1]
+            flag_actif: [1],
         })
             .then(() => {
                 _this.notEmptyDates

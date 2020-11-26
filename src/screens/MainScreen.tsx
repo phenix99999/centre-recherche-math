@@ -7,23 +7,17 @@ import TimeStore from "../stores/TimeStore";
 import { MainStackParamList } from "../types";
 import DateSlider from "../components/DateSlider";
 import { ScrollView, TouchableOpacity } from "react-native";
-import { CustomPickerRow } from "../components/CustomPicker";
-import { Client, Record, Projet, Activite } from "../stores/FMObjectTypes";
-import { Container, Header, Button, Right, Left, Body, Icon, Text } from "native-base";
+import { Container, Header, Button, Left, Icon, Text } from "native-base";
 import { setNavigationState } from "../utils/PersistState";
 import { dateToFrench } from "../utils/date";
+
 type Props = {
     timeStore: TimeStore;
 } & StackScreenProps<MainStackParamList, "Main">;
 
 const MainScreen = ({ navigation, timeStore }: Props) => {
-    const [isRefreshing, setIsRefreshing] = React.useState<boolean>(false);
-    const loadData = async () => {
-        //await store.fetchHeures().finally(() => setIsRefreshing(false));
-    };
     React.useEffect(() => {
         timeStore.loadConfigData().then(() => timeStore.fetchHeures());
-        setIsRefreshing(true);
     }, []);
     const crud = timeStore.resources.heure;
     const heures = timeStore.selectedHeures;

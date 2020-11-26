@@ -17,6 +17,7 @@ export default class AuthStore {
     @persist @observable token = "";
 
     @observable authLoading = false;
+
     constructor(rootStore: RootStore) {
         this.rootStore = rootStore;
     }

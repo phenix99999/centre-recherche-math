@@ -5,35 +5,19 @@ export interface Record<T> {
 
 export interface Heure {
     "pk_ID": string,
-    "_link": string,
-    "_found_Count": string,
     "StartDate": string,
-    "Timestamp_creation": string,
     "Minutes": string,
     "Minutes_planifie": string,
+    "Minutes_restantes":string,
     "Description": string,
     "fk_projet": string,
     "fk_activites": string,
-    "Flag_DD": string,
     "flag_actif": string,
     "fk_assignation": string,
-    "StartTime": string,
-    "Minutes_facturable": string,
-    "BGColor": string,
-    "ID_Category": string,
     "Nom_projet": string,
     "Nom_activite": string,
-    "flag_R_et_D": string,
-    "FlagCalendrier": string,
-    "EndDate": string,
-    "EndTime": string,
-    "StartDatePAsBonne": string,
-    "calendrier_AllDay": string,
-    "calendrier_AllDayTrueFalse": string,
     "Total_Heures": string,
     "fk_client": string,
-    "Nom_incertitude": string,
-    "Nom_incertitude_contexte": string,
     "AM_PM": string,
 }
 
@@ -47,10 +31,17 @@ export interface Account {
     UserAccountName: string
 }
 
+export type Type_de_projet = "Budget du total du projet"
+    | "Budget du total des budgets d'activités"
+    | "Budget par mois"
+    | "Pas de budget déterminé"
+    | ""
+
 export interface Projet {
     pk_ID: string
     fk_client: string
-    Nom: string
+    Nom: string,
+    Type_de_projet: Type_de_projet
 }
 
 export interface Activite {
@@ -62,3 +53,4 @@ export interface Activite {
     Heures_budget: string
     Heures_budget_auto: string
 }
+

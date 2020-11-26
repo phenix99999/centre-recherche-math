@@ -20,7 +20,7 @@ import * as React from "react";
 import { StyleSheet, View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { CustomPickerRow, DetachedCustomPickerRow } from "../components/CustomPicker";
-import { Record, Client, Activite, Projet } from "../stores/FMObjectTypes";
+import { Record, Client, Activite, Projet, Type_de_projet } from "../stores/FMObjectTypes";
 import TimeStore from "../stores/TimeStore";
 import { MainStackParamList } from "../types";
 
@@ -36,18 +36,37 @@ const TempsDetails = ({ navigation, timeStore }: Props) => {
     React.useEffect(() => {
         timeStore.loadPickerData();
     }, []);
+
     const computeColor = (activite?: Record<Activite>) => {
+        //rouge si
+        //Activite::Heures_budget_auto  >  Activite::Heures_budget
         if (activite === undefined) return "green";
         return Number(activite.fields.Heures_budget_auto) > Number(activite.fields.Heures_budget) ? "red" : "green";
     };
 
-    //rouge si
-    //Activite::Heures_budget_auto  >  Activite::Heures_budget
+    const askQuestion = (projet?: Record<Projet>) => {
+        if (projet === undefined) return false;
+        const map: {
+            [key in Type_de_projet]: boolean;
+        } = {
+            "Budget du total des budgets d'activités": true,
+            "Budget du total du projet": true,
+            "Budget par mois": false,
+            "Pas de budget déterminé": false,
+            "": false,
+        };
+        return map[projet.fields.Type_de_projet];
+    };
+
     const selectedActivite = timeStore.resources.activite.records.find(
         (record) => Number(crud.shownValue("fk_activites")) === Number(record.fields.pk_ID)
     );
+
+    const selectedProjet = timeStore.resources.projet.records.find(
+        (record) => Number(crud.shownValue("fk_projet")) === Number(record.fields.pk_ID)
+    );
+
     const color = computeColor(selectedActivite);
-    console.log("color", color);
 
     return (
         <Container>
