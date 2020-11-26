@@ -19,7 +19,7 @@ import {
 import * as React from "react";
 import { StyleSheet, View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
-import { CustomPickerRow } from "../components/CustomPicker";
+import { CustomPickerRow, DetachedCustomPickerRow } from "../components/CustomPicker";
 import { Record, Client, Activite, Projet } from "../stores/FMObjectTypes";
 import TimeStore from "../stores/TimeStore";
 import { MainStackParamList } from "../types";
@@ -36,6 +36,18 @@ const TempsDetails = ({ navigation, timeStore }: Props) => {
     React.useEffect(() => {
         timeStore.loadPickerData();
     }, []);
+    const computeColor = (activite?: Record<Activite>) => {
+        if (activite === undefined) return "green";
+        return Number(activite.fields.Heures_budget_auto) > Number(activite.fields.Heures_budget) ? "red" : "green";
+    };
+
+    //rouge si
+    //Activite::Heures_budget_auto  >  Activite::Heures_budget
+    const selectedActivite = timeStore.resources.activite.records.find(
+        (record) => Number(crud.shownValue("fk_activites")) === Number(record.fields.pk_ID)
+    );
+    const color = computeColor(selectedActivite);
+    console.log("color", color);
 
     return (
         <Container>
@@ -121,6 +133,21 @@ const TempsDetails = ({ navigation, timeStore }: Props) => {
                 </View>
 
                 <View style={styles.inputWrapper}>
+                    <DetachedCustomPickerRow
+                        values={["AM", "PM"]}
+                        //label={(activite: Record<Activite>) => activite.fields.Nom}
+                        selectedValue={crud.shownValue("AM_PM")}
+                        onChange={(value) => {
+                            //console.log("change", value);
+                            crud.updateValue("AM_PM", value, true);
+                            if (editionMode === "update") {
+                                timeStore.fetchHeures();
+                            }
+                        }}
+                        placeholder={"AM / PM "}
+                    />
+                </View>
+                <View style={styles.inputWrapper}>
                     <Text>Description:</Text>
                     <Textarea
                         placeholder={"Écrivez la description ici"}
@@ -139,7 +166,23 @@ const TempsDetails = ({ navigation, timeStore }: Props) => {
                     />
                 </View>
                 <View style={styles.inputWrapper}>
-                    <Text>Nombre d'heures:</Text>
+                    <Text>Nombre d'heures planifiées:</Text>
+                    <Input
+                        style={styles.inputBorder}
+                        placeholder={"Écrivez ici"}
+                        value={crud.shownValue("Minutes_planifie")}
+                        onChangeText={(text) => crud.updateValue("Minutes_planifie", text)}
+                        keyboardType={"numeric"}
+                        onBlur={() => {
+                            if (editionMode == "update") {
+                                crud.save();
+                                timeStore.fetchHeures();
+                            }
+                        }}
+                    />
+                </View>
+                <View style={styles.inputWrapper}>
+                    <Text>Nombre d'heures réelles:</Text>
                     <Input
                         style={styles.inputBorder}
                         placeholder={"Écrivez ici"}

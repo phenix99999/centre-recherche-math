@@ -58,6 +58,46 @@ export const CustomPickerRow = <Fields,>(props: CustomPickerProps<Fields>) => (
     </View>
 );
 
+interface DetachedCustomPickerProps {
+    values: string[];
+    onChange: (itemValue: string) => void;
+    selectedValue: string;
+    placeholder: string;
+}
+export const DetachedCustomPickerRow = (props: DetachedCustomPickerProps) => (
+    <View style={styles.pickerRow}>
+        <View style={{ width: 150 }}>
+            <Text style={styles.pickerText}>{props.placeholder}:</Text>
+        </View>
+        <View style={{ flexGrow: 1, flex: 1, alignItems: "flex-end" }}>
+            <Picker
+                style={{ height: 40 }}
+                selectedValue={props.selectedValue}
+                onValueChange={(itemValue, itemIndex) => {
+                    props.onChange(itemValue);
+                }}
+                mode="dropdown"
+                iosIcon={<Icon name="arrow-down" />}
+                headerBackButtonText={"Annuler"}
+                placeholder={props.placeholder}
+                placeholderStyle={{ color: "#bfc6ea" }}
+                placeholderIconColor="#007aff"
+                itemTextStyle={{ flex: 1 }}
+                renderHeader={(goBack: any) => (
+                    <Header.Header>
+                        <Header.BackButton onPress={() => goBack()} />
+                        <Header.TitleText title="Sélectionnez une valeur" />
+                    </Header.Header>
+                )}
+            >
+                {props.values.map((value) => (
+                    <Picker.Item label={value} value={value} key={value} />
+                ))}
+            </Picker>
+        </View>
+    </View>
+);
+
 const styles = StyleSheet.create({
     pickerRow: {
         flexDirection: "row",

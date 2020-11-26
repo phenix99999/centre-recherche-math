@@ -99,6 +99,7 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
                             style={styles.item}
                             key={record.fields.pk_ID}
                         >
+                            <Text>{record.fields.AM_PM}</Text>
                             <Text>{record.fields.Nom_projet}</Text>
                             <Text>{record.fields.Minutes} h</Text>
                         </TouchableOpacity>
