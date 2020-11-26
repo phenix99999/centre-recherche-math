@@ -28,9 +28,9 @@ export default class TransportStore {
         this.resources = {
             heure: new FMResource<Heure>('mobile_TEMPS2', rootStore.api, this.handleError),
             client: new FMResource<Client>('mobile_CLIENTS2', rootStore.api, this.handleError),
-            projet: new FMResource<Projet>('PROJETS', rootStore.api, this.handleError),
+            projet: new FMResource<Projet>('mobile_PROJETS2', rootStore.api, this.handleError),
             account: new FMResource<Account>('mobile_ACCOUNT', rootStore.api, this.handleError),
-            activite: new FMResource<Activite>('ACTIVITES', rootStore.api, this.handleError),
+            activite: new FMResource<Activite>('mobile_ACTIVITES2', rootStore.api, this.handleError),
         }
         const today = new Date()
         this.activeMonth = today.getMonth()
@@ -155,10 +155,16 @@ export default class TransportStore {
         this.resources.projet.clear()
         this.resources.activite.clear()
         const fk_client = this.resources.heure.shownValue('fk_client')
-        console.log('load picker data', fk_client)
+
         if (!fk_client) return
         await this.resources.projet.list({ fk_client: [fk_client] })
-        await this.resources.activite.list({ fk_client: [fk_client] })
+
+        const fk_projet = this.resources.heure.shownValue('fk_projet')
+        if (!fk_projet) return
+        await this.resources.activite.list({
+            fk_client: [fk_client],
+            fk_projet: [fk_projet]
+        })
     }
 
     @action
@@ -173,7 +179,6 @@ export default class TransportStore {
             || this.resources.projet.isLoading
             || this.resources.account.isLoading
     }
-
 
     currentAccountKey() {
         const username = this.root.authStore.extractToken()

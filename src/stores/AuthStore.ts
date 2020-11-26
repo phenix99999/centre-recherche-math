@@ -1,12 +1,9 @@
 import { observable, computed, action } from 'mobx';
 import { persist } from 'mobx-persist';
 import { RootStore } from './index';
-import { AsyncStorage } from 'react-native';
-import { Screen, setNavigationState } from '../utils/PersistState'
+import { setNavigationState } from '../utils/PersistState'
 import { decode as atob, encode as btoa } from 'base-64'
 
-import { Toast } from 'native-base';
-import Navigation from '../navigation';
 
 export default class AuthStore {
 

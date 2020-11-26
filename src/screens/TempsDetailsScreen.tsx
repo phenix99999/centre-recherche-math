@@ -41,10 +41,10 @@ const TempsDetails = ({ navigation, timeStore }: Props) => {
         //rouge si
         //Activite::Heures_budget_auto  >  Activite::Heures_budget
         if (activite === undefined) return "green";
-        return Number(activite.fields.Heures_budget_auto) > Number(activite.fields.Heures_budget) ? "red" : "green";
+        return Number(activite.fields.Heures_budget_auto) >= Number(activite.fields.Heures_budget) ? "red" : "green";
     };
 
-    const askQuestion = (projet?: Record<Projet>) => {
+    const isProjectRunningBill = (projet?: Record<Projet>) => {
         if (projet === undefined) return false;
         const map: {
             [key in Type_de_projet]: boolean;
@@ -216,6 +216,25 @@ const TempsDetails = ({ navigation, timeStore }: Props) => {
                         }}
                     />
                 </View>
+
+                {isProjectRunningBill(selectedProjet) ? (
+                    <View style={styles.inputWrapper}>
+                        <Text>Nombre d'heures restantes:</Text>
+                        <Input
+                            style={styles.inputBorder}
+                            placeholder={"Écrivez ici"}
+                            value={crud.shownValue("Minutes_restantes")}
+                            onChangeText={(text) => crud.updateValue("Minutes_restantes", text)}
+                            keyboardType={"numeric"}
+                            onBlur={() => {
+                                if (editionMode == "update") {
+                                    crud.save();
+                                    timeStore.fetchHeures();
+                                }
+                            }}
+                        />
+                    </View>
+                ) : null}
                 {record !== undefined && editionMode === "update" ? (
                     <Button
                         danger
