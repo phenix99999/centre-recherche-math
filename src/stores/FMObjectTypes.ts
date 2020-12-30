@@ -8,7 +8,6 @@ export interface Heure {
     "StartDate": string,
     "Minutes": string,
     "Minutes_planifie": string,
-    "Minutes_restantes":string,
     "Description": string,
     "fk_projet": string,
     "fk_activites": string,
@@ -19,6 +18,10 @@ export interface Heure {
     "Total_Heures": string,
     "fk_client": string,
     "AM_PM": string,
+    "Flag_termine": string,
+    "Minutes_restantes": string,
+    "Minutes_restantes_tache": string,
+    
 }
 
 export interface Client {

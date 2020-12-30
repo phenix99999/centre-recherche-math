@@ -32,6 +32,7 @@ const TempsDetails = ({ navigation, timeStore }: Props) => {
     const editionMode = timeStore.resources.heure.editionMode;
     const crud = timeStore.resources.heure;
     const record = crud.selectedRecord;
+    const [showQuestion, setShowQuestion] = React.useState(0);
 
     React.useEffect(() => {
         timeStore.loadPickerData();
@@ -217,6 +218,8 @@ const TempsDetails = ({ navigation, timeStore }: Props) => {
                     />
                 </View>
 
+                    
+{/* 
                 {isProjectRunningBill(selectedProjet) ? (
                     <View style={styles.inputWrapper}>
                         <Text>Nombre d'heures restantes pour accomplir la tâche:</Text>
@@ -234,7 +237,79 @@ const TempsDetails = ({ navigation, timeStore }: Props) => {
                             }}
                         />
                     </View>
-                ) : null}
+                ) : null} */}
+
+            <View style={styles.inputWrapper}>
+                    <Text>Est-ce que ça complète la tâche?(Oui/Non)</Text>
+                    <Input
+                        style={styles.inputBorder}
+                        placeholder={"Écrivez ici"}
+                        value={crud.shownValue("Flag_termine")}
+                        onChangeText={(text) => 
+                            {
+                                if(text.toLowerCase()=="oui"){
+                                    crud.updateValue("Flag_termine", "1");
+                                    setShowQuestion(0);
+                                }else if(text.toLowerCase()=="non"){
+                                    crud.updateValue("Flag_termine", "0");
+                                    setShowQuestion(1);
+                                } else{
+
+                                    crud.updateValue("Flag_termine", text); 
+                                }
+    
+                        }}
+                        onBlur={() => {
+                            if (editionMode == "update") {
+                                crud.save();
+                                timeStore.fetchHeures();
+                            }
+                        }}
+                    />
+                </View>
+                
+
+                {showQuestion == 1 ?  
+                <View>
+                                <View style={styles.inputWrapper}>
+                                <Text>Combien d'heure de plus ça prendrait pour terminer la tâche? </Text>
+                                <Input
+                                    style={styles.inputBorder}
+                                    placeholder={"Écrivez ici"}
+                                    value={crud.shownValue("Minutes_restantes")}
+                                    onChangeText={(text) => crud.updateValue("Minutes_restantes", text)}
+                                    keyboardType={"numeric"}
+                                    onBlur={() => {
+                                        if (editionMode == "update") {
+                                            crud.save();
+                                            timeStore.fetchHeures();
+                                        }
+                                    }}
+                                />
+                            </View>
+            
+                            <View style={styles.inputWrapper}>
+                                <Text>Brève description sur ce qui reste à accomplir :</Text>
+                                <Textarea
+                                    placeholder={"Écrivez la description ici"}
+                                    bordered
+                                    underline
+                                    style={styles.inputBorder}
+                                    rowSpan={5}
+                                    value={crud.shownValue("Minutes_restantes_tache")}
+                                    onChangeText={(text) => crud.updateValue("Minutes_restantes_tache", text)}
+                                    onBlur={() => {
+                                        if (editionMode == "update") {
+                                            crud.save();
+                                            timeStore.fetchHeures();
+                                        }
+                                    }}
+                                />
+                            </View>
+                            </View>
+                : null}
+    
+
                 {record !== undefined && editionMode === "update" ? (
                     <Button
                         danger
