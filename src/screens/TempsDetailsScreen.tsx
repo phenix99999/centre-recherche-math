@@ -47,7 +47,7 @@ const TempsDetails = ({ navigation, timeStore }: Props) => {
     React.useEffect(() => {
         timeStore.loadPickerData();
  
-        if (editionMode) {
+        if (editionMode === "update") {
    
           
             if (crud.shownValue("Flag_termine").localeCompare("0") == 0) {
@@ -286,7 +286,7 @@ const TempsDetails = ({ navigation, timeStore }: Props) => {
                         
                         <RadioForm
                         radio_props={radio_props}
-                        initial={initialJobComplete == 1 ? 1 : 0}
+                        initial={crud.shownValue("Flag_termine") === "1" ? 0: 1 }
                         formHorizontal={true}
                         labelHorizontal={true}
                         style={{ left: 10 }}
