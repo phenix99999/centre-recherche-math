@@ -16,6 +16,9 @@ import {
     Text,
     Textarea,
 } from "native-base";
+import RadioForm, { RadioButton, RadioButtonInput, RadioButtonLabel } from 'react-native-simple-radio-button';
+
+
 import * as React from "react";
 import { StyleSheet, View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
@@ -28,6 +31,13 @@ type Props = {
     timeStore: TimeStore;
 } & StackScreenProps<MainStackParamList, "Main">;
 
+
+var radio_props = [
+    { label: 'Oui', value: 1 },
+    { label: 'Non', value: 0 },
+];
+let initialJobComplete = -1;
+
 const TempsDetails = ({ navigation, timeStore }: Props) => {
     const editionMode = timeStore.resources.heure.editionMode;
     const crud = timeStore.resources.heure;
@@ -36,8 +46,36 @@ const TempsDetails = ({ navigation, timeStore }: Props) => {
 
     React.useEffect(() => {
         timeStore.loadPickerData();
+ 
+        if (editionMode) {
+   
+          
+            if (crud.shownValue("Flag_termine").localeCompare("0") == 0) {
+                initialJobComplete ="1";
+                setShowQuestion(0);
+            } else if (crud.shownValue("Flag_termine").localeCompare("1") == 0) {
+                initialJobComplete =0;
+                setShowQuestion(1);
+            } else {
+                initialJobComplete =-1;
+            }
+            console.log("Initial job complete " + initialJobComplete);
+
+ 
+            // if (crud.shownValue("Flag_termine").localeCompare("1") == 0) {
+            //     alert("ICI");
+            //     setShowFlagTerminer(0);
+            // } else if (crud.shownValue("Flag_termine").localeCompare("0") == 0) {
+            //     alert("On est la?");
+            //     setShowFlagTerminer(1);
+            // } else {
+            //     setShowFlagTerminer(-1);
+            // }
+        }
     }, []);
 
+
+ 
     const computeColor = (activite?: Record<Activite>) => {
         //rouge si
         //Activite::Heures_budget_auto  >  Activite::Heures_budget
@@ -68,6 +106,7 @@ const TempsDetails = ({ navigation, timeStore }: Props) => {
     );
 
     const color = computeColor(selectedActivite);
+    console.log(crud.shownValue("Flag_termine"));
 
     return (
         <Container>
@@ -218,8 +257,8 @@ const TempsDetails = ({ navigation, timeStore }: Props) => {
                     />
                 </View>
 
-                    
-{/* 
+
+                {/* 
                 {isProjectRunningBill(selectedProjet) ? (
                     <View style={styles.inputWrapper}>
                         <Text>Nombre d'heures restantes pour accomplir la tâche:</Text>
@@ -239,9 +278,86 @@ const TempsDetails = ({ navigation, timeStore }: Props) => {
                     </View>
                 ) : null} */}
 
-            <View style={styles.inputWrapper}>
+                <View style={styles.inputWrapper}>
                     <Text>Est-ce que ça complète la tâche?(Oui/Non)</Text>
-                    <Input
+                    <View style={{ flexDirection: 'row' }}>
+                        
+                        {editionMode === "update" ?   
+                        
+                        <RadioForm
+                        radio_props={radio_props}
+                        initial={initialJobComplete == 1 ? 1 : 0}
+                        formHorizontal={true}
+                        labelHorizontal={true}
+                        style={{ left: 10 }}
+                        radioStyle={{ paddingRight: 20 }}
+
+                        onPress={(value) => {
+
+                            if (value == 1) {
+                                crud.updateValue("Flag_termine", "1");
+                                setShowQuestion(0);
+
+                                if (editionMode == "update") {
+                                    crud.save();
+                                    timeStore.fetchHeures();
+                                }
+
+
+                            } else if (value == 0) {
+                                crud.updateValue("Flag_termine", "0");
+                                setShowQuestion(1);
+
+                                if (editionMode == "update") {
+                                    crud.save();
+                                    timeStore.fetchHeures();
+                                }
+
+
+                            }
+                        }
+                        }
+                    />
+                    :
+                    <RadioForm
+                    radio_props={radio_props}
+                    initial={-1}
+                    formHorizontal={true}
+                    labelHorizontal={true}
+                    style={{ left: 10 }}
+                    radioStyle={{ paddingRight: 20 }}
+
+                    onPress={(value) => {
+
+                        if (value == 1) {
+                            crud.updateValue("Flag_termine", "1");
+                            setShowQuestion(0);
+
+                            if (editionMode == "update") {
+                                crud.save();
+                                timeStore.fetchHeures();
+                            }
+
+
+                        } else if (value == 0) {
+                            crud.updateValue("Flag_termine", "0");
+                            setShowQuestion(1);
+
+                            if (editionMode == "update") {
+                                crud.save();
+                                timeStore.fetchHeures();
+                            }
+
+
+                        }
+                    }
+                    }
+                />
+                    }
+                        
+                    </View>
+
+                    {/* <Input
                         style={styles.inputBorder}
                         placeholder={"Écrivez ici"}
                         value={crud.shownValue("Flag_termine")}
@@ -265,50 +381,50 @@ const TempsDetails = ({ navigation, timeStore }: Props) => {
                                 timeStore.fetchHeures();
                             }
                         }}
-                    />
+                    /> */}
                 </View>
-                
 
-                {showQuestion == 1 ?  
-                <View>
-                                <View style={styles.inputWrapper}>
-                                <Text>Combien d'heure de plus ça prendrait pour terminer la tâche? </Text>
-                                <Input
-                                    style={styles.inputBorder}
-                                    placeholder={"Écrivez ici"}
-                                    value={crud.shownValue("Minutes_restantes")}
-                                    onChangeText={(text) => crud.updateValue("Minutes_restantes", text)}
-                                    keyboardType={"numeric"}
-                                    onBlur={() => {
-                                        if (editionMode == "update") {
-                                            crud.save();
-                                            timeStore.fetchHeures();
-                                        }
-                                    }}
-                                />
-                            </View>
-            
-                            <View style={styles.inputWrapper}>
-                                <Text>Brève description sur ce qui reste à accomplir :</Text>
-                                <Textarea
-                                    placeholder={"Écrivez la description ici"}
-                                    bordered
-                                    underline
-                                    style={styles.inputBorder}
-                                    rowSpan={5}
-                                    value={crud.shownValue("Minutes_restantes_tache")}
-                                    onChangeText={(text) => crud.updateValue("Minutes_restantes_tache", text)}
-                                    onBlur={() => {
-                                        if (editionMode == "update") {
-                                            crud.save();
-                                            timeStore.fetchHeures();
-                                        }
-                                    }}
-                                />
-                            </View>
-                            </View>
-                : null}
-    
+
+                {crud.shownValue("Flag_termine") == 0 ?
+                    <View>
+                        <View style={styles.inputWrapper}>
+                            <Text>Combien d'heure de plus ça prendrait pour terminer la tâche? </Text>
+                            <Input
+                                style={styles.inputBorder}
+                                placeholder={"Écrivez ici"}
+                                value={crud.shownValue("Minutes_restantes")}
+                                onChangeText={(text) => crud.updateValue("Minutes_restantes", text)}
+                                keyboardType={"numeric"}
+                                onBlur={() => {
+                                    if (editionMode == "update") {
+                                        crud.save();
+                                        timeStore.fetchHeures();
+                                    }
+                                }}
+                            />
+                        </View>
+
+                        <View style={styles.inputWrapper}>
+                            <Text>Brève description sur ce qui reste à accomplir :</Text>
+                            <Textarea
+                                placeholder={"Écrivez la description ici"}
+                                bordered
+                                underline
+                                style={styles.inputBorder}
+                                rowSpan={5}
+                                value={crud.shownValue("Minutes_restantes_tache")}
+                                onChangeText={(text) => crud.updateValue("Minutes_restantes_tache", text)}
+                                onBlur={() => {
+                                    if (editionMode == "update") {
+                                        crud.save();
+                                        timeStore.fetchHeures();
+                                    }
+                                }}
+                            />
+                        </View>
+                    </View>
+                    : null}
+
 
                 {record !== undefined && editionMode === "update" ? (
                     <Button
