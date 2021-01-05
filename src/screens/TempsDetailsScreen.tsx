@@ -26,6 +26,7 @@ import { CustomPickerRow, DetachedCustomPickerRow } from "../components/CustomPi
 import { Record, Client, Activite, Projet, Type_de_projet } from "../stores/FMObjectTypes";
 import TimeStore from "../stores/TimeStore";
 import { MainStackParamList } from "../types";
+import CrudResource from "../stores/FMMobxResource";
 
 type Props = {
     timeStore: TimeStore;
@@ -44,24 +45,28 @@ const TempsDetails = ({ navigation, timeStore }: Props) => {
     const record = crud.selectedRecord;
     const [showQuestion, setShowQuestion] = React.useState(0);
 
+
     React.useEffect(() => {
         timeStore.loadPickerData();
- 
+        timeStore.objTemp = {AM_PM: crud.shownValue("AM_PM"),Description:crud.shownValue("Description")};
+
         if (editionMode === "update") {
-   
-          
             if (crud.shownValue("Flag_termine").localeCompare("0") == 0) {
-                initialJobComplete ="1";
-                setShowQuestion(0);
-            } else if (crud.shownValue("Flag_termine").localeCompare("1") == 0) {
                 initialJobComplete =0;
                 setShowQuestion(1);
+            } else if (crud.shownValue("Flag_termine").localeCompare("1") == 0) {
+                initialJobComplete =0;
+                setShowQuestion(0);
             } else {
                 initialJobComplete =-1;
             }
-            console.log("Initial job complete " + initialJobComplete);
+  
+            // timeStore.resources.client.records =  ([]);
+            // timeStore.resources.projet.records =  ([timeStore.resources.projet.records.find(projet => projet.fields.pk_ID == crud.shownValue("fk_projet"))]);
+            // timeStore.resources.activite.records =  ([timeStore.resources.activite.records.find(activite => activite.fields.pk_ID == crud.shownValue("fk_activites") )]);
+        
+            // console.log
 
- 
             // if (crud.shownValue("Flag_termine").localeCompare("1") == 0) {
             //     alert("ICI");
             //     setShowFlagTerminer(0);
@@ -127,44 +132,86 @@ const TempsDetails = ({ navigation, timeStore }: Props) => {
                     <Text>{editionMode === "create" ? "Nouvelle entrée" : "Modifier"}</Text>
                 </Body>
                 <Right>
-                    {editionMode === "create" ? (
-                        <Button
-                            transparent
-                            onPress={() => {
-                                timeStore.create();
-                                timeStore.fetchHeures();
-                                navigation.goBack();
-                            }}
-                        >
-                            <Text>Créer</Text>
-                        </Button>
-                    ) : null}
+                    {editionMode == "update" ? 
+                    <Button
+                    transparent
+                    onPress={() => {
+         
+                        
+                        crud.updateValue("AM_PM", timeStore.objTemp.AM_PM, true);
+                    
+
+                        crud.save();
+                        timeStore.fetchHeures();
+                        navigation.goBack();
+                    }}
+                >
+                    <Text>Modifier</Text>
+                </Button>
+                : 
+                <Button
+                transparent
+                onPress={() => {
+                    timeStore.create();
+                    timeStore.fetchHeures();
+                    navigation.goBack();
+                }}
+            >
+                <Text>Créer</Text>
+            </Button>
+                }
+               
+     
+           
                 </Right>
             </Header>
 
             <Content style={{ flex: 1, flexDirection: "column" }}>
                 <View style={styles.inputWrapper}>
+                    {editionMode == "update"  ? 
+                    <Text>
+                Clients  :&nbsp;&nbsp;&nbsp;&nbsp;
+                
+                        
+              {timeStore.resources.client.records.find(record => record.fields.pk_ID == crud.shownValue("fk_client"))?.fields.Nom}
+                        </Text>
+                       
+                     
+                    :   
+                    
                     <CustomPickerRow<Client>
-                        records={timeStore.resources.client.records}
-                        valueKey={"pk_ID"}
-                        getLabel={(client: Record<Client>) => client.fields.Nom}
-                        selectedValue={Number(crud.shownValue("fk_client"))}
-                        onChange={(value) => {
-                            crud.updateValue("fk_client", value, true);
-                            timeStore.loadPickerData();
-                            if (editionMode === "update") {
-                                timeStore.fetchHeures();
-                            }
-                        }}
-                        placeholder={"Client"}
-                    />
+                    records={timeStore.resources.client.records}
+                    valueKey={"pk_ID"}
+                    getLabel={(client: Record<Client>) => client.fields.Nom}
+                    selectedValue={Number(crud.shownValue("fk_client"))}
+                 
+                    onChange={(value) => {
+                        crud.updateValue("fk_client", value, true);
+                        timeStore.loadPickerData();
+                        if (editionMode === "update") {
+                            timeStore.fetchHeures();
+                        }
+                    }}
+                    placeholder={"Client"}
+                /> }
+         
                 </View>
                 <View style={styles.inputWrapper}>
+                   
+                {editionMode == "update" ? 
+               <Text>
+               Projets  :&nbsp;&nbsp;&nbsp;&nbsp;
+               
+                       
+             {timeStore.resources.projet.records.find(record => record.fields.pk_ID == crud.shownValue("fk_projet"))?.fields.Nom}
+                       </Text>
+                : 
+
                     <CustomPickerRow<Projet>
                         records={timeStore.resources.projet.records}
                         valueKey={"pk_ID"}
                         getLabel={(projet: Record<Projet>) => projet.fields.Nom}
-                        selectedValue={Number(crud.shownValue("fk_projet"))}
+                        selectedValue={Number(crud.shownValue("fk_projet"))} 
                         onChange={(value) => {
                             crud.updateValue("fk_projet", value, true);
                             if (editionMode === "update") {
@@ -173,32 +220,48 @@ const TempsDetails = ({ navigation, timeStore }: Props) => {
                         }}
                         placeholder={"Projets"}
                     />
+                 }
                 </View>
 
                 <View style={styles.inputWrapper}>
-                    <CustomPickerRow<Activite>
-                        records={timeStore.resources.activite.records}
-                        valueKey={"pk_ID"}
-                        getLabel={(activite: Record<Activite>) => activite.fields.Nom}
-                        selectedValue={Number(crud.shownValue("fk_activites"))}
-                        onChange={(value) => {
-                            crud.updateValue("fk_activites", value, true);
-                            if (editionMode === "update") {
-                                timeStore.fetchHeures();
-                            }
-                        }}
-                        placeholder={"Activités"}
-                    />
+
+                {editionMode == "update" ? 
+               <Text>
+               Projets  :&nbsp;&nbsp;&nbsp;&nbsp;
+               
+                       
+             {timeStore.resources.activite.records.find(record => record.fields.pk_ID == crud.shownValue("fk_activites"))?.fields.Nom}
+                       </Text>
+                : 
+
+                <CustomPickerRow<Activite>
+                records={timeStore.resources.activite.records}
+                valueKey={"pk_ID"}
+                getLabel={(activite: Record<Activite>) => activite.fields.Nom}
+                selectedValue={Number(crud.shownValue("fk_activites"))}
+                onChange={(value) => {
+                    crud.updateValue("fk_activites", value, true);
+                    if (editionMode === "update") {
+                        timeStore.fetchHeures();
+                    }
+                }}
+                placeholder={"Activités"}
+            />
+                 }
+
+
+           
                 </View>
 
                 <View style={styles.inputWrapper}>
                     <DetachedCustomPickerRow
                         values={["AM", "PM"]}
                         //label={(activite: Record<Activite>) => activite.fields.Nom}
-                        selectedValue={crud.shownValue("AM_PM")}
+                        selectedValue={ timeStore.objTemp  == null ? crud.shownValue("AM_PM") : timeStore.objTemp.AM_PM}
                         onChange={(value) => {
-                            //console.log("change", value);
-                            crud.updateValue("AM_PM", value, true);
+                           
+                            timeStore.objTemp.AM_PM = value;
+                    
                             if (editionMode === "update") {
                                 timeStore.fetchHeures();
                             }
@@ -218,27 +281,25 @@ const TempsDetails = ({ navigation, timeStore }: Props) => {
                         onChangeText={(text) => crud.updateValue("Description", text)}
                         onBlur={() => {
                             if (editionMode == "update") {
-                                crud.save();
-                                timeStore.fetchHeures();
+                                timeStore.objTemp.Description = crud.shownValue("Description");
                             }
                         }}
                     />
                 </View>
                 <View style={styles.inputWrapper}>
                     <Text>Nombre d'heures planifiées:</Text>
+                    {editionMode == "update" ? 
+                    <Text> {crud.shownValue("Minutes_planifie")}</Text>
+                    : 
                     <Input
-                        style={styles.inputBorder}
-                        placeholder={"Écrivez ici"}
-                        value={crud.shownValue("Minutes_planifie")}
-                        onChangeText={(text) => crud.updateValue("Minutes_planifie", text)}
-                        keyboardType={"numeric"}
-                        onBlur={() => {
-                            if (editionMode == "update") {
-                                crud.save();
-                                timeStore.fetchHeures();
-                            }
-                        }}
-                    />
+                    style={styles.inputBorder}
+                    placeholder={"Écrivez ici"}
+                    value={crud.shownValue("Minutes_planifie")}
+                    onChangeText={(text) => crud.updateValue("Minutes_planifie", text)}
+                    keyboardType={"numeric"}
+           
+                />}
+                
                 </View>
                 <View style={styles.inputWrapper}>
                     <Text>Nombre d'heures réelles:</Text>
@@ -248,12 +309,7 @@ const TempsDetails = ({ navigation, timeStore }: Props) => {
                         value={crud.shownValue("Minutes")}
                         onChangeText={(text) => crud.updateValue("Minutes", text)}
                         keyboardType={"numeric"}
-                        onBlur={() => {
-                            if (editionMode == "update") {
-                                crud.save();
-                                timeStore.fetchHeures();
-                            }
-                        }}
+        
                     />
                 </View>
 
@@ -286,35 +342,19 @@ const TempsDetails = ({ navigation, timeStore }: Props) => {
                         
                         <RadioForm
                         radio_props={radio_props}
-                        initial={crud.shownValue("Flag_termine") === "1" ? 0: 1 }
+                        initial={crud.shownValue("Flag_termine") === "0" ? 1: 0 }
                         formHorizontal={true}
                         labelHorizontal={true}
                         style={{ left: 10 }}
                         radioStyle={{ paddingRight: 20 }}
 
                         onPress={(value) => {
-
                             if (value == 1) {
                                 crud.updateValue("Flag_termine", "1");
-                                setShowQuestion(0);
-
-                                if (editionMode == "update") {
-                                    crud.save();
-                                    timeStore.fetchHeures();
-                                }
-
-
                             } else if (value == 0) {
                                 crud.updateValue("Flag_termine", "0");
-                                setShowQuestion(1);
-
-                                if (editionMode == "update") {
-                                    crud.save();
-                                    timeStore.fetchHeures();
-                                }
-
-
                             }
+                            setShowQuestion(0);
                         }
                         }
                     />
@@ -328,27 +368,15 @@ const TempsDetails = ({ navigation, timeStore }: Props) => {
                     radioStyle={{ paddingRight: 20 }}
 
                     onPress={(value) => {
-
                         if (value == 1) {
                             crud.updateValue("Flag_termine", "1");
                             setShowQuestion(0);
-
-                            if (editionMode == "update") {
-                                crud.save();
-                                timeStore.fetchHeures();
-                            }
-
 
                         } else if (value == 0) {
                             crud.updateValue("Flag_termine", "0");
                             setShowQuestion(1);
 
-                            if (editionMode == "update") {
-                                crud.save();
-                                timeStore.fetchHeures();
-                            }
-
-
+        
                         }
                     }
                     }
@@ -356,36 +384,11 @@ const TempsDetails = ({ navigation, timeStore }: Props) => {
                     }
                         
                     </View>
-
-                    {/* <Input
-                        style={styles.inputBorder}
-                        placeholder={"Écrivez ici"}
-                        value={crud.shownValue("Flag_termine")}
-                        onChangeText={(text) => 
-                            {
-                                if(text.toLowerCase()=="oui"){
-                                    crud.updateValue("Flag_termine", "1");
-                                    setShowQuestion(0);
-                                }else if(text.toLowerCase()=="non"){
-                                    crud.updateValue("Flag_termine", "0");
-                                    setShowQuestion(1);
-                                } else{
-
-                                    crud.updateValue("Flag_termine", text); 
-                                }
-    
-                        }}
-                        onBlur={() => {
-                            if (editionMode == "update") {
-                                crud.save();
-                                timeStore.fetchHeures();
-                            }
-                        }}
-                    /> */}
+ 
                 </View>
 
 
-                {crud.shownValue("Flag_termine") == 0 ?
+                {crud.shownValue("Flag_termine") === "0" ?
                     <View>
                         <View style={styles.inputWrapper}>
                             <Text>Combien d'heure de plus ça prendrait pour terminer la tâche? </Text>
@@ -395,12 +398,7 @@ const TempsDetails = ({ navigation, timeStore }: Props) => {
                                 value={crud.shownValue("Minutes_restantes")}
                                 onChangeText={(text) => crud.updateValue("Minutes_restantes", text)}
                                 keyboardType={"numeric"}
-                                onBlur={() => {
-                                    if (editionMode == "update") {
-                                        crud.save();
-                                        timeStore.fetchHeures();
-                                    }
-                                }}
+                               
                             />
                         </View>
 
@@ -414,12 +412,7 @@ const TempsDetails = ({ navigation, timeStore }: Props) => {
                                 rowSpan={5}
                                 value={crud.shownValue("Minutes_restantes_tache")}
                                 onChangeText={(text) => crud.updateValue("Minutes_restantes_tache", text)}
-                                onBlur={() => {
-                                    if (editionMode == "update") {
-                                        crud.save();
-                                        timeStore.fetchHeures();
-                                    }
-                                }}
+                               
                             />
                         </View>
                     </View>
