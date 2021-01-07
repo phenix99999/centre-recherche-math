@@ -60,22 +60,7 @@ const TempsDetails = ({ navigation, timeStore }: Props) => {
             } else {
                 initialJobComplete =-1;
             }
-  
-            // timeStore.resources.client.records =  ([]);
-            // timeStore.resources.projet.records =  ([timeStore.resources.projet.records.find(projet => projet.fields.pk_ID == crud.shownValue("fk_projet"))]);
-            // timeStore.resources.activite.records =  ([timeStore.resources.activite.records.find(activite => activite.fields.pk_ID == crud.shownValue("fk_activites") )]);
-        
-            // console.log
-
-            // if (crud.shownValue("Flag_termine").localeCompare("1") == 0) {
-            //     alert("ICI");
-            //     setShowFlagTerminer(0);
-            // } else if (crud.shownValue("Flag_termine").localeCompare("0") == 0) {
-            //     alert("On est la?");
-            //     setShowFlagTerminer(1);
-            // } else {
-            //     setShowFlagTerminer(-1);
-            // }
+ 
         }
     }, []);
 
@@ -135,14 +120,20 @@ const TempsDetails = ({ navigation, timeStore }: Props) => {
                     {editionMode == "update" ? 
                     <Button
                     transparent
-                    onPress={() => {
-         
-                        
+                    onPress={async () => {
+                        const scriptOptions = {
+                            script:'replanification',
+                            params:[crud.shownValue("pk_ID")]
+                        }
                         crud.updateValue("AM_PM", timeStore.objTemp.AM_PM, true);
-                    
+                        await crud.save();
+                        await timeStore.fetchHeures();
 
-                        crud.save();
-                        timeStore.fetchHeures();
+
+                        crud.updateValue("flag_actif",0);
+                        await timeStore.create(scriptOptions);
+            
+                    
                         navigation.goBack();
                     }}
                 >
@@ -257,14 +248,10 @@ const TempsDetails = ({ navigation, timeStore }: Props) => {
                     <DetachedCustomPickerRow
                         values={["AM", "PM"]}
                         //label={(activite: Record<Activite>) => activite.fields.Nom}
-                        selectedValue={ timeStore.objTemp  == null ? crud.shownValue("AM_PM") : timeStore.objTemp.AM_PM}
+                        selectedValue={ crud.shownValue("AM_PM")}
                         onChange={(value) => {
-                           
-                            timeStore.objTemp.AM_PM = value;
+                            crud.updateValue("AM_PM",value,true);
                     
-                            if (editionMode === "update") {
-                                timeStore.fetchHeures();
-                            }
                         }}
                         placeholder={"AM / PM "}
                     />

@@ -39,12 +39,12 @@ export default class TransportStore {
     }
 
     @action
-    create() {
+    create(script) {
         this.resources.heure.create({
             fk_assignation: this.currentAccountKey(),
             StartDate: dateToFMDate(this.selectedDate),
             flag_actif: '1'
-        }).then(res => {
+        },script).then(res => {
             console.log(res)
         })
 
