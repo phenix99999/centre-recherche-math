@@ -89,7 +89,6 @@ export default class CrudResource<Fields >{
     
     @action
     create(defaultPayload:Partial<Fields>, scriptOptions?:{script:string, params:string[]}) {
- 
         const totalPayload: Partial<Fields> = {
             ...this.formPayload,
             ...defaultPayload

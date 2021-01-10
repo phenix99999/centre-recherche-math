@@ -131,8 +131,12 @@ const TempsDetails = ({ navigation, timeStore }: Props) => {
 
 
                         crud.updateValue("flag_actif",0);
-                        await timeStore.create(scriptOptions);
+                        if(crud.shownValue("Flag_termine") === "0"){
+                            await timeStore.create(scriptOptions);
+                        }
             
+
+                        await timeStore.fetchHeures();
                     
                         navigation.goBack();
                     }}
@@ -320,62 +324,43 @@ const TempsDetails = ({ navigation, timeStore }: Props) => {
                         />
                     </View>
                 ) : null} */}
+{editionMode == "update" ? 
+   <View style={styles.inputWrapper}>
+   <Text>Est-ce que ça complète la tâche?(Oui/Non)</Text>
+   <View style={{ flexDirection: 'row' }}>
+       
+     
+       
+       <RadioForm
+       radio_props={radio_props}
+       initial={crud.shownValue("Flag_termine") === "0" ? 1: 0 }
+       formHorizontal={true}
+       labelHorizontal={true}
+       style={{ left: 10 }}
+       radioStyle={{ paddingRight: 20 }}
 
-                <View style={styles.inputWrapper}>
-                    <Text>Est-ce que ça complète la tâche?(Oui/Non)</Text>
-                    <View style={{ flexDirection: 'row' }}>
-                        
-                        {editionMode === "update" ?   
-                        
-                        <RadioForm
-                        radio_props={radio_props}
-                        initial={crud.shownValue("Flag_termine") === "0" ? 1: 0 }
-                        formHorizontal={true}
-                        labelHorizontal={true}
-                        style={{ left: 10 }}
-                        radioStyle={{ paddingRight: 20 }}
+       onPress={(value) => {
+           if (value == 1) {
+               crud.updateValue("Flag_termine", "1");
+           } else if (value == 0) {
+               crud.updateValue("Flag_termine", "0");
+           }
+           setShowQuestion(0);
+       }
+       }
+   />
+   
+       
+   </View>
 
-                        onPress={(value) => {
-                            if (value == 1) {
-                                crud.updateValue("Flag_termine", "1");
-                            } else if (value == 0) {
-                                crud.updateValue("Flag_termine", "0");
-                            }
-                            setShowQuestion(0);
-                        }
-                        }
-                    />
-                    :
-                    <RadioForm
-                    radio_props={radio_props}
-                    initial={-1}
-                    formHorizontal={true}
-                    labelHorizontal={true}
-                    style={{ left: 10 }}
-                    radioStyle={{ paddingRight: 20 }}
+</View>
 
-                    onPress={(value) => {
-                        if (value == 1) {
-                            crud.updateValue("Flag_termine", "1");
-                            setShowQuestion(0);
+:
+ null
+}
+             
 
-                        } else if (value == 0) {
-                            crud.updateValue("Flag_termine", "0");
-                            setShowQuestion(1);
-
-        
-                        }
-                    }
-                    }
-                />
-                    }
-                        
-                    </View>
- 
-                </View>
-
-
-                {crud.shownValue("Flag_termine") === "0" ?
+                {crud.shownValue("Flag_termine") === "0" && editionMode == "update" ?
                     <View>
                         <View style={styles.inputWrapper}>
                             <Text>Combien d'heure de plus ça prendrait pour terminer la tâche? </Text>
