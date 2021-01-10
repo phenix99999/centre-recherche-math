@@ -11,6 +11,7 @@ interface Resources {
     projet: FMResource<Projet>
     activite: FMResource<Activite>
     account: FMResource<Account>
+    replanification: FMResource<any>
 }
 
 export default class TransportStore {
@@ -26,6 +27,7 @@ export default class TransportStore {
     constructor(rootStore: RootStore) {
         this.root = rootStore;
         this.resources = {
+            replanification: new FMResource<Heure>('mobile_TEMPS2', rootStore.api, this.handleError),
             heure: new FMResource<Heure>('mobile_TEMPS2', rootStore.api, this.handleError),
             client: new FMResource<Client>('mobile_CLIENTS2', rootStore.api, this.handleError),
             projet: new FMResource<Projet>('mobile_PROJETS2', rootStore.api, this.handleError),

@@ -4,7 +4,7 @@ import TimeStore from './TimeStore'
 import { create } from 'mobx-persist'
 import { AsyncStorage } from 'react-native';
 //import FMClient from '../services/FMClient/Client';
-import FilemakerClient from './node_modules/filemaker-api';
+import FilemakerClient from 'filemaker-api';
 
 const hydrate = create({
   storage: AsyncStorage,
