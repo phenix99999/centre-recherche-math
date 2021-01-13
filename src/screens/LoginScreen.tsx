@@ -35,9 +35,14 @@ type Props = {
     authStore: AuthStore;
 } & StackScreenProps<RootStackParamList, "Logout">;
 
+
+
 const LoginScreen = ({ navigation, authStore }: Props) => {
-    authStore.username = "Alain Simoneau";
-    authStore.password = "4251";
+    React.useEffect(() => {
+        if(SyncStorage.get('username')){
+            authStore.username = SyncStorage.get('username');
+        }
+    });
     return (
         <Root>
             <Container style={{ flexGrow: 1, flex: 1 }}>
