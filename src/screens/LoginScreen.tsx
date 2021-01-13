@@ -38,11 +38,14 @@ type Props = {
 
 
 const LoginScreen = ({ navigation, authStore }: Props) => {
+   
     React.useEffect(() => {
         if(SyncStorage.get('username')){
             authStore.username = SyncStorage.get('username');
         }
     });
+
+
     return (
         <Root>
             <Container style={{ flexGrow: 1, flex: 1 }}>
@@ -80,6 +83,7 @@ const LoginScreen = ({ navigation, authStore }: Props) => {
                                             position: "top",
                                             text: "Mauvais identifiants",
                                         });
+                                        
                                     } else {
                                         let role = "";
                                         SyncStorage.set('connected', true);
@@ -87,6 +91,7 @@ const LoginScreen = ({ navigation, authStore }: Props) => {
                                         SyncStorage.set('user',user[0]);
                                         SyncStorage.set('password',authStore.password);
                                         navigation.goBack();
+                                        authStore.password = "";
                                         navigation.navigate("Login");
                                     }  
                                 }}
