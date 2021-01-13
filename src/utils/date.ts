@@ -37,3 +37,17 @@ export function dateToFrench(date:Date){
     ]
     return  `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`
 }
+
+export function getNotEmptyDates(data,fieldName){
+  let notEmptyDates = [];
+  let indexNotEmptyDates = 0;
+    for(let i=0;i<data.length;i++){
+        // console.log(data[i][fieldName]);
+        if(!notEmptyDates.includes(data[i][fieldName])){
+            notEmptyDates[indexNotEmptyDates] = new Date(data[i][fieldName]);
+            indexNotEmptyDates++;
+        }
+    }
+ 
+    return notEmptyDates;
+}

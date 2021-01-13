@@ -4,6 +4,7 @@ import Constants from "expo-constants";
 
 import { StackScreenProps } from "@react-navigation/stack";
 import { LoginStackParamList, RootStackParamList } from "../types";
+import SyncStorage from 'sync-storage';
 
 import { Root } from "native-base";
 import { inject, observer } from "mobx-react";
@@ -28,12 +29,15 @@ import {
 } from "native-base";
 import { Image, ImageBackground, RefreshControl, ScrollView, View } from "react-native";
 import AuthStore from "../stores/AuthStore";
+import { authentification } from '../utils/connectorFileMaker';
 
 type Props = {
     authStore: AuthStore;
 } & StackScreenProps<RootStackParamList, "Logout">;
 
 const LoginScreen = ({ navigation, authStore }: Props) => {
+    authStore.username = "Alain Simoneau";
+    authStore.password = "4251";
     return (
         <Root>
             <Container style={{ flexGrow: 1, flex: 1 }}>
@@ -60,28 +64,26 @@ const LoginScreen = ({ navigation, authStore }: Props) => {
                                 </Item>
                             </Form>
                             <Button
-                                onPress={() => {
-                                    authStore.setToken();
-                                    const store = authStore;
-
-                                    authStore
-                                        .login()
-                                        .then((isAuthorized) => {
-                                            if (isAuthorized) {
-                                                navigation.navigate("Login");
-                                                return;
-                                            }
-                                            Toast.show({
-                                                position: "top",
-                                                text: "Mauvais identifiants",
-                                            });
-                                        })
-                                        .then((err) => {
-                                            console.log(err);
-                                        })
-                                        .catch((err) => {
-                                            console.log(err);
+                                onPress={async () => {
+                                    let server = "vhmsoft.com";
+                                    let db = "vhmsoft_Lyes";
+                                    let layout = "mobile_ACCOUNT";
+                                    let user = await authentification(authStore.username, authStore.password, server, db, layout, "&_C_nomComplet=" + authStore.username);
+                           
+                                    if (user == -1) {
+                                        Toast.show({
+                                            position: "top",
+                                            text: "Mauvais identifiants",
                                         });
+                                    } else {
+                                        let role = "";
+                                        SyncStorage.set('connected', true);
+                                        SyncStorage.set('username', authStore.username);
+                                        SyncStorage.set('user',user[0]);
+                                        SyncStorage.set('password',authStore.password);
+                                        navigation.goBack();
+                                        navigation.navigate("Login");
+                                    }  
                                 }}
                                 style={[styles.button]}
                             >

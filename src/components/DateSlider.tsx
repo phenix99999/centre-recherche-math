@@ -14,6 +14,8 @@ interface DayCellProps {
 const DayCell = (props: DayCellProps) => {
     const isWeekend = props.date.getDay() === 0 || props.date.getDay() === 6;
     const isSelected = areSameDates(props.selected, props.date);
+ 
+
     const today = new Date();
     const isToday = areSameDates(today, props.date);
     return (

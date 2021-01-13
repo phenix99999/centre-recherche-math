@@ -27,12 +27,12 @@ export default class TransportStore {
     constructor(rootStore: RootStore) {
         this.root = rootStore;
         this.resources = {
-            replanification: new FMResource<Heure>('mobile_TEMPS2', rootStore.api, this.handleError),
-            heure: new FMResource<Heure>('mobile_TEMPS2', rootStore.api, this.handleError),
-            client: new FMResource<Client>('mobile_CLIENTS2', rootStore.api, this.handleError),
-            projet: new FMResource<Projet>('mobile_PROJETS2', rootStore.api, this.handleError),
+            replanification: new FMResource<Heure>('mobile_TEMPS', rootStore.api, this.handleError),
+            heure: new FMResource<Heure>('mobile_TEMPS', rootStore.api, this.handleError),
+            client: new FMResource<Client>('mobile_CLIENTS', rootStore.api, this.handleError),
+            projet: new FMResource<Projet>('mobile_PROJETS', rootStore.api, this.handleError),
             account: new FMResource<Account>('mobile_ACCOUNT', rootStore.api, this.handleError),
-            activite: new FMResource<Activite>('mobile_ACTIVITES2', rootStore.api, this.handleError),
+            activite: new FMResource<Activite>('mobile_ACTIVITES', rootStore.api, this.handleError),
         }
         const today = new Date()
         this.activeMonth = today.getMonth()

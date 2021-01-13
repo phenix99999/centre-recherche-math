@@ -39,7 +39,7 @@ export const CustomPicker = inject("timeStore")(<Fields,>(props: CustomPickerPro
             {props.records.map((record) => (
                 <Picker.Item
                     label={props.getLabel(record)}
-                    value={Number(record.fields[props.valueKey])}
+                    value={Number(record[props.valueKey])}
                     key={record.id}
                 />
             ))}
