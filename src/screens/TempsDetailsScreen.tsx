@@ -35,7 +35,7 @@ type Props = {
     timeStore: TimeStore;
 } & StackScreenProps<MainStackParamList, "Main">;
 
-let initialValueCompleteJob;
+ 
 var radio_props = [
     { label: 'Oui', value: 1 },
     { label: 'Non', value: 0 },
@@ -43,7 +43,8 @@ var radio_props = [
 let initialJobComplete = -1;
 
 const TempsDetails = ({ route,navigation, timeStore }: Props) => {
-    const editionMode = timeStore.resources.heure.editionMode;
+    const editionMode = route.params.editionMode;
+    
     const crud = timeStore.resources.heure;
     // const record = crud.selectedRecord;
     const [showQuestion, setShowQuestion] = React.useState(0);
@@ -52,53 +53,51 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
     const [record,setRecord] = React.useState<Object>({});
     const [formatedProjects, setFormatedProjects] = React.useState<Object>([]);
     const [activityName, setActivityName] = React.useState<String>("");
-
+    const [initialeValueFlagComplet, setInitialeValueFlagComplet] = React.useState<String>("");
 
     async function getAll(query=null){
         let username = SyncStorage.get('username');
         let password = SyncStorage.get('password');
-        let server = "vhmsoft.com";
+ 
         let db = "vhmsoft";
 
         let layoutClient = "mobile_CLIENTS2";
         let layoutProjet = "mobile_PROJETS2";
         let layoutActivite = "mobile_ACTIVITES2";
       
-        setFormatedClients(await get(username, password, server, db, layoutClient));
-        setFormatedProjects(await get(username, password, server, db, layoutProjet));
- 
-   
+        setFormatedClients(await get(username, password,   global.fmServer, db, layoutClient));
+        setFormatedProjects(await get(username, password,   global.fmServer, db, layoutProjet));
     }
 
     async function getProjects(fk_client){
         let username = SyncStorage.get('username');
         let password = SyncStorage.get('password');
-        let server = "vhmsoft.com";
+ 
         let db = "vhmsoft";
         let layoutProjet = "mobile_PROJETS2";
 
-        setFormatedProjects(await get(username, password, server, db, layoutProjet,"&fk_client=" + fk_client));
+        setFormatedProjects(await get(username, password,   global.fmServer, db, layoutProjet,"&fk_client=" + fk_client));
     }
 
     async function getActivities(fk_projet){
         let username = SyncStorage.get('username');
         let password = SyncStorage.get('password');
-        let server = "vhmsoft.com";
+    
         let db = "vhmsoft";
         let layoutActivite = "mobile_ACTIVITES2";
 
-        setFormatedActivities(await get(username, password, server, db, layoutActivite,"&fk_projet=" + fk_projet));
+        setFormatedActivities(await get(username, password,   global.fmServer, db, layoutActivite,"&fk_projet=" + fk_projet));
     }
 
 
     async function getActivityNameWithActivityId(fk_activites){
         let username = SyncStorage.get('username');
         let password = SyncStorage.get('password');
-        let server = "vhmsoft.com";
+ 
         let db = "vhmsoft";
         let layoutActivite = "mobile_ACTIVITES2";
         console.log(fk_activites);
-        let activity = await get(username, password, server, db, layoutActivite,"&pk_ID=" + fk_activites);
+        let activity = await get(username, password,   global.fmServer, db, layoutActivite,"&pk_ID=" + fk_activites);
 
         setActivityName(activity[0].Nom);
     }
@@ -109,7 +108,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
 
         let username = SyncStorage.get('username');
         let password = SyncStorage.get('password');
-        let server = "vhmsoft.com";
+  
         let db = "vhmsoft";
 
         let layoutClient = "mobile_CLIENTS2";
@@ -122,21 +121,21 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
              pk_ID = route.params.pk_ID;
         }
         const setDataToUpdate = async (pk_ID) => {
+      
             if(editionMode == "update"){
        
-                let theRecord = (await get(username, password, server, db, layoutTemps,"&pk_ID="+pk_ID));
-      
-                if(theRecord[0].Flag_termine == 1){
-                    initialValueCompleteJob = 0;
-                } else if(theRecord[0].Flag_termine == 0){
-                    initialValueCompleteJob = 1;
-                } else{
-                    initialValueCompleteJob = -1;
-                }
-
+                let theRecord = (await get(username, password, global.fmServer, db, layoutTemps,"&pk_ID="+pk_ID));
+                 if(theRecord[0].Flag_termine.localeCompare("1") == 0){
+                    setInitialeValueFlagComplet("0");
+                } else if(theRecord[0].Flag_termine.localeCompare("0") == 0){
+                    setInitialeValueFlagComplet("1");
+                } 
+                setInitialeValueFlagComplet("1");
+            
+               
                 getActivityNameWithActivityId(theRecord[0].fk_activites);
                 
-                console.log("Initial value complete job " + initialValueCompleteJob);
+       
                 setRecord(theRecord[0]);
             }
         };
@@ -148,9 +147,9 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
         };
     
 
-        setData(username,password,server,db,layoutClient,layoutProjet,layoutActivite);
+        setData(username,password,  global.fmServer,db,layoutClient,layoutProjet,layoutActivite);
         if(editionMode == "update"){
-            setDataToUpdate(pk_ID);
+             setDataToUpdate(pk_ID);
         }
 
         // if (editionMode === "update") {
@@ -179,7 +178,9 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
      let fk_activites = record.fk_activites || "";
      let flag_actif = deleteVar == true ? 0 : 1;
      let Description = record.Description || "";
-     let Flag_termine = record.Flag_termine || "";
+     let Flag_termine = record.Flag_termine;
+        
+
      let Minutes_restantes = record.Minutes_restantes || "";
      let Minutes_restantes_tache = record.Minutes_restantes_tache || "";
  
@@ -199,7 +200,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
             let username = SyncStorage.get('username');
             let password = SyncStorage.get('password');
             
-            let server = "vhmsoft.com";
+ 
             let db = "vhmsoft";
            
             let layoutTemps = "mobile_TEMPS2";
@@ -214,11 +215,11 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
          let username = SyncStorage.get('username');
          let password = SyncStorage.get('password');
          
-         let server = "vhmsoft.com";
-         let db = "vhmsoft";
+ 
+                  let db = "vhmsoft";
         
          let layoutTemps = "mobile_TEMPS2";
-        await edit(username,password,server,db,layoutTemps,record['record-id'],addAndUpdateQuery());
+        await edit(username,password,global.fmServer,db,layoutTemps,record['record-id'],addAndUpdateQuery());
     }
  
     const computeColor = (activite?: Record<Activite>) => {
@@ -252,7 +253,11 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
 
     const color = computeColor(selectedActivite);
 
-
+    if(record.Flag_termine == "1"){
+        initialJobComplete =0;
+    } else if(record.Flag_termine == "0"){
+        initialJobComplete = 1;
+    }
     return (
     
 
@@ -287,7 +292,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                             let scriptParam = record.pk_ID;
                             let username = SyncStorage.get('username');
                             let password = SyncStorage.get('password');
-                            let server = "vhmsoft.com";
+                
                             let db = "vhmsoft";
                     
                             let layoutClient = "mobile_CLIENTS2";
@@ -472,18 +477,15 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                         <View style={{ flexDirection: 'row' }}>
                             
                             
-                            
                             <RadioForm
                             radio_props={radio_props}
-                            initial={initialValueCompleteJob}
+                            initial={initialJobComplete}
                             formHorizontal={true}
                             labelHorizontal={true}
                             style={{ left: 10 }}
                             radioStyle={{ paddingRight: 20 }}
                             onPress={(value) => {
-                                
-                                console.log(value);
-                       
+                            
                                 setRecord({...record,"Flag_termine":value})
                                
                             }
@@ -498,7 +500,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                         :
                         null
                         }
-                {record.Flag_termine == 0 && editionMode == "update" ?
+                {(record.Flag_termine == "0" || initialJobComplete == 1) && editionMode == "update" ?
                     <View>
                         <View style={styles.inputWrapper}>
                             <Text>Combien d'heure de plus ça prendrait pour terminer la tâche? </Text>
@@ -543,7 +545,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                            
                             let layoutTemps = "mobile_TEMPS2";
                            
-                            await edit(username,password,server,db,layoutTemps,record['record-id'],addAndUpdateQuery(true));
+                            await edit(username,password,server,  global.fmServer,layoutTemps,record['record-id'],addAndUpdateQuery(true));
                             navigation.replace('Main');
 
                         }}

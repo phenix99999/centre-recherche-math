@@ -38,7 +38,7 @@ type Props = {
 
 
 const LoginScreen = ({ navigation, authStore }: Props) => {
-   
+ 
     React.useEffect(() => {
         if(SyncStorage.get('username')){
             authStore.username = SyncStorage.get('username');
@@ -73,10 +73,10 @@ const LoginScreen = ({ navigation, authStore }: Props) => {
                             </Form>
                             <Button
                                 onPress={async () => {
-                                    let server = "vhmsoft.com";
+                                 
                                     let db = "vhmsoft_Lyes";
                                     let layout = "mobile_ACCOUNT";
-                                    let user = await authentification(authStore.username, authStore.password, server, db, layout, "&_C_nomComplet=" + authStore.username);
+                                    let user = await authentification(authStore.username, authStore.password,global.fmServer, db, layout, "&_C_nomComplet=" + authStore.username);
                            
                                     if (user == -1) {
                                         Toast.show({

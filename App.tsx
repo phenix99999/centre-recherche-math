@@ -21,7 +21,9 @@ export default function App() {
 
     const [routeName, setRouteName] = React.useState<"Login" | "Logout">("Logout");
     //const [fontReady, setFontReady] = React.useState<boolean>(false);
-
+    global.fmServer = "vhmsoft.com";
+    
+    
     React.useEffect(() => {
         const getRouteName = async () => {
             const routeName = await getNavigationState();

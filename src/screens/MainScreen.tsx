@@ -57,7 +57,7 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
     async function getRefreshData() {
         let username = SyncStorage.get('username');
         let password = SyncStorage.get('password');
-        let server = "vhmsoft.com";
+       
         let db = "vhmsoft";
         let layoutTemps = "mobile_TEMPS2";
 
@@ -66,7 +66,7 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
         let nbJourMois = (getDaysInMonth(timeStore.activeMonth, year).length);
         let fk_assignation = SyncStorage.get('user').pk_ID;
 
-        setFormatedData(await get(username, password, server, db, layoutTemps
+        setFormatedData(await get(username, password,global.fmServer, db, layoutTemps
             , "&fk_assignation=" + fk_assignation + "&flag_actif=1&StartDate=" + month + "/1/" + year + "..." + month + "/" + nbJourMois + "/" + year));
 
     }
@@ -87,7 +87,7 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
 
         let username = SyncStorage.get('username');
         let password = SyncStorage.get('password');
-        let server = "vhmsoft.com";
+    
         let db = "vhmsoft";
         let layoutTemps = "mobile_TEMPS2";
         selectDate(timeStore.selectedDate);
@@ -95,18 +95,16 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
         let year = timeStore.activeYear;
         let nbJourMois = (getDaysInMonth(timeStore.activeMonth, year).length);
 
-        
-        let fk_assignation = SyncStorage.get('user')?.pk_ID;
+        let fk_assignation = SyncStorage.get('user').pk_ID;
 
 
 
-        getDataOnDate(username, password, server, db, month, year, nbJourMois, timeStore.selectedDate);
+        getDataOnDate(username, password,  global.fmServer, db, month, year, nbJourMois, timeStore.selectedDate);
 
-        setData(username, password, server, db, month, year, nbJourMois, timeStore);
+        setData(username, password,  global.fmServer, db, month, year, nbJourMois, timeStore);
 
     }, []);
-    const crud = timeStore.resources.heure;
-    const heures = timeStore.selectedHeures;
+  
     let notEmptyDates = getNotEmptyDates(formatedData, "StartDate");
 
     return (
@@ -147,8 +145,8 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
                         style={{ alignSelf: "flex-end" }}
                         transparent
                         onPress={() => {
-                            crud.updateEditionMode("create");
-                            navigation.replace("TempsDetails");
+                            // crud.updateEditionMode("create");
+                            navigation.replace("TempsDetails",{editionMode: 'create'});
                         }}
                     >
                         <Text>+ Nouvelle entrée</Text>
@@ -172,9 +170,9 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
                         dataOnDate.map((record) => (
                             <TouchableOpacity
                                 onPress={() => {
-                                    crud.updateEditionMode("update");
+                                    // crud.updateEditionMode("update");
 
-                                    navigation.navigate("TempsDetails", { pk_ID: record.pk_ID});
+                                    navigation.navigate("TempsDetails", { pk_ID: record.pk_ID,editionMode: "update"});
                                 }}
                                 style={styles.item}
                                 key={record.pk_ID}

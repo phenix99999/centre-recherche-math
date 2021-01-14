@@ -19,7 +19,7 @@ export class RootStore {
 
   constructor() {
     this.authStore = new AuthStore(this);
-    this.api = new FilemakerClient('vhmsoft.com', 'vhmsoft_Lyes', this.authStore.getAuthHeader.bind(this.authStore))
+    // this.api = new FilemakerClient('vhmsoft.com', 'vhmsoft_Lyes', this.authStore.getAuthHeader.bind(this.authStore))
     this.timeStore = new TimeStore(this);
     hydrate('auth', this.authStore)
   }
