@@ -11,6 +11,7 @@ import LoginScreen from "../screens/LoginScreen";
 import WelcomeScreen from "../screens/WelcomeScreen";
 import MainScreen from "../screens/MainScreen";
 import Sidebar from "../components/Sidebar";
+import SyncStorage from 'sync-storage';
 import TempsDetailsScreen from "../screens/TempsDetailsScreen";
 // If you are not familiar with React Navigation, we recommend going through the
 // "Fundamentals" guide: https://reactnavigation.org/docs/getting-started
@@ -21,9 +22,14 @@ export default function Navigation({
     colorScheme: ColorSchemeName;
     initialRouteName: InitialRouteNames;
 }) {
+    let init = "Logout"
+    if(SyncStorage.get('connected')){
+        let init = "Login"
+    } 
+
     return (
         <NavigationContainer>
-            <RootNavigator initialRouteName={initialRouteName} />
+            <RootNavigator initialRouteName={init} />
         </NavigationContainer>
     );
 }

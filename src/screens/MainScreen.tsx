@@ -95,7 +95,8 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
         let year = timeStore.activeYear;
         let nbJourMois = (getDaysInMonth(timeStore.activeMonth, year).length);
 
-        let fk_assignation = SyncStorage.get('user').pk_ID;
+        
+        let fk_assignation = SyncStorage.get('user')?.pk_ID;
 
 
 
@@ -115,8 +116,6 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
                     <Button
                         transparent
                         onPress={() => {
-
-                
                             navigation.navigate("Logout");
                             setNavigationState("Logout");
                         }}
