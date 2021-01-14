@@ -51,6 +51,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
     const [formatedClients, setFormatedClients] = React.useState<Object>([]);
     const [record,setRecord] = React.useState<Object>({});
     const [formatedProjects, setFormatedProjects] = React.useState<Object>([]);
+    const [activityName, setActivityName] = React.useState<String>("");
 
 
     async function getAll(query=null){
@@ -65,8 +66,8 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
       
         setFormatedClients(await get(username, password, server, db, layoutClient));
         setFormatedProjects(await get(username, password, server, db, layoutProjet));
-        setFormatedActivities(await get(username, password, server, db, layoutActivite));
-
+ 
+   
     }
 
     async function getProjects(fk_client){
@@ -90,6 +91,20 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
     }
 
 
+    async function getActivityNameWithActivityId(fk_activites){
+        let username = SyncStorage.get('username');
+        let password = SyncStorage.get('password');
+        let server = "vhmsoft.com";
+        let db = "vhmsoft";
+        let layoutActivite = "mobile_ACTIVITES2";
+        console.log(fk_activites);
+        let activity = await get(username, password, server, db, layoutActivite,"&pk_ID=" + fk_activites);
+
+        setActivityName(activity[0].Nom);
+    }
+
+
+
     React.useEffect(() => {
 
         let username = SyncStorage.get('username');
@@ -110,8 +125,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
             if(editionMode == "update"){
        
                 let theRecord = (await get(username, password, server, db, layoutTemps,"&pk_ID="+pk_ID));
-                console.log("The record ");
-                console.log(theRecord);
+      
                 if(theRecord[0].Flag_termine == 1){
                     initialValueCompleteJob = 0;
                 } else if(theRecord[0].Flag_termine == 0){
@@ -119,6 +133,9 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                 } else{
                     initialValueCompleteJob = -1;
                 }
+
+                getActivityNameWithActivityId(theRecord[0].fk_activites);
+                
                 console.log("Initial value complete job " + initialValueCompleteJob);
                 setRecord(theRecord[0]);
             }
@@ -127,13 +144,14 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
         const setData = async (username,password,server,db,layoutClient,layoutProjet,layoutActivite) => {
             setFormatedClients(await get(username, password, server, db, layoutClient));
             setFormatedProjects(await get(username, password, server, db, layoutProjet));
-            setFormatedActivities(await get(username, password, server, db, layoutActivite));
+            // setFormatedActivities(await get(username, password, server, db, layoutActivite));
         };
     
 
         setData(username,password,server,db,layoutClient,layoutProjet,layoutActivite);
-  
-        setDataToUpdate(pk_ID);
+        if(editionMode == "update"){
+            setDataToUpdate(pk_ID);
+        }
 
         // if (editionMode === "update") {
         //     if (crud.shownValue("Flag_termine").localeCompare("0") == 0) {
@@ -154,17 +172,17 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
      let fk_assignation = SyncStorage.get('user').pk_ID;
      let fk_client = record.fk_client;
      let fk_projet = record.fk_projet;
-     let Minutes  = record.Minutes;
-     let Minutes_planifie = record.Minutes_planifie;
+     let Minutes  = record.Minutes || "";
+     let Minutes_planifie = record.Minutes_planifie || "";
      
-     let AM_PM = record.AM_PM;
-     let fk_activites = record.fk_activites;
+     let AM_PM = record.AM_PM || "";
+     let fk_activites = record.fk_activites || "";
      let flag_actif = deleteVar == true ? 0 : 1;
-     let Description = record.Description;
-     let Flag_termine = record.Flag_termine;
-     let Minutes_restantes = record.Minutes_restantes;
-     let Minutes_restantes_tache = record.Minutes_restantes_tache;
-
+     let Description = record.Description || "";
+     let Flag_termine = record.Flag_termine || "";
+     let Minutes_restantes = record.Minutes_restantes || "";
+     let Minutes_restantes_tache = record.Minutes_restantes_tache || "";
+ 
      return "&StartDate=" + StartDate + "&fk_assignation=" + fk_assignation +"&fk_client=" + fk_client +"&fk_projet=" + fk_projet
      + "&Minutes="+Minutes+"&Minutes_planifie="+Minutes_planifie+"&AM_PM="+AM_PM+"&fk_activites="+fk_activites+"&flag_actif="+flag_actif+"&Description="+Description+"&Flag_termine=" + Flag_termine + "&Minutes_restantes=" + Minutes_restantes + "&Minutes_restantes_tache="+Minutes_restantes_tache;
 
@@ -177,17 +195,17 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
 
         if(!record.fk_client || !record.fk_projet || !record.fk_activites ){
             alert("Veuillez remplir le client,projet et activites s.v.p");
-        }
-         let username = SyncStorage.get('username');
-         let password = SyncStorage.get('password');
-         
-         let server = "vhmsoft.com";
-         let db = "vhmsoft";
-        
-         let layoutTemps = "mobile_TEMPS2";
- 
-        await add(username,password,server,db,layoutTemps,addAndUpdateQuery());
-         
+        }else{
+            let username = SyncStorage.get('username');
+            let password = SyncStorage.get('password');
+            
+            let server = "vhmsoft.com";
+            let db = "vhmsoft";
+           
+            let layoutTemps = "mobile_TEMPS2";
+            addAndUpdateQuery();
+           await add(username,password,server,db,layoutTemps,addAndUpdateQuery());
+        } 
     }
 
     async function update(){
@@ -259,12 +277,12 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                     {editionMode == "update" ? 
                     <Button
                     transparent
-                    onPress={async () => {
+                    onPress={async (initialValueCompleteJob) => {
                        
                        
                         update();
 
-                        if(record.Flag_termine == 0){
+                        if(record.Flag_termine == 0 && initialValueCompleteJob == -1){
                             let scriptName = "replanification";
                             let scriptParam = record.pk_ID;
                             let username = SyncStorage.get('username');
@@ -278,26 +296,6 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                         }
                          navigation.replace('Main');
 
-
-                        // const scriptOptions = {
-                        //     script:'replanification',
-                        //     params:[crud.shownValue("pk_ID")]
-                        // }
-                        // crud.updateValue("AM_PM", timeStore.objTemp.AM_PM, true);
-                        // await crud.save();
-                        // await timeStore.fetchHeures();
-
-
-                        // crud.updateValue("flag_actif",0);
-                        // if(crud.shownValue("Flag_termine") === "0"){
-                        //     await timeStore.create(scriptOptions);
-                        // }
-            
-
-                        // await timeStore.fetchHeures();
-              
-                   
-
                     }}
                 >
                     <Text>Modifier</Text>
@@ -308,9 +306,6 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                 onPress={() => {
                     create();
                     navigation.replace('Main');
-                    // timeStore.create();
-                    // timeStore.fetchHeures();
-                    // navigation.goBack();
                 }}
             >
                 <Text>Créer</Text>
@@ -370,6 +365,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                         onChange={(value) => {
                             setRecord({...record,"fk_projet":value});
                             getActivities(value);
+
                         }}
                         placeholder={"Projets"}
                     />
@@ -382,7 +378,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                <Text>
                Activités  :&nbsp;&nbsp;&nbsp;&nbsp;  
    
-             {formatedActivities.find(activity => activity.pk_ID == record.fk_activites)?.Nom}
+             {activityName}
                        </Text>
                 : 
 
@@ -431,7 +427,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                 <View style={styles.inputWrapper}>
                     <Text>Nombre d'heures planifiées:</Text>
                     {editionMode == "update" ? 
-                    <Text> {"ASDF"}</Text>
+                    <Text> {record.Minutes_planifie}</Text>
                     : 
                     <Input
                     style={styles.inputBorder}
