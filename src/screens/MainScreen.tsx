@@ -25,8 +25,6 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
     const [notEmptyDate, setNotEmptyDate] = React.useState<Object>([]);
     const [dataOnDate, setDataOnDate] = React.useState<Object>([]);
 
-
-
     function selectDate(date) {
         let dateObj = new Date(date);
         let month = ("0" + parseInt(dateObj.getMonth() + 1)).slice(-2);
@@ -58,7 +56,7 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
         let username = SyncStorage.get('username');
         let password = SyncStorage.get('password');
        
-        let db = "vhmsoft";
+       
         let layoutTemps = "mobile_TEMPS2";
 
         let month = timeStore.activeMonth + 1;
@@ -66,7 +64,7 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
         let nbJourMois = (getDaysInMonth(timeStore.activeMonth, year).length);
         let fk_assignation = SyncStorage.get('user').pk_ID;
 
-        setFormatedData(await get(username, password,global.fmServer, db, layoutTemps
+        setFormatedData(await get(username, password,global.fmServer,  global.fmDatabase, layoutTemps
             , "&fk_assignation=" + fk_assignation + "&flag_actif=1&StartDate=" + month + "/1/" + year + "..." + month + "/" + nbJourMois + "/" + year));
 
     }
@@ -99,9 +97,9 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
 
 
 
-        getDataOnDate(username, password,  global.fmServer, db, month, year, nbJourMois, timeStore.selectedDate);
+        getDataOnDate(username, password,  global.fmServer,  global.fmDatabase, month, year, nbJourMois, timeStore.selectedDate);
 
-        setData(username, password,  global.fmServer, db, month, year, nbJourMois, timeStore);
+        setData(username, password,  global.fmServer,  global.fmDatabase, month, year, nbJourMois, timeStore);
 
     }, []);
   

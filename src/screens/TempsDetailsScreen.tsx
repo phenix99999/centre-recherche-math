@@ -62,11 +62,10 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
     async function getProjects(fk_client){
         let username = SyncStorage.get('username');
         let password = SyncStorage.get('password');
- 
-        let db = "vhmsoft";
+  
         let layoutProjet = "mobile_PROJETS2";
 
-        setFormatedProjects(await get(username, password,   global.fmServer, db, layoutProjet,"&fk_client=" + fk_client));
+        setFormatedProjects(await get(username, password,   global.fmServer, global.fmDatabase, layoutProjet,"&fk_client=" + fk_client));
     }
 
     async function getActivities(fk_projet){
@@ -76,7 +75,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
         let db = "vhmsoft";
         let layoutActivite = "mobile_ACTIVITES2";
 
-        setFormatedActivities(await get(username, password,   global.fmServer, db, layoutActivite,"&fk_projet=" + fk_projet));
+        setFormatedActivities(await get(username, password,   global.fmServer,  global.fmDatabase, layoutActivite,"&fk_projet=" + fk_projet));
     }
 
 
@@ -87,7 +86,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
         let db = "vhmsoft";
         let layoutActivite = "mobile_ACTIVITES2";
         console.log(fk_activites);
-        let activity = await get(username, password,   global.fmServer, db, layoutActivite,"&pk_ID=" + fk_activites);
+        let activity = await get(username, password,   global.fmServer,  global.fmDatabase, layoutActivite,"&pk_ID=" + fk_activites);
         setActivity(activity[0]);
         setActivityName(activity[0].Nom);
     }
@@ -100,7 +99,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
         let db = "vhmsoft";
         let layoutActivite = "mobile_PROJETS2";
   
-        let project = await get(username, password,   global.fmServer, db, layoutActivite,"&pk_ID=" + fk_project);
+        let project = await get(username, password,   global.fmServer,  global.fmDatabase, layoutActivite,"&pk_ID=" + fk_project);
         setProject(project[0]);
         setProjectName(project[0].Nom);
     }
@@ -128,7 +127,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
       
             if(editionMode == "update"){
        
-                let theRecord = (await get(username, password, global.fmServer, db, layoutTemps,"&pk_ID="+pk_ID));
+                let theRecord = (await get(username, password, global.fmServer, global.fmDatabase, layoutTemps,"&pk_ID="+pk_ID));
                  if(theRecord[0].Flag_termine.localeCompare("1") == 0){
                     setInitialeValueFlagComplet("0");
                 } else if(theRecord[0].Flag_termine.localeCompare("0") == 0){
@@ -151,7 +150,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
         };
     
 
-        setData(username,password,  global.fmServer,db,layoutClient,layoutProjet,layoutActivite);
+        setData(username,password,  global.fmServer, global.fmDatabase,layoutClient,layoutProjet,layoutActivite);
         if(editionMode == "update"){
              setDataToUpdate(pk_ID);
         }
@@ -223,7 +222,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                   let db = "vhmsoft";
         
          let layoutTemps = "mobile_TEMPS2";
-        await edit(username,password,global.fmServer,db,layoutTemps,record['record-id'],addAndUpdateQuery());
+        await edit(username,password,global.fmServer,global.fmDatabase,layoutTemps,record['record-id'],addAndUpdateQuery());
     }
  
     const computeColor = (activite?: Record<Activite>) => {
@@ -327,8 +326,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                 Clients  :&nbsp;&nbsp;&nbsp;&nbsp;
                
                 {formatedClients.find(client => client.pk_ID == record.fk_client)?.Nom}
-                     {/* {timeStore.resources.projet.records.find(record => record.fields.pk_ID == crud.shownValue("fk_projet"))?.fields.Nom} */}
-
+            
                             </Text>
                        
                 
@@ -356,7 +354,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                Projets  :&nbsp;&nbsp;&nbsp;&nbsp;
      
                {formatedProjects.find(project => project.pk_ID == record.fk_projet)?.Nom}
-             {/* {timeStore.resources.projet.records.find(record => record.fields.pk_ID == crud.shownValue("fk_projet"))?.fields.Nom} */}
+
                        </Text>
                 : 
 

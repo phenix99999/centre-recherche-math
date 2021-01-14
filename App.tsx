@@ -22,7 +22,7 @@ export default function App() {
     const [routeName, setRouteName] = React.useState<"Login" | "Logout">("Logout");
     //const [fontReady, setFontReady] = React.useState<boolean>(false);
     global.fmServer = "vhmsoft.com";
-    
+    global.fmDatabase = "vhmsoft";
     
     React.useEffect(() => {
         const getRouteName = async () => {
