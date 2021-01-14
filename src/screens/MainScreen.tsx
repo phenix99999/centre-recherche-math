@@ -157,7 +157,7 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
                 style={styles.scrollview}
                 refreshControl={
                     <RefreshControl
-                        refreshing={timeStore.resources.heure.isFetching}
+                        refreshing={false}
                         onRefresh={() => {
 
                         }}

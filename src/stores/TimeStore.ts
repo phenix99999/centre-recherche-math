@@ -17,7 +17,7 @@ interface Resources {
 export default class TransportStore {
 
     root: RootStore;
-    @observable resources: Resources;
+  
     @observable activeMonth: number;
     @observable activeYear: number;
     @observable selectedDate: Date;
@@ -26,14 +26,6 @@ export default class TransportStore {
 
     constructor(rootStore: RootStore) {
         this.root = rootStore;
-        this.resources = {
-            replanification: new FMResource<Heure>('mobile_TEMPS', rootStore.api, this.handleError),
-            heure: new FMResource<Heure>('mobile_TEMPS', rootStore.api, this.handleError),
-            client: new FMResource<Client>('mobile_CLIENTS', rootStore.api, this.handleError),
-            projet: new FMResource<Projet>('mobile_PROJETS', rootStore.api, this.handleError),
-            account: new FMResource<Account>('mobile_ACCOUNT', rootStore.api, this.handleError),
-            activite: new FMResource<Activite>('mobile_ACTIVITES', rootStore.api, this.handleError),
-        }
         const today = new Date()
         this.activeMonth = today.getMonth()
         this.activeYear = today.getFullYear()

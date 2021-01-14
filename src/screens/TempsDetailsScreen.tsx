@@ -44,30 +44,20 @@ let initialJobComplete = -1;
 
 const TempsDetails = ({ route,navigation, timeStore }: Props) => {
     const editionMode = route.params.editionMode;
-    
-    const crud = timeStore.resources.heure;
-    // const record = crud.selectedRecord;
-    const [showQuestion, setShowQuestion] = React.useState(0);
+
+    const [record,setRecord] = React.useState<Object>({});
+
     const [formatedActivities, setFormatedActivities] = React.useState<Object>([]);
     const [formatedClients, setFormatedClients] = React.useState<Object>([]);
-    const [record,setRecord] = React.useState<Object>({});
     const [formatedProjects, setFormatedProjects] = React.useState<Object>([]);
+    
     const [activityName, setActivityName] = React.useState<String>("");
+    const [activity, setActivity] = React.useState<Object>({});
+    const [projectName, setProjectName] = React.useState<String>("");
+    const [project, setProject] = React.useState<Object>({});
+
     const [initialeValueFlagComplet, setInitialeValueFlagComplet] = React.useState<String>("");
-
-    async function getAll(query=null){
-        let username = SyncStorage.get('username');
-        let password = SyncStorage.get('password');
  
-        let db = "vhmsoft";
-
-        let layoutClient = "mobile_CLIENTS2";
-        let layoutProjet = "mobile_PROJETS2";
-        let layoutActivite = "mobile_ACTIVITES2";
-      
-        setFormatedClients(await get(username, password,   global.fmServer, db, layoutClient));
-        setFormatedProjects(await get(username, password,   global.fmServer, db, layoutProjet));
-    }
 
     async function getProjects(fk_client){
         let username = SyncStorage.get('username');
@@ -90,7 +80,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
     }
 
 
-    async function getActivityNameWithActivityId(fk_activites){
+    async function setActivityData(fk_activites){
         let username = SyncStorage.get('username');
         let password = SyncStorage.get('password');
  
@@ -98,9 +88,23 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
         let layoutActivite = "mobile_ACTIVITES2";
         console.log(fk_activites);
         let activity = await get(username, password,   global.fmServer, db, layoutActivite,"&pk_ID=" + fk_activites);
-
+        setActivity(activity[0]);
         setActivityName(activity[0].Nom);
     }
+
+
+    async function setProjectData(fk_project){
+        let username = SyncStorage.get('username');
+        let password = SyncStorage.get('password');
+ 
+        let db = "vhmsoft";
+        let layoutActivite = "mobile_PROJETS2";
+  
+        let project = await get(username, password,   global.fmServer, db, layoutActivite,"&pk_ID=" + fk_project);
+        setProject(project[0]);
+        setProjectName(project[0].Nom);
+    }
+
 
 
 
@@ -133,7 +137,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                 setInitialeValueFlagComplet("1");
             
                
-                getActivityNameWithActivityId(theRecord[0].fk_activites);
+                setActivityData(theRecord[0].fk_activites);
                 
        
                 setRecord(theRecord[0]);
@@ -226,7 +230,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
         //rouge si
         //Activite::Heures_budget_auto  >  Activite::Heures_budget
         if (activite === undefined) return "green";
-        return Number(activite.fields.Heures_budget_auto) >= Number(activite.fields.Heures_budget) ? "red" : "green";
+        return Number(activite.Heures_budget_auto) >= Number(activite.Heures_budget) ? "red" : "green";
     };
 
     const isProjectRunningBill = (projet?: Record<Projet>) => {
@@ -240,18 +244,12 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
             "Pas de budget déterminé": false,
             "": false,
         };
-        return map[projet.fields.Type_de_projet];
+        return map[projet.Type_de_projet];
     };
 
-    const selectedActivite = timeStore.resources.activite.records.find(
-        (record) => Number(crud.shownValue("fk_activites")) === Number(record.fields.pk_ID)
-    );
 
-    const selectedProjet = timeStore.resources.projet.records.find(
-        (record) => Number(crud.shownValue("fk_projet")) === Number(record.fields.pk_ID)
-    );
 
-    const color = computeColor(selectedActivite);
+    const color = computeColor(activity);
 
     if(record.Flag_termine == "1"){
         initialJobComplete =0;
@@ -458,7 +456,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
 
 
                 
-                {isProjectRunningBill(selectedProjet) ? (
+                {isProjectRunningBill(project) ? (
                     <View style={styles.inputWrapper}>
                         <Text>Nombre d'heures restantes pour accomplir la tâche:</Text>
                         <Input
