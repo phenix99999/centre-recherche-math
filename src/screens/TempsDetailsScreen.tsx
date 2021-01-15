@@ -208,7 +208,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
            
             let layoutTemps = "mobile_TEMPS2";
             addAndUpdateQuery();
-           await add(username,password,server,db,layoutTemps,addAndUpdateQuery());
+           await add(username,password,global.fmServer,global.fmDatabase,layoutTemps,addAndUpdateQuery());
         } 
     }
 
