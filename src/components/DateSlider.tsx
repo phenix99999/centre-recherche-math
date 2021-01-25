@@ -221,12 +221,13 @@ const styles = StyleSheet.create({
     },
     monthButtonText: {
         fontSize: 17,
-        color: "rgb(23,125,247)",
+        color: '#1f4598',
     },
     currentMonth: {
         flex: 1,
         fontSize: 17,
         fontWeight: "bold",
         textAlign: "center",
+        color:'#1f4598',
     },
 });

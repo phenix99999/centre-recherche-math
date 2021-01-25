@@ -73,10 +73,9 @@ const LoginScreen = ({ navigation, authStore }: Props) => {
                             </Form>
                             <Button
                                 onPress={async () => {
-                                 
-                                    let db = "vhmsoft_Lyes";
-                                    let layout = "mobile_ACCOUNT";
-                                    let user = await authentification(authStore.username, authStore.password,global.fmServer, db, layout, "&_C_nomComplet=" + authStore.username);
+                                  
+                                    let layout = "mobile_ACCOUNT2";
+                                    let user = await authentification(authStore.username, authStore.password,global.fmServer, global.fmDatabase, layout, "&_C_nomComplet=" + authStore.username);
                            
                                     if (user == -1) {
                                         Toast.show({
@@ -92,7 +91,7 @@ const LoginScreen = ({ navigation, authStore }: Props) => {
                                         SyncStorage.set('password',authStore.password);
                                         navigation.goBack();
                                         authStore.password = "";
-                                        navigation.navigate("Login");
+                                        navigation.navigate("Main");
                                     }  
                                 }}
                                 style={[styles.button]}

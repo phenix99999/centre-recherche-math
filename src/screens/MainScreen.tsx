@@ -7,7 +7,7 @@ import TimeStore from "../stores/TimeStore";
 import { MainStackParamList } from "../types";
 import DateSlider from "../components/DateSlider";
 import { ScrollView, TouchableOpacity } from "react-native";
-import { Container, Header, Button, Left, Icon, Text } from "native-base";
+import { Container, Header, Button, Left, Icon, Text,Right,Body } from "native-base";
 import { setNavigationState } from "../utils/PersistState";
 import { dateToFrench, getNotEmptyDates, getDaysInMonth } from "../utils/date";
 import { get, add } from '../utils/connectorFileMaker';
@@ -109,17 +109,31 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
         <Container style={{ flex: 1 }}>
             <Header>
                 <Left>
-                    <Button
-                        transparent
-                        onPress={() => {
-                            navigation.navigate("Logout");
-                            setNavigationState("Logout");
-                        }}
-                    >
-                        <Icon name="logout" type={"AntDesign"} style={{ fontSize: 14, marginLeft: 2 }} />
-                        <Text style={{ fontSize: 14 }}>Déconnexion</Text>
-                    </Button>
+                           <Button
+                            transparent
+                            onPress={async () => {
+                                navigation.goBack();
+
+                            }}
+                        >
+
+                            <Icon name="back" type="AntDesign" style={{ fontSize: 30, marginLeft: 2, color: '#1f4598' }} />
+                        </Button>
+                
                 </Left>
+                <Right>
+
+<Button
+  transparent
+  onPress={async () => {
+    navigation.openDrawer();
+
+  }}
+>
+  <Icon name="menu" type={"MaterialIcons"} style={{ fontSize: 30, marginLeft: 2, color: '#1f4598' }} />
+</Button>
+</Right>
+
             </Header>
             <DateSlider
                 onViewUpdate={(date: { month: number; year: number }) => {
@@ -136,7 +150,7 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
             />
             <View style={{ maxHeight: 40, flex: 1, flexDirection: "row", paddingLeft: 20 }}>
                 <View style={{ height: 50, flex: 1, justifyContent: "center" }}>
-                    <Text style={{ fontWeight: "bold" }}>{dateToFrench(timeStore.selectedDate)}</Text>
+                    <Text style={{ fontWeight: "bold",color:'#1f4598' }}>{dateToFrench(timeStore.selectedDate)}</Text>
                 </View>
                 <View style={{ height: 50, flex: 1, justifyContent: "center" }}>
                     <Button
@@ -147,7 +161,7 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
                             navigation.replace("TempsDetails",{editionMode: 'create'});
                         }}
                     >
-                        <Text>+ Nouvelle entrée</Text>
+                        <Text style={{color:'#1f4598'}}>+ Nouvelle entrée</Text>
                     </Button>
                 </View>
             </View>
