@@ -28,11 +28,6 @@ class PageIntro extends Component {
 
   constructor(props) {
     super(props);
-    SyncStorage.remove("connected");
-    SyncStorage.remove("user");
-    SyncStorage.remove('username');
-    SyncStorage.remove('password');
-    
   }
 
   render() {

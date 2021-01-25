@@ -41,11 +41,11 @@ export function formatData(records) {
             }
 
             formatedDataTemp[indexRecord][records[indexRecord].children[indexField].attributes.name] = records[indexRecord].children[indexField].children[0].value;
-            formatedDataTemp[indexRecord]['record-id'] =   records[indexRecord]['attributes']['record-id'];
-      
+            formatedDataTemp[indexRecord]['record-id'] = records[indexRecord]['attributes']['record-id'];
+
         }
     }
- 
+
     return formatedDataTemp;
 }
 
@@ -55,12 +55,14 @@ export async function authentification(username, password, server, db, layout, q
     return data;
 }
 
-export async function add(username,password,server,db,layout,query) {
+export async function add(username, password, server, db, layout, query) {
     var XMLParser = require('react-xml-parser');
     const authHeader = 'Basic ' + base64.encode(`${username}:${password}`);
 
     // https://vhmsoft.com/fmi/xml/fmresultset.xml?-db=vhmsoft_Lyes&-lay=mobile_TEMPS&AM_PM=PM&-new
-    let url = "https://" + server + "/fmi/xml/fmresultset.xml?-db=" + db + "&-lay=" + layout+query+"&-new";
+    let url = "https://" + server + "/fmi/xml/fmresultset.xml?-db=" + db + "&-lay=" + layout + query + "&-new";
+
+    console.log("Inside the thing ");
     console.log(url);
     await axios.post(url, {}, {
         headers: { 'Authorization': authHeader }
@@ -70,19 +72,19 @@ export async function add(username,password,server,db,layout,query) {
     }).catch(function (error) {
         alert("ERROR");
         return false;
-    });  
+    });
 
 }
 
 
-export async function execScript(username,password,server,db,layout,scriptName,scriptParam) {
+export async function execScript(username, password, server, db, layout, scriptName, scriptParam) {
     const authHeader = 'Basic ' + base64.encode(`${username}:${password}`);
     var XMLParser = require('react-xml-parser');
- 
-    let   url = "https://" + server + "/fmi/xml/fmresultset.xml?-findall&-db=" + db + "&-lay=" + layout +"&-script=" + scriptName
-        +"&-script.param="+scriptParam;
-    
-        console.log(url);
+
+    let url = "https://" + server + "/fmi/xml/fmresultset.xml?-findall&-db=" + db + "&-lay=" + layout + "&-script=" + scriptName
+        + "&-script.param=" + scriptParam;
+
+    console.log(url);
     let errorAuth = false;
 
     await axios.post(url, {}, {
@@ -92,21 +94,23 @@ export async function execScript(username,password,server,db,layout,scriptName,s
     }).catch(function (error) {
         alert("ERROR");
         errorAuth = true;
-    });  
+    });
 
-    alert("Script executer!");
+
 
 }
 
 
 
-export async function edit(username,password,server,db,layout,recid,query) {
+export async function edit(username, password, server, db, layout, recid, query) {
     var XMLParser = require('react-xml-parser');
     const authHeader = 'Basic ' + base64.encode(`${username}:${password}`);
 
     // https://vhmsoft.com/fmi/xml/fmresultset.xml?-db=vhmsoft_Lyes&-lay=mobile_TEMPS&AM_PM=PM&-new
-    let url = "https://" + server + "/fmi/xml/fmresultset.xml?-db=" + db + "&-lay=" +  layout+ "&-recid=" + recid + query+"&-edit";
+    let url = "https://" + server + "/fmi/xml/fmresultset.xml?-db=" + db + "&-lay=" + layout + "&-recid=" + recid + query + "&-edit";
+    console.log("Inside the thing ");
     console.log(url);
+
     await axios.post(url, {}, {
         headers: { 'Authorization': authHeader }
     }).then(function (response) {
@@ -115,7 +119,7 @@ export async function edit(username,password,server,db,layout,recid,query) {
     }).catch(function (error) {
         alert("ERROR");
         return false;
-    });  
+    });
 
 }
 
@@ -137,7 +141,7 @@ export async function get(username, password, server, db, layout, query = null) 
         data = new XMLParser().parseFromString(response.data);
     }).catch(function (error) {
         errorAuth = true;
-    });  
+    });
 
     if (errorAuth) {
         return -1;

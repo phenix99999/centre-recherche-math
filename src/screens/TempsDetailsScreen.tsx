@@ -21,7 +21,7 @@ import SyncStorage from 'sync-storage';
 import { dateToFrench, getNotEmptyDates, getDaysInMonth,dateToFMDate } from "../utils/date";
 
 import * as React from "react";
-import { StyleSheet, unstable_batchedUpdates, View } from "react-native";
+import { Alert, StyleSheet, unstable_batchedUpdates, View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { CustomPickerRow, DetachedCustomPickerRow } from "../components/CustomPicker";
 import { Record, Client, Activite, Projet, Type_de_projet } from "../stores/FMObjectTypes";
@@ -40,7 +40,27 @@ var radio_props = [
     { label: 'Oui', value: 1 },
     { label: 'Non', value: 0 },
 ];
+
+let formatedTaches = [
+"Analyse",
+"Gestion de projet",
+"Programmation",
+"Support",
+"Rencontre",
+"Appel téléphonique",
+"Améliorations continues",
+"Suivis",
+"Rédaction",
+"Pilotage",
+"Recherche",
+"Design",
+];
 let initialJobComplete = -1;
+
+let initialFacturable = -1;
+
+let initialRd = -1;
+
 
 const TempsDetails = ({ route,navigation, timeStore }: Props) => {
     const editionMode = route.params.editionMode;
@@ -50,7 +70,8 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
     const [formatedActivities, setFormatedActivities] = React.useState<Object>([]);
     const [formatedClients, setFormatedClients] = React.useState<Object>([]);
     const [formatedProjects, setFormatedProjects] = React.useState<Object>([]);
-    
+
+    const [tache, setTache] = React.useState<String>("");
     const [activityName, setActivityName] = React.useState<String>("");
     const [activity, setActivity] = React.useState<Object>({});
     const [projectName, setProjectName] = React.useState<String>("");
@@ -181,13 +202,17 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
      let fk_activites = record.fk_activites || "";
      let flag_actif = deleteVar == true ? 0 : 1;
      let Description = record.Description || "";
-     let Flag_termine = record.Flag_termine;
+     let Flag_termine = record.Flag_termine || "";
         
+     let facturable = record.Flag_facturable || "";
+     let rd = record.flag_R_et_D;
+     let tache = record.Taches.length;
+ 
 
      let Minutes_restantes = record.Minutes_restantes || "";
      let Minutes_restantes_tache = record.Minutes_restantes_tache || "";
- 
-     return "&StartDate=" + StartDate + "&fk_assignation=" + fk_assignation +"&fk_client=" + fk_client +"&fk_projet=" + fk_projet
+    
+     return "&StartDate=" + StartDate + "&fk_assignation=" + fk_assignation +"&fk_client=" + fk_client +"&fk_projet=" + fk_projet+"&Taches=" + tache +"&Flag_facturable="+facturable+"&flag_R_et_D=" + rd
      + "&Minutes="+Minutes+"&Minutes_planifie="+Minutes_planifie+"&AM_PM="+AM_PM+"&fk_activites="+fk_activites+"&flag_actif="+flag_actif+"&Description="+Description+"&Flag_termine=" + Flag_termine + "&Minutes_restantes=" + Minutes_restantes + "&Minutes_restantes_tache="+Minutes_restantes_tache;
 
     }
@@ -196,6 +221,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
 
     async function create(){
         //  POUR AJOUTER
+     
 
         if(!record.fk_client || !record.fk_projet || !record.fk_activites ){
             alert("Veuillez remplir le client,projet et activites s.v.p");
@@ -207,8 +233,9 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
             let db = "vhmsoft";
            
             let layoutTemps = "mobile_TEMPS2";
-            addAndUpdateQuery();
+            console.log(addAndUpdateQuery());
            await add(username,password,global.fmServer,global.fmDatabase,layoutTemps,addAndUpdateQuery());
+           navigation.replace('Main');
         } 
     }
 
@@ -222,7 +249,13 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                   let db = "vhmsoft";
         
          let layoutTemps = "mobile_TEMPS2";
-        await edit(username,password,global.fmServer,global.fmDatabase,layoutTemps,record['record-id'],addAndUpdateQuery());
+        if(record.Minutes_restantes_tache.length == 0  && record.Flag_termine == 0){
+            alert("Veuillez entrez une description de ce qui reste à accomplir s.v.p.");
+        } else {
+            await edit(username,password,global.fmServer,global.fmDatabase,layoutTemps,record['record-id'],addAndUpdateQuery());
+            navigation.replace('Main');
+        }
+
     }
  
     const computeColor = (activite?: Record<Activite>) => {
@@ -255,6 +288,21 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
     } else if(record.Flag_termine == "0"){
         initialJobComplete = 1;
     }
+ 
+    if(record.Flag_facturable == "1"){
+        initialFacturable = 0;
+    } else if(record.Flag_facturable == "0"){
+        initialFacturable = 1;
+    }
+
+
+    if(record.flag_R_et_D == "1"){
+        initialRd = 0;
+    } else if(record.flag_R_et_D == "0"){
+        initialRd = 1;
+    }
+
+
     return (
     
 
@@ -296,7 +344,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
 
                             execScript(username,password,server,db,layoutClient,scriptName,scriptParam);
                         }
-                         navigation.replace('Main');
+                        
 
                     }}
                 >
@@ -307,7 +355,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                 transparent
                 onPress={() => {
                     create();
-                    navigation.replace('Main');
+            
                 }}
             >
                 <Text>Créer</Text>
@@ -395,9 +443,32 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
             />
                  }
 
-
-    
+                 
                 </View>
+
+                <View style={styles.inputWrapper}>
+ 
+                    {editionMode == "update" ?
+                        <Text>
+                            Tâches  :&nbsp;&nbsp;&nbsp;&nbsp;
+
+                        {record.Taches}
+                        </Text>
+                        :
+
+                <DetachedCustomPickerRow
+                        values={formatedTaches}
+                        label={(tache: Record<Activite>) => tache.name}
+                        selectedValue={record.Taches}
+                        onChange={(value) => {
+                            setRecord({ ...record, "Taches": value })
+                        }}
+                        placeholder={"Tâches"}
+                    />
+                    }
+
+                </View>
+
                 <View style={styles.inputWrapper}>
               
                     <DetachedCustomPickerRow
@@ -467,6 +538,61 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                         />
                     </View>
                 ) : null}
+
+
+               
+                        <View style={styles.inputWrapper}>
+                        <Text>Est-ce que c'est facturable?</Text>
+                        <View style={{ flexDirection: 'row' }}>
+                            
+                            
+                            <RadioForm
+                            radio_props={radio_props}
+                            initial={initialFacturable}
+                            formHorizontal={true}
+                            labelHorizontal={true}
+                            style={{ left: 10 }}
+                            radioStyle={{ paddingRight: 20 }}
+                            onPress={(value) => {
+                                setRecord({...record,"Flag_facturable":Number(value)})
+                               
+                            }
+                            }
+                        />
+                        
+                            
+                        </View>
+
+                        </View>
+
+
+                        <View style={styles.inputWrapper}>
+                        <Text>Est-ce que c'est du R&D ?</Text>
+                        <View style={{ flexDirection: 'row' }}>
+                            
+                            
+                            <RadioForm
+                            radio_props={radio_props}
+                            initial={initialRd}
+                            formHorizontal={true}
+                            labelHorizontal={true}
+                            style={{ left: 10 }}
+                            radioStyle={{ paddingRight: 20 }}
+                            onPress={(value) => {
+                                setRecord({...record,"flag_R_et_D":Number(value)})                               
+                            }
+                            }
+                        />
+                        
+                            
+                        </View>
+
+                        </View>
+ 
+
+ 
+                        
+
                         {editionMode == "update" ? 
                         <View style={styles.inputWrapper}>
                         <Text>Est-ce que ça complète la tâche?(Oui/Non)</Text>
