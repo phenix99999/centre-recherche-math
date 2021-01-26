@@ -75,19 +75,19 @@ class AccueilScreen extends Component {
 
                 <View>
                            
-                        <View style={{alignItems:'center',marginTop:5}}>
+                        <View style={{marginleft:30,marginTop:25}}>
 
-                          <Text style={{fontWeight:'bold',fontSize:24,textDecorationLine: 'underline'}}>PROPOSITIONS ET ESTIMATION</Text>
-                          </View> 
-                            <Text style={{fontSize:16,marginTop:5,fontSize:20,marginLeft:15,marginRight:15}}>Nous vous proposons des solutions adaptées à vos besoins et à votre budget pour donner vie à tous vos projets.</Text>
-                            <Text style={{fontWeight:'bold',fontSize:24,marginTop:15,marginLeft:5,marginRight:5,textDecorationLine: 'underline'}}>DÉVELOPPEMENT SUR MESURE</Text>
-                            <Text style={{marginTop:8,fontSize:20,marginLeft:15,marginRight:15}}>Nous développons des solutions personnalisées et des applications sur mesure répondant à vos critères et vos enjeux de productivité.</Text>
-                           <View style={{alignItems:'center',marginTop:15}}>
-                           <Text style={{fontWeight:'bold',fontSize:24,marginLeft:5,marginRight:5,textDecorationLine: 'underline'}}>SUPPORT 7 JOURS / 24H</Text>
-                           </View>
+                          <Text style={{marginLeft:20,fontWeight:'bold',fontSize:24,textDecorationLine: 'underline'}}>PROPOSITIONS ET ESTIMATION</Text>
+                        
+                            <Text style={{marginLeft:20,fontSize:16,marginTop:15,fontSize:20}}>Nous vous proposons des solutions adaptées à vos besoins et à votre budget pour donner vie à tous vos projets.</Text>
+                            <Text style={{marginLeft:20,fontWeight:'bold',fontSize:24,marginTop:15,textDecorationLine: 'underline'}}>DÉVELOPPEMENT SUR MESURE</Text>
+                            <Text style={{marginLeft:20,marginTop:8,fontSize:20,marginTop:15,marginRight:15}}>Nous développons des solutions personnalisées et des applications sur mesure répondant à vos critères et vos enjeux de productivité.</Text>
                            
-                            <Text style={{marginTop:6,fontSize:20,marginLeft:15,marginRight:15}}>Nous vous accompagnons bien au-delà de l'acquisition de votre nouveau système et nous vous offrons le support technique 7 jours par semaine, 24 heures sur 24, de façon à régler sur-le-champ tout problème ponctuel afin de faciliter le déploiement et l’adoption de notre solution.</Text>
-                            
+                           <Text style={{marginLeft:20,marginTop:10,fontWeight:'bold',fontSize:24,textDecorationLine: 'underline'}}>SUPPORT 7 JOURS / 24H</Text>
+                           
+                           
+                            <Text style={{marginTop:6,fontSize:20,marginLeft:20,marginTop:15,marginRight:15}}>Nous vous accompagnons bien au-delà de l'acquisition de votre nouveau système et nous vous offrons le support technique 7 jours par semaine, 24 heures sur 24, de façon à régler sur-le-champ tout problème ponctuel afin de faciliter le déploiement et l’adoption de notre solution.</Text>
+                        </View> 
                 </View>
 
         </ImageBackground>
