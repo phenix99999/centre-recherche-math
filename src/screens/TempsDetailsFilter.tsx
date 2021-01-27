@@ -52,13 +52,13 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
         let layoutActivite = "mobile_ACTIVITES2";
         let layoutTemps = "mobile_TEMPS2";
         let layoutAccount = "mobile_ACCOUNT2";
-        if (SyncStorage.get('filterProject')) {
-            setProject(SyncStorage.get('filterProject'));
-        }
-        if (SyncStorage.get('filterActivity')) {
-            setActivity(SyncStorage.get('filterActivity'));
+        // if (SyncStorage.get('filterProject')) {
+        //     setProject(SyncStorage.get('filterProject'));
+        // }
+        // if (SyncStorage.get('filterActivity')) {
+        //     setActivity(SyncStorage.get('filterActivity'));
 
-        }
+        // }
 
         const setData = async (username, password, server, db, layoutClient, layoutProjet, layoutActivite) => {
             // setFormatedClients(await get(username, password, server, db, layoutClient));
@@ -104,9 +104,10 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
 
                         }}
                     >
-                        <Icon name="filter" type={"AntDesign"} style={{ fontSize: 30, marginLeft: 2, color: '#1f4598' }} >
 
-                        </Icon>
+                        {SyncStorage.get('filterProject') && SyncStorage.get('filterProject') > 0 || SyncStorage.get('filterActivity') && SyncStorage.get('filterActivity') > 0 ?
+                            <Icon name="filter" type={"AntDesign"} style={{ fontSize: 30, marginLeft: 2, color: 'red' }} /> :
+                            <Icon name="filter" type={"AntDesign"} style={{ fontSize: 30, marginLeft: 2, color: '#1f4598' }} />}
                     </Button>
                 </Right>
             </Header>
@@ -149,7 +150,7 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
                 onPress={() => {
                     SyncStorage.set('filterProject', project);
                     SyncStorage.set('filterActivity', activity);
-                    navigation.goBack();
+                    navigation.replace(route.params.from);
 
                 }
                 }

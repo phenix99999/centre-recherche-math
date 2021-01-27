@@ -129,7 +129,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
 
 
     React.useEffect(() => {
-
+        alert(route.params.pk_ID);
         let username = SyncStorage.get('username');
         let password = SyncStorage.get('password');
   
@@ -665,7 +665,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                            
                             let layoutTemps = "mobile_TEMPS2";
                            
-                            await edit(username,password,server,  global.fmServer,layoutTemps,record['record-id'],addAndUpdateQuery(true));
+                            await edit(username,password,global.fmServer,global.fmDatabase,layoutTemps,record['record-id'],addAndUpdateQuery(true));
                             navigation.replace('Main');
 
                         }}

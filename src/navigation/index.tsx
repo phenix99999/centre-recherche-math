@@ -12,8 +12,11 @@ import LoginScreen from "../screens/LoginScreen";
 import WelcomeScreen from "../screens/WelcomeScreen";
 import PageIntro from "../screens/PageIntro";
 import ClientScreen from "../screens/ClientScreen";
+import Entypo from "react-native-vector-icons/Entypo";
 
 import MainScreen from "../screens/MainScreen";
+import Bilan from "../screens/Bilan";
+
 import SupportScreen from "../screens/SupportScreen";
 
 
@@ -26,6 +29,8 @@ import TempsDetailsFilter from "../screens/TempsDetailsFilter";
 import { Icon } from "native-base";
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import SolutionMobileScreen from "../screens/SolutionMobileScreen";
+import CalendrierModeList from "../screens/CalendrierModeList";
+
 import SolutionSanteScreen from "../screens/SolutionSanteScreen";
 import SolutionPortailScreen from "../screens/SolutionPortailScreen";
 import SolutionVhmClassesScreen from "../screens/SolutionVhmClassesScreen";
@@ -66,12 +71,11 @@ export default class App extends Component {
         const Drawer = createDrawerNavigator();
 
 
-        function MainStack() {
+        function CalendrierStack() {
 
             return (
                 <Stack.Navigator screenOptions={{ headerShown: false }} mode="modal" >
                     <Stack.Screen name="Main" component={MainScreen} />
-                    <Stack.Screen name="PageIntro" component={PageIntro} />
 
                     <Stack.Screen name="TempsDetailsFilter" component={TempsDetailsFilter} />
 
@@ -82,6 +86,78 @@ export default class App extends Component {
                 </Stack.Navigator>
             );
         }
+
+        function CalendrierListeStack() {
+
+            return (
+                <Stack.Navigator screenOptions={{ headerShown: false }} mode="modal" >
+                    <Stack.Screen name="CalendrierModeList" component={CalendrierModeList} />
+                    <Stack.Screen name="TempsDetailsFilter" component={TempsDetailsFilter} />
+                    <Stack.Screen name="TempsDetailsClient" component={TempsDetailsClient} />
+
+
+                </Stack.Navigator>
+            );
+        }
+
+        function BilanStack() {
+
+            return (
+                <Stack.Navigator screenOptions={{ headerShown: false }} mode="modal" >
+                    <Stack.Screen name="Bilan" component={Bilan} />
+                </Stack.Navigator>
+            );
+        }
+
+
+        function MainStack() {
+
+            return (
+                <Tab.Navigator
+                    tabBarOptions={{
+                        activeTintColor: '#1f4598',
+                        inactiveTintColor: 'gray',
+                    }}
+                    style={{
+                        backgroundColor: 'blue',
+                    }}
+
+                >
+                    <Stack.Screen options=
+                        {{
+
+                            tabBarLabel: 'Calendrier',
+                            tabBarIcon: ({ color, size }) => (
+                                <Entypo name="calendar" color={"#1f4598"} size={size} />
+                            ),
+
+                        }} name="Main" component={CalendrierStack} />
+
+                    <Stack.Screen options=
+                        {{
+                            tabBarLabel: 'Mode Liste',
+                            tabBarIcon: ({ color, size }) => (
+                                <Entypo name="list" color={"#1f4598"} size={size} />
+                            ),
+
+                        }} name="CalendrierModeList" component={CalendrierListeStack} />
+
+
+                    <Stack.Screen options=
+                        {{
+                            tabBarLabel: 'Mode Bilan',
+                            tabBarIcon: ({ color, size }) => (
+                                <Entypo name="bar-graph" color={"#1f4598"} size={size} />
+                            ),
+
+                        }} name="BilanStack" component={BilanStack} />
+
+
+                </Tab.Navigator>
+
+            );
+        }
+
 
 
         function IntroStack() {

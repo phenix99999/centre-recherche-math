@@ -26,28 +26,36 @@ export function groupDaysByWeek(dates: Date[]) {
     }, []);
 }
 
-export function dateToFMDate(date:Date){
-    return (date.getMonth() + 1) +  '/' + date.getDate() + '/'+date.getFullYear()
+export function dateToFMDate(date: Date) {
+    let month = (date.getMonth() + 1);
+    let day = date.getDate();
+    if (month < 10) {
+        month = "0" + month;
+    }
+    if (day < 10) {
+        day = "0" + day;
+    }
+    return (month) + '/' + day + '/' + date.getFullYear()
 }
 
-export function dateToFrench(date:Date){
+export function dateToFrench(date: Date) {
 
-    const months =  [
+    const months = [
         'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
     ]
-    return  `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`
+    return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`
 }
 
-export function getNotEmptyDates(data,fieldName){
-  let notEmptyDates = [];
-  let indexNotEmptyDates = 0;
-    for(let i=0;i<data.length;i++){
+export function getNotEmptyDates(data, fieldName) {
+    let notEmptyDates = [];
+    let indexNotEmptyDates = 0;
+    for (let i = 0; i < data.length; i++) {
         // console.log(data[i][fieldName]);
-        if(!notEmptyDates.includes(data[i][fieldName])){
+        if (!notEmptyDates.includes(data[i][fieldName])) {
             notEmptyDates[indexNotEmptyDates] = new Date(data[i][fieldName]);
             indexNotEmptyDates++;
         }
     }
- 
+
     return notEmptyDates;
 }

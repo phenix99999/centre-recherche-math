@@ -318,7 +318,7 @@ const TempsDetailsClient = ({ route,navigation, timeStore }: Props) => {
                     <Button
                         onPress={() => {
                            
-                            navigation.replace('Main');
+                            navigation.replace(route.params.comeFrom);
                         }}
                         transparent
                     >

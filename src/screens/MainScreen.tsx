@@ -68,14 +68,11 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
         timeStore.selectDate(date)
         if (SyncStorage.get('typeAccount') == 1) {
             setDateOnDateClient(dataOnDateTemp);
-
         } else if (SyncStorage.get('typeAccount') == 0) {
             setDataOnDateEmploye(dataOnDateTemp);
-
         } else {
             setDataOnDateEmploye([]);
             setDateOnDateClient([]);
-
         }
 
     }
@@ -122,9 +119,7 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
     const isFocused = useIsFocused();
 
     React.useEffect(() => {
-        console.log("Data on date employe");
-        console.log(dataOnDateEmploye);
-        // timeStore.loadConfigData().then(() => timeStore.fetchHeures());
+
         const setDataEmploye = async (username, password, server, db, month, year, nbJourMois) => {
             setFormatedDataEmploye(await get(username, password, server, db, layoutTemps
                 , "&fk_assignation=" + fk_assignation + "&flag_actif=1&StartDate=" + month + "/1/" + year + "..." + month + "/" + nbJourMois + "/" + year));
@@ -220,33 +215,26 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
         notEmptyDates = getNotEmptyDates(formatedDataEmploye, "StartDate");
     }
 
+
     let render;
-    console.log("LENGTH   +");
-    console.log(dataOnDateEmploye == undefined);
-    console.log
+
     if (SyncStorage.get('typeAccount') == null) {
 
         render = null;
     } else {
+
+        // alert(SyncStorage.get('filterActivity') > 0);
         let rightHeader = <View style={{ flexDirection: 'row' }}>
-            <Button
-                transparent
-                onPress={async () => {
-                    navigation.openDrawer();
 
-                }}
-            >
-                <Icon name="menu" type={"MaterialIcons"} style={{ fontSize: 30, color: '#1f4598' }} />
-            </Button>
             <Button
                 transparent
                 onPress={async () => {
-                    navigation.navigate('TempsDetailsFilter');
+                    navigation.navigate('TempsDetailsFilter', { from: 'Main' });
 
                 }}
             >
 
-                {SyncStorage.get('filterProject') || SyncStorage.get('filterActivity') ?
+                {SyncStorage.get('filterProject') && SyncStorage.get('filterProject') > 0 || SyncStorage.get('filterActivity') && SyncStorage.get('filterActivity') > 0 ?
                     <Icon name="filter" type={"AntDesign"} style={{ fontSize: 30, marginRight: 0, color: 'red' }} >
 
                     </Icon>
@@ -280,13 +268,11 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
                         <Button
                             transparent
                             onPress={async () => {
-                                navigation.replace('PageIntro');
+                                navigation.openDrawer();
 
                             }}
                         >
-
-                            <Icon name="back" type="AntDesign" style={{ fontSize: 30, marginLeft: 2, color: '#1f4598' }} />
-
+                            <Icon name="menu" type={"MaterialIcons"} style={{ fontSize: 30, color: '#1f4598' }} />
                         </Button>
 
                     </Left>
@@ -347,7 +333,11 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
                 >
                     {SyncStorage.get('typeAccount') == 0 && dataOnDateEmploye.length === 0 || (dataOnDateEmploye.length == undefined) ? (
                         <Text style={styles.noItemText}>Aucune entrée de temps ne correspond à la date sélectionnée</Text>
-                    ) : (
+                    ) : null}
+
+
+                    {SyncStorage.get('typeAccount') == 0 && dataOnDateEmploye.length > 0 ?
+                        (
                             dataOnDateEmploye.map((record) => (
                                 <TouchableOpacity
                                     onPress={() => {
@@ -363,28 +353,41 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
                                     <Text>{record.Minutes} h</Text>
                                 </TouchableOpacity>
                             ))
-                        )}
+                        )
+                        :
+                        null
+                    }
 
                     {SyncStorage.get('typeAccount') == 1 && dataOnDateClient.length === 0 ? (
                         <Text style={styles.noItemText}>Aucune entrée de temps ne correspond à la date sélectionnée</Text>
-                    ) : (
-                            dataOnDateClient.map((record) => (
-                                <TouchableOpacity
-                                    onPress={() => {
-                                        // crud.updateEditionMode("update");
 
-                                        navigation.navigate("TempsDetailsClient", { pk_ID: record.pk_ID, editionMode: "read" });
-                                    }}
-                                    style={styles.item}
-                                    key={record.pk_ID}
-                                >
-                                    <Text>{record.Nom_assignation}</Text>
-                                    <Text>{getActivitiesNameWithPkId(record.fk_activites)}</Text>
-                                    <Text>{record.Minutes} h</Text>
+                    ) : null}
 
-                                </TouchableOpacity>
-                            ))
-                        )}
+
+                    {SyncStorage.get('typeAccount') == 1 && dataOnDateClient.length > 0 ? (
+
+                        dataOnDateClient.map((record) => (
+                            <TouchableOpacity
+                                onPress={() => {
+                                    // crud.updateEditionMode("update");
+
+                                    navigation.navigate("TempsDetailsClient", { pk_ID: record.pk_ID, editionMode: "read", comeFrom: 'Main' });
+                                }}
+                                style={styles.item}
+                                key={record.pk_ID}
+                            >
+                                <Text>{record.Nom_assignation}</Text>
+                                <Text>{getActivitiesNameWithPkId(record.fk_activites)}</Text>
+                                <Text>{record.Minutes} h</Text>
+
+                            </TouchableOpacity>
+                        ))
+                    )
+                        :
+
+                        null
+
+                    }
 
                 </ScrollView>
             </Container>
