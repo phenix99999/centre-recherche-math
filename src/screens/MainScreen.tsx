@@ -378,7 +378,7 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
                                     style={styles.item}
                                     key={record.pk_ID}
                                 >
-                                    <Text>{record.Nom_projet}</Text>
+                                    <Text>{record.Nom_assignation}</Text>
                                     <Text>{getActivitiesNameWithPkId(record.fk_activites)}</Text>
                                     <Text>{record.Minutes} h</Text>
 
