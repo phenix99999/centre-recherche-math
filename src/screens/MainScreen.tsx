@@ -7,24 +7,37 @@ import TimeStore from "../stores/TimeStore";
 import { MainStackParamList } from "../types";
 import DateSlider from "../components/DateSlider";
 import { ScrollView, TouchableOpacity } from "react-native";
-import { Container, Header, Button, Left, Icon, Text,Right,Body } from "native-base";
+import { Container, Header, Button, Left, Icon, Text, Right, Body } from "native-base";
 import { setNavigationState } from "../utils/PersistState";
 import { dateToFrench, getNotEmptyDates, getDaysInMonth } from "../utils/date";
 import { get, add } from '../utils/connectorFileMaker';
 import SyncStorage from 'sync-storage';
 import { setReactionScheduler } from "mobx/lib/internal";
-
+import { useIsFocused } from "@react-navigation/native";
+import { Badge } from 'react-native-paper';
 type Props = {
     timeStore: TimeStore;
 } & StackScreenProps<MainStackParamList, "Main">;
 
 
 const MainScreen = ({ navigation, timeStore }: Props) => {
-    const [formatedData, setFormatedData] = React.useState<Object>([]);
-    const [formatedProjectData, setFormatedProjectData] = React.useState<Object>([]);
-    const [notEmptyDate, setNotEmptyDate] = React.useState<Object>([]);
-    const [dataOnDate, setDataOnDate] = React.useState<Object>([]);
+    const [formatedDataEmploye, setFormatedDataEmploye] = React.useState<Object>([]);
+    const [dataOnDateEmploye, setDataOnDateEmploye] = React.useState<Object>([]);
 
+    const [dataOnDateClient, setDateOnDateClient] = React.useState<Object>([]);
+    const [formatedDataClient, setFormatedDataClient] = React.useState<Object>([]);
+    const [activitesList, setActivitesList] = React.useState<Object>([]);
+
+
+    const [typeAccount, setTypeAccount] = React.useState<Number>();
+    function getActivitiesNameWithPkId(pk_id) {
+        for (let i = 0; i < activitesList.length; i++) {
+            if (activitesList[i].pk_ID == pk_id) {
+                return activitesList[i].Nom;
+            }
+        }
+        return "";
+    }
     function selectDate(date) {
         let dateObj = new Date(date);
         let month = ("0" + parseInt(dateObj.getMonth() + 1)).slice(-2);
@@ -36,7 +49,12 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
         // var formattedNumber = ("0" + myNumber).slice(-2);
         let dataOnDateTemp = [];
         let indexDataOnDate = 0;
-
+        let formatedData = [];
+        if (SyncStorage.get('typeAccount') == 1) {
+            formatedData = formatedDataClient;
+        } else {
+            formatedData = formatedDataEmploye;
+        }
 
         for (let i = 0; i < formatedData.length; i++) {
 
@@ -48,156 +66,334 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
         }
 
         timeStore.selectDate(date)
-        setDataOnDate(dataOnDateTemp);
+        if (SyncStorage.get('typeAccount') == 1) {
+            setDateOnDateClient(dataOnDateTemp);
+
+        } else if (SyncStorage.get('typeAccount') == 0) {
+            setDataOnDateEmploye(dataOnDateTemp);
+
+        } else {
+            setDataOnDateEmploye([]);
+            setDateOnDateClient([]);
+
+        }
+
     }
 
 
     async function getRefreshData() {
+
         let username = SyncStorage.get('username');
         let password = SyncStorage.get('password');
-       
-       
+
+
         let layoutTemps = "mobile_TEMPS2";
 
         let month = timeStore.activeMonth + 1;
         let year = timeStore.activeYear;
         let nbJourMois = (getDaysInMonth(timeStore.activeMonth, year).length);
-        let fk_assignation = SyncStorage.get('user').pk_ID;
+        if (SyncStorage.get("typeAccount") == 1) {
+            if (SyncStorage.get('filterProject') && SyncStorage.get('filterActivity')) {
+                setFormatedDataClient(await get(username, password, global.fmServer, global.fmDatabase, layoutTemps
+                    , "&fk_client=" + SyncStorage.get('client_PK') + "&fk_projet=" + SyncStorage.get('filterProject') + "&fk_activites=" + SyncStorage.get('filterActivity') + "&flag_actif=1&StartDate=" + month + "/1/" + year + "..." + month + "/" + nbJourMois + "/" + year));
+            } else if (SyncStorage.get('filterProject')) {
+                setFormatedDataClient(await get(username, password, global.fmServer, global.fmDatabase, layoutTemps
+                    , "&fk_client=" + SyncStorage.get('client_PK') + "&fk_projet=" + SyncStorage.get('filterProject') + "&flag_actif=1&StartDate=" + month + "/1/" + year + "..." + month + "/" + nbJourMois + "/" + year));
+            } else if (SyncStorage.get('filterActivity')) {
+                setFormatedDataClient(await get(username, password, global.fmServer, global.fmDatabase, layoutTemps
+                    , "&fk_client=" + SyncStorage.get('client_PK') + "&fk_activites=" + SyncStorage.get('filterActivity') + "&flag_actif=1&StartDate=" + month + "/1/" + year + "..." + month + "/" + nbJourMois + "/" + year));
+            } else {
+                setFormatedDataClient(await get(username, password, global.fmServer, global.fmDatabase, layoutTemps
+                    , "&fk_client=" + SyncStorage.get('client_PK') + "&flag_actif=1&StartDate=" + month + "/1/" + year + "..." + month + "/" + nbJourMois + "/" + year));
+            }
+        } else {
+            let fk_assignation = -1;
+            if (SyncStorage.get('user'.pk_ID)) {
+                fk_assignation = SyncStorage.get('user').pk_ID;
+            }
 
-        setFormatedData(await get(username, password,global.fmServer,  global.fmDatabase, layoutTemps
-            , "&fk_assignation=" + fk_assignation + "&flag_actif=1&StartDate=" + month + "/1/" + year + "..." + month + "/" + nbJourMois + "/" + year));
 
-    }
-
-    React.useEffect(() => {
-        // timeStore.loadConfigData().then(() => timeStore.fetchHeures());
-        const setData = async (username, password, server, db, month, year, nbJourMois) => {
-            setFormatedData(await get(username, password, server, db, layoutTemps
+            setFormatedDataEmploye(await get(username, password, global.fmServer, global.fmDatabase, layoutTemps
                 , "&fk_assignation=" + fk_assignation + "&flag_actif=1&StartDate=" + month + "/1/" + year + "..." + month + "/" + nbJourMois + "/" + year));
         }
 
-        const getDataOnDate = async (username, password, server, db, month, year, nbJourMois, dateSelected) => {
-            setDataOnDate(await get(username, password, server, db, layoutTemps
-                , "&fk_assignation=" + fk_assignation + "&flag_actif=1&StartDate=" + dateSelected.getMonth() + 1 + "/" + dateSelected.getDate() + "/" + dateSelected.getFullYear()));
+
+    }
+    const isFocused = useIsFocused();
+
+    React.useEffect(() => {
+        console.log("Data on date employe");
+        console.log(dataOnDateEmploye);
+        // timeStore.loadConfigData().then(() => timeStore.fetchHeures());
+        const setDataEmploye = async (username, password, server, db, month, year, nbJourMois) => {
+            setFormatedDataEmploye(await get(username, password, server, db, layoutTemps
+                , "&fk_assignation=" + fk_assignation + "&flag_actif=1&StartDate=" + month + "/1/" + year + "..." + month + "/" + nbJourMois + "/" + year));
         }
 
 
 
+        const setDataClient = async (username, password, server, db, month, year, nbJourMois) => {
+            if (SyncStorage.get('filterProject') && SyncStorage.get('filterActivity')) {
+                setFormatedDataClient(await get(username, password, server, db, layoutTemps
+                    , "&fk_client=" + SyncStorage.get('client_PK') + "&fk_projet=" + SyncStorage.get('filterProject') + "&fk_activites=" + SyncStorage.get('filterActivity') + "&flag_actif=1&StartDate=" + month + "/1/" + year + "..." + month + "/" + nbJourMois + "/" + year));
+            } else if (SyncStorage.get('filterProject')) {
+                setFormatedDataClient(await get(username, password, server, db, layoutTemps
+                    , "&fk_client=" + SyncStorage.get('client_PK') + "&fk_projet=" + SyncStorage.get('filterProject') + "&flag_actif=1&StartDate=" + month + "/1/" + year + "..." + month + "/" + nbJourMois + "/" + year));
+            } else if (SyncStorage.get('filterActivity')) {
+                setFormatedDataClient(await get(username, password, server, db, layoutTemps
+                    , "&fk_client=" + SyncStorage.get('client_PK') + "&fk_activites=" + SyncStorage.get('filterActivity') + "&flag_actif=1&StartDate=" + month + "/1/" + year + "..." + month + "/" + nbJourMois + "/" + year));
+            } else {
+                setFormatedDataClient(await get(username, password, server, db, layoutTemps
+                    , "&fk_client=" + SyncStorage.get('client_PK') + "&flag_actif=1&StartDate=" + month + "/1/" + year + "..." + month + "/" + nbJourMois + "/" + year));
+            }
+
+        }
+
+
+        const getDataOnDateEmploye = async (username, password, server, db, month, year, nbJourMois, dateSelected) => {
+            setDataOnDateEmploye(await get(username, password, server, db, layoutTemps
+                , "&fk_assignation=" + fk_assignation + "&flag_actif=1&StartDate=" + dateSelected.getMonth() + 1 + "/" + dateSelected.getDate() + "/" + dateSelected.getFullYear()));
+        }
+
+        const getDataOnDateClient = async (username, password, server, db, month, year, nbJourMois, dateSelected) => {
+            if (SyncStorage.get('filterProject') && SyncStorage.get('filterActivity')) {
+                setDateOnDateClient(await get(username, password, server, db, layoutTemps
+                    , "&fk_client=" + SyncStorage.get('client_PK') + "&fk_projet=" + SyncStorage.get('filterProject') + "&fk_activites=" + SyncStorage.get('filterActivity') + "&flag_actif=1&StartDate=" + dateSelected.getMonth() + 1 + "/" + dateSelected.getDate() + "/" + dateSelected.getFullYear()));
+            } else if (SyncStorage.get('filterProject')) {
+                setDateOnDateClient(await get(username, password, server, db, layoutTemps
+                    , "&fk_client=" + SyncStorage.get('client_PK') + "&fk_projet=" + SyncStorage.get('filterProject') + "&flag_actif=1&StartDate=" + dateSelected.getMonth() + 1 + "/" + dateSelected.getDate() + "/" + dateSelected.getFullYear()));
+            } else if (SyncStorage.get('filterActivity')) {
+                setDateOnDateClient(await get(username, password, server, db, layoutTemps
+                    , "&fk_client=" + SyncStorage.get('client_PK') + "&fk_activites=" + SyncStorage.get('filterActivity') + "&flag_actif=1&StartDate=" + dateSelected.getMonth() + 1 + "/" + dateSelected.getDate() + "/" + dateSelected.getFullYear()));
+            } else {
+                setDateOnDateClient(await get(username, password, server, db, layoutTemps
+                    , "&fk_client=" + SyncStorage.get('client_PK') + "&flag_actif=1&StartDate=" + dateSelected.getMonth() + 1 + "/" + dateSelected.getDate() + "/" + dateSelected.getFullYear()));
+            }
+
+
+
+        }
+
+        const setListActivities = async () => {
+            setActivitesList(await get(username, password, global.fmServer, global.fmDatabase, "mobile_ACTIVITES2"
+                , "&fk_client=" + SyncStorage.get('client_PK')));
+
+        }
+
+
+
+
+        let typeAccount = (SyncStorage.get('typeAccount'));
+
+        setTypeAccount(typeAccount);
+
+        let fk_assignation = SyncStorage.get('user') ? SyncStorage.get('user').pk_ID : -1;
+        let pkIdClient;
         let username = SyncStorage.get('username');
         let password = SyncStorage.get('password');
-    
         let db = "vhmsoft";
         let layoutTemps = "mobile_TEMPS2";
         selectDate(timeStore.selectedDate);
         let month = timeStore.activeMonth + 1;
         let year = timeStore.activeYear;
         let nbJourMois = (getDaysInMonth(timeStore.activeMonth, year).length);
+        if (typeAccount == 1) { //PrivilegeSet est la valeur qui determine le compte (1 ==> client //  le reste ==> employé)
+            //pk_id du client 
+            pkIdClient = SyncStorage.get('client_PK');
+            getDataOnDateClient(username, password, global.fmServer, global.fmDatabase, month, year, nbJourMois, timeStore.selectedDate);
+            setDataClient(username, password, global.fmServer, global.fmDatabase, month, year, nbJourMois, timeStore);
+            setListActivities();
 
-        let fk_assignation = SyncStorage.get('user').pk_ID;
+            // alert(SyncStorage.get('pk_ID'));
+        } else {
+
+            getDataOnDateEmploye(username, password, global.fmServer, global.fmDatabase, month, year, nbJourMois, timeStore.selectedDate);
+            setDataEmploye(username, password, global.fmServer, global.fmDatabase, month, year, nbJourMois, timeStore);
+        }
 
 
+    }, [isFocused]);
+    let notEmptyDates;
+    if (SyncStorage.get('typeAccount') == 1) {
+        notEmptyDates = getNotEmptyDates(formatedDataClient, "StartDate");
+    } else {
+        notEmptyDates = getNotEmptyDates(formatedDataEmploye, "StartDate");
+    }
 
-        getDataOnDate(username, password,  global.fmServer,  global.fmDatabase, month, year, nbJourMois, timeStore.selectedDate);
+    let render;
+    console.log("LENGTH   +");
+    console.log(dataOnDateEmploye == undefined);
+    console.log
+    if (SyncStorage.get('typeAccount') == null) {
 
-        setData(username, password,  global.fmServer,  global.fmDatabase, month, year, nbJourMois, timeStore);
+        render = null;
+    } else {
+        let rightHeader = <View style={{ flexDirection: 'row' }}>
+            <Button
+                transparent
+                onPress={async () => {
+                    navigation.openDrawer();
 
-    }, []);
-  
-    let notEmptyDates = getNotEmptyDates(formatedData, "StartDate");
+                }}
+            >
+                <Icon name="menu" type={"MaterialIcons"} style={{ fontSize: 30, color: '#1f4598' }} />
+            </Button>
+            <Button
+                transparent
+                onPress={async () => {
+                    navigation.navigate('TempsDetailsFilter');
 
-    return (
-        <Container style={{ flex: 1 }}>
-            <Header>
-                <Left>
-                           <Button
+                }}
+            >
+
+                {SyncStorage.get('filterProject') || SyncStorage.get('filterActivity') ?
+                    <Icon name="filter" type={"AntDesign"} style={{ fontSize: 30, marginRight: 0, color: 'red' }} >
+
+                    </Icon>
+                    :
+                    <Icon name="filter" type={"AntDesign"} style={{ fontSize: 30, marginRight: 0, color: '#1f4598' }} >
+
+                    </Icon>
+                }
+            </Button>
+        </View>;
+
+        if (SyncStorage.get('typeAccount') == 0) {
+            rightHeader = <View style={{ flexDirection: 'row' }}>
+                <Button
+                    transparent
+                    onPress={async () => {
+                        navigation.openDrawer();
+
+                    }}
+                >
+                    <Icon name="menu" type={"MaterialIcons"} style={{ fontSize: 30, color: '#1f4598' }} />
+                </Button>
+
+            </View>
+        }
+
+        render = (
+            <Container style={{ flex: 1 }}>
+                <Header>
+                    <Left>
+                        <Button
                             transparent
                             onPress={async () => {
-                                navigation.goBack();
+                                navigation.replace('PageIntro');
 
                             }}
                         >
 
                             <Icon name="back" type="AntDesign" style={{ fontSize: 30, marginLeft: 2, color: '#1f4598' }} />
+
                         </Button>
-                
-                </Left>
-                <Right>
 
-<Button
-  transparent
-  onPress={async () => {
-    navigation.openDrawer();
+                    </Left>
+                    <Right>
+                        {rightHeader}
 
-  }}
->
-  <Icon name="menu" type={"MaterialIcons"} style={{ fontSize: 30, marginLeft: 2, color: '#1f4598' }} />
-</Button>
-</Right>
+                    </Right>
 
-            </Header>
-            <DateSlider
-                onViewUpdate={(date: { month: number; year: number }) => {
-                    timeStore.setMonth(date.month);
-                    timeStore.setYear(date.year);
+                </Header>
 
-                    getRefreshData();
-                }}
-                noEmptyDates={notEmptyDates}
-                month={timeStore.activeMonth}
-                year={timeStore.activeYear}
-                selected={timeStore.selectedDate}
-                onSelect={(date: Date) => selectDate(date)}
-            />
-            <View style={{ maxHeight: 40, flex: 1, flexDirection: "row", paddingLeft: 20 }}>
-                <View style={{ height: 50, flex: 1, justifyContent: "center" }}>
-                    <Text style={{ fontWeight: "bold",color:'#1f4598' }}>{dateToFrench(timeStore.selectedDate)}</Text>
-                </View>
-                <View style={{ height: 50, flex: 1, justifyContent: "center" }}>
-                    <Button
-                        style={{ alignSelf: "flex-end" }}
-                        transparent
-                        onPress={() => {
-                            // crud.updateEditionMode("create");
-                            navigation.replace("TempsDetails",{editionMode: 'create'});
-                        }}
-                    >
-                        <Text style={{color:'#1f4598'}}>+ Nouvelle entrée</Text>
-                    </Button>
-                </View>
-            </View>
-            <ScrollView
-                style={styles.scrollview}
-                refreshControl={
-                    <RefreshControl
-                        refreshing={false}
-                        onRefresh={() => {
+                <DateSlider
+                    onViewUpdate={(date: { month: number; year: number }) => {
+                        timeStore.setMonth(date.month);
+                        timeStore.setYear(date.year);
+                        getRefreshData();
+                    }}
+                    noEmptyDates={notEmptyDates}
+                    month={timeStore.activeMonth}
+                    year={timeStore.activeYear}
+                    selected={timeStore.selectedDate}
+                    onSelect={(date: Date) => selectDate(date)}
+                />
+                <View style={{ maxHeight: 40, flex: 1, flexDirection: "row", paddingLeft: 20 }}>
+                    <View style={{ height: 50, flex: 1, justifyContent: "center" }}>
+                        <Text style={{ fontWeight: "bold", color: '#1f4598' }}>{dateToFrench(timeStore.selectedDate)}</Text>
+                    </View>
 
-                        }}
-                    />
-                }
-            >
-                {dataOnDate.length === 0 ? (
-                    <Text style={styles.noItemText}>Aucune entrée de temps ne correspond à la date sélectionnée</Text>
-                ) : (
-                        dataOnDate.map((record) => (
-                            <TouchableOpacity
+                    {!typeAccount ?
+
+                        <View style={{ height: 50, flex: 1, justifyContent: "center" }}>
+                            <Button
+                                style={{ alignSelf: "flex-end" }}
+                                transparent
                                 onPress={() => {
-                                    // crud.updateEditionMode("update");
-
-                                    navigation.navigate("TempsDetails", { pk_ID: record.pk_ID,editionMode: "update"});
+                                    // crud.updateEditionMode("create");
+                                    navigation.replace("TempsDetails", { editionMode: 'create' });
                                 }}
-                                style={styles.item}
-                                key={record.pk_ID}
                             >
-                                <Text>{record.AM_PM}</Text>
-                                <Text>{record.Nom_projet}</Text>
-                                <Text>{record.Minutes} h</Text>
-                            </TouchableOpacity>
-                        ))
-                    )}
-            </ScrollView>
-        </Container>
+                                <Text style={{ color: '#1f4598' }}>+ Nouvelle entrée</Text>
+                            </Button>
+                        </View>
+                        :
+
+                        null}
+
+
+                </View>
+                <ScrollView
+                    style={styles.scrollview}
+                    refreshControl={
+                        <RefreshControl
+                            refreshing={false}
+                            onRefresh={() => {
+
+                            }}
+                        />
+                    }
+                >
+                    {SyncStorage.get('typeAccount') == 0 && dataOnDateEmploye.length === 0 || (dataOnDateEmploye.length == undefined) ? (
+                        <Text style={styles.noItemText}>Aucune entrée de temps ne correspond à la date sélectionnée</Text>
+                    ) : (
+                            dataOnDateEmploye.map((record) => (
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        // crud.updateEditionMode("update");
+                                        // alert("YER LA");
+                                        navigation.navigate("TempsDetails", { pk_ID: record.pk_ID, editionMode: "update" });
+                                    }}
+                                    style={styles.item}
+                                    key={record.pk_ID}
+                                >
+                                    <Text>{record.AM_PM}</Text>
+                                    <Text>{record.Nom_projet}</Text>
+                                    <Text>{record.Minutes} h</Text>
+                                </TouchableOpacity>
+                            ))
+                        )}
+
+                    {SyncStorage.get('typeAccount') == 1 && dataOnDateClient.length === 0 ? (
+                        <Text style={styles.noItemText}>Aucune entrée de temps ne correspond à la date sélectionnée</Text>
+                    ) : (
+                            dataOnDateClient.map((record) => (
+                                <TouchableOpacity
+                                    onPress={() => {
+                                        // crud.updateEditionMode("update");
+
+                                        navigation.navigate("TempsDetailsClient", { pk_ID: record.pk_ID, editionMode: "read" });
+                                    }}
+                                    style={styles.item}
+                                    key={record.pk_ID}
+                                >
+                                    <Text>{record.Nom_projet}</Text>
+                                    <Text>{getActivitiesNameWithPkId(record.fk_activites)}</Text>
+                                    <Text>{record.Minutes} h</Text>
+
+                                </TouchableOpacity>
+                            ))
+                        )}
+
+                </ScrollView>
+            </Container>
+        );
+    }
+    return (
+        render
     );
+
 };
 export default inject("timeStore")(observer(MainScreen));
 

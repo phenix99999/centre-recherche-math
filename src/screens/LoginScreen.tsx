@@ -29,7 +29,7 @@ import {
 } from "native-base";
 import { Image, ImageBackground, RefreshControl, ScrollView, View } from "react-native";
 import AuthStore from "../stores/AuthStore";
-import { authentification } from '../utils/connectorFileMaker';
+import { authentification, get } from '../utils/connectorFileMaker';
 
 type Props = {
     authStore: AuthStore;
@@ -38,9 +38,9 @@ type Props = {
 
 
 const LoginScreen = ({ navigation, authStore }: Props) => {
- 
+
     React.useEffect(() => {
-        if(SyncStorage.get('username')){
+        if (SyncStorage.get('username')) {
             authStore.username = SyncStorage.get('username');
         }
     });
@@ -73,26 +73,39 @@ const LoginScreen = ({ navigation, authStore }: Props) => {
                             </Form>
                             <Button
                                 onPress={async () => {
-                                  
+
                                     let layout = "mobile_ACCOUNT2";
-                                    let user = await authentification(authStore.username, authStore.password,global.fmServer, global.fmDatabase, layout, "&_C_nomComplet=" + authStore.username);
-                           
+                                    let user = await authentification(authStore.username, authStore.password, global.fmServer, global.fmDatabase, layout, "&_C_nomComplet=" + authStore.username);
+
                                     if (user == -1) {
                                         Toast.show({
                                             position: "top",
                                             text: "Mauvais identifiants",
                                         });
-                                        
+
                                     } else {
                                         let role = "";
                                         SyncStorage.set('connected', true);
                                         SyncStorage.set('username', authStore.username);
-                                        SyncStorage.set('user',user[0]);
-                                        SyncStorage.set('password',authStore.password);
+                                        SyncStorage.set('user', user[0]);
+                                        //1 = client 0 = employe
+                                        if (user[0].PrivilegeSet == 1) {
+                                            SyncStorage.set('typeAccount', 1)
+                                        } else {
+                                            SyncStorage.set('typeAccount', 0)
+                                        }
+                                        if (user[0].PrivilegeSet == 1) {
+                                            //Client id
+                                            let client = await get(authStore.username, authStore.password, global.fmServer, global.fmDatabase, "mobile_CLIENTS2"
+                                                , "&Nom=" + authStore.username);
+
+                                            SyncStorage.set('client_PK', client[0].pk_ID);
+                                        }
+                                        SyncStorage.set('password', authStore.password);
                                         navigation.goBack();
                                         authStore.password = "";
                                         navigation.navigate("Main");
-                                    }  
+                                    }
                                 }}
                                 style={[styles.button]}
                             >

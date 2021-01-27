@@ -1,7 +1,7 @@
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import React, { Component } from 'react';
 import { NavigationContainer } from "@react-navigation/native";
-import { ColorSchemeName, View, Text, ImageBackground, Image,TouchableOpacity } from "react-native";
+import { ColorSchemeName, View, Text, ImageBackground, Image, TouchableOpacity } from "react-native";
 
 import { createDrawerNavigator, DrawerContentComponentProps, DrawerContentOptions } from "@react-navigation/drawer";
 //import BarcodeScreen from "../screens/BarcodeScreen";
@@ -20,6 +20,9 @@ import SupportScreen from "../screens/SupportScreen";
 import Sidebar from "../components/Sidebar";
 import SyncStorage from 'sync-storage';
 import TempsDetailsScreen from "../screens/TempsDetailsScreen";
+import TempsDetailsClient from "../screens/TempsDetailsClient";
+import TempsDetailsFilter from "../screens/TempsDetailsFilter";
+
 import { Icon } from "native-base";
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import SolutionMobileScreen from "../screens/SolutionMobileScreen";
@@ -62,13 +65,19 @@ export default class App extends Component {
         const Stack = createStackNavigator();
         const Drawer = createDrawerNavigator();
 
-       
+
         function MainStack() {
 
             return (
                 <Stack.Navigator screenOptions={{ headerShown: false }} mode="modal" >
-                     <Stack.Screen name="Main" component={MainScreen} />
+                    <Stack.Screen name="Main" component={MainScreen} />
+                    <Stack.Screen name="PageIntro" component={PageIntro} />
+
+                    <Stack.Screen name="TempsDetailsFilter" component={TempsDetailsFilter} />
+
+
                     <Stack.Screen name="TempsDetails" component={TempsDetailsScreen} />
+                    <Stack.Screen name="TempsDetailsClient" component={TempsDetailsClient} />
                     <Stack.Screen name="Login" component={LoginScreen} />
                 </Stack.Navigator>
             );
@@ -161,84 +170,81 @@ export default class App extends Component {
         function CustomDrawerContent(props) {
             return (
                 <View>
-        
-                <ImageBackground style={{ width: '100%', height: '100%' }}
-                source={require("../assets/images/accueil.png")}
-                >
-                    <View>
-                        <Image source={require("../assets/images/vhiculeMedia.png")} style={{ width: 175, top: 10, left: 25 }} resizeMode={'contain'} />
-                    </View>
-                    <View style={{ flexDirection: 'row', top: 25, height: 50,alignItems:'center' }}>
-                        <TouchableOpacity  onPress={() => 
-                            {props.navigation.goBack() 
-                            props.navigation.navigate("PageIntro")}
-                        }
+
+                    <ImageBackground style={{ width: '100%', height: '100%' }}
+                        source={require("../assets/images/accueil.png")}
+                    >
+                        <View>
+                            <Image source={require("../assets/images/vhiculeMedia.png")} style={{ width: 175, top: 10, left: 25 }} resizeMode={'contain'} />
+                        </View>
+                        <View style={{ flexDirection: 'row', top: 25, height: 50, alignItems: 'center' }}>
+                            <TouchableOpacity onPress={() => {
+                                props.navigation.goBack()
+                                props.navigation.navigate("PageIntro")
+                            }
+                            }
                             >
-                            <Text style={{ color: '#1C1E53',fontWeight:'bold' }}>  <Icon name="home" type="Ionicons" style={{ top: 15, fontSize: 24, color: "#1C1E53" }}> </Icon> Accueil </Text>
-                        </TouchableOpacity>
-                    </View>
+                                <Text style={{ color: '#1C1E53', fontWeight: 'bold' }}>  <Icon name="home" type="Ionicons" style={{ top: 15, fontSize: 24, color: "#1C1E53" }}> </Icon> Accueil </Text>
+                            </TouchableOpacity>
+                        </View>
 
 
-                {SyncStorage.get('connected') ?
-          <View style={{ flexDirection: 'row', top: 25, height: 50,alignItems:'center' }}>
-                   <TouchableOpacity onPress={() => props.navigation.navigate("Main")}>
-                       <Text style={{ color: '#1C1E53',fontWeight:'bold'  }}>  <Icon name="calendar" style={{ top: 15, fontSize: 24, color: '#1C1E53' }}> </Icon> Calendrier </Text>
-                   </TouchableOpacity>
-               </View>
-        
-                
-                : null}
-
-            <View style={{ flexDirection: 'row', top: 25, height: 50,alignItems:'center' }}>
-               <TouchableOpacity onPress={() => props.navigation.navigate("SolutionsScreen")}>
-                       <Text style={{ color: "#1C1E53",fontWeight:'bold' }}>  <Icon name="lightbulb" type={"Foundation"} style={{ top: 15, fontSize: 24, color: '#1C1E53' }}> </Icon> Solutions </Text>
-
-                   </TouchableOpacity>
-               </View> 
-
-                
-               <View style={{ flexDirection: 'row', top: 25, height: 50,alignItems:'center' }}>
-                        <TouchableOpacity onPress={() => props.navigation.navigate("Support")} >
-                            <Text style={{ color: "#1C1E53",fontWeight:'bold'  }}>  <Icon name="customerservice" type="AntDesign" style={{ top: 15, fontSize: 24, color: "#1C1E53" }}> </Icon> Support </Text>
-
-                        </TouchableOpacity>
-                    </View>
+                        {SyncStorage.get('connected') ?
+                            <View style={{ flexDirection: 'row', top: 25, height: 50, alignItems: 'center' }}>
+                                <TouchableOpacity onPress={() => props.navigation.navigate("Main")}>
+                                    <Text style={{ color: '#1C1E53', fontWeight: 'bold' }}>  <Icon name="calendar" style={{ top: 15, fontSize: 24, color: '#1C1E53' }}> </Icon> Calendrier </Text>
+                                </TouchableOpacity>
+                            </View>
 
 
+                            : null}
 
-                {SyncStorage.get("connected") ? 
-                
-                <View style={{ flexDirection: 'row', top: 25, height: 50,alignItems:'center' }}>
-                <TouchableOpacity  onPress={() => 
-                    {
-                        SyncStorage.remove("connected");
-                        SyncStorage.remove("user");
-                        SyncStorage.remove('username');
-                        SyncStorage.remove('password');
-                        props.navigation.navigate("PageIntro");
-                    }
-                   }>
-                    <Text style={{ color: "#1C1E53",fontWeight:'bold'  }}>  <Icon name="logout" type="AntDesign" style={{ top: 15, fontSize: 24, color: "#1C1E53" }}> </Icon> Deconnexion </Text>
-                </TouchableOpacity>
-            </View>
-            
-                : 
+                        <View style={{ flexDirection: 'row', top: 25, height: 50, alignItems: 'center' }}>
+                            <TouchableOpacity onPress={() => props.navigation.navigate("SolutionsScreen")}>
+                                <Text style={{ color: "#1C1E53", fontWeight: 'bold' }}>  <Icon name="lightbulb" type={"Foundation"} style={{ top: 15, fontSize: 24, color: '#1C1E53' }}> </Icon> Solutions </Text>
 
-                
-                <View style={{ flexDirection: 'row', top: 25, height: 50,alignItems:'center' }}>
-                <TouchableOpacity  onPress={() => props.navigation.navigate("Login")}>
-                    <Text style={{ color: "#1C1E53",fontWeight:'bold'  }}>  <Icon name="login" type="AntDesign" style={{ top: 15, fontSize: 24, color: "#1C1E53" }}> </Icon> Connexion </Text>
-                </TouchableOpacity>
-            </View>
+                            </TouchableOpacity>
+                        </View>
 
-                
-                }
-                  
+
+                        <View style={{ flexDirection: 'row', top: 25, height: 50, alignItems: 'center' }}>
+                            <TouchableOpacity onPress={() => props.navigation.navigate("Support")} >
+                                <Text style={{ color: "#1C1E53", fontWeight: 'bold' }}>  <Icon name="customerservice" type="AntDesign" style={{ top: 15, fontSize: 24, color: "#1C1E53" }}> </Icon> Support </Text>
+
+                            </TouchableOpacity>
+                        </View>
 
 
 
-                </ImageBackground>
-                            
+                        {SyncStorage.get("connected") ?
+
+                            <View style={{ flexDirection: 'row', top: 25, height: 50, alignItems: 'center' }}>
+                                <TouchableOpacity onPress={() => {
+                                    SyncStorage.getAllKeys().map(k => SyncStorage.remove(k));
+                                    props.navigation.navigate("PageIntro");
+                                }
+                                }>
+                                    <Text style={{ color: "#1C1E53", fontWeight: 'bold' }}>  <Icon name="logout" type="AntDesign" style={{ top: 15, fontSize: 24, color: "#1C1E53" }}> </Icon> Deconnexion </Text>
+                                </TouchableOpacity>
+                            </View>
+
+                            :
+
+
+                            <View style={{ flexDirection: 'row', top: 25, height: 50, alignItems: 'center' }}>
+                                <TouchableOpacity onPress={() => props.navigation.navigate("Login")}>
+                                    <Text style={{ color: "#1C1E53", fontWeight: 'bold' }}>  <Icon name="login" type="AntDesign" style={{ top: 15, fontSize: 24, color: "#1C1E53" }}> </Icon> Connexion </Text>
+                                </TouchableOpacity>
+                            </View>
+
+
+                        }
+
+
+
+
+                    </ImageBackground>
+
                 </View>
             );
         }
@@ -295,10 +301,10 @@ export default class App extends Component {
 
 
         let navigation =
-        <Drawer.Navigator
-        drawerContent={(props) => <CustomDrawerContent {...props} />} 
-        
-        >
+            <Drawer.Navigator
+                drawerContent={(props) => <CustomDrawerContent {...props} />}
+
+            >
 
                 <Drawer.Screen name="PageIntro" component={PageIntro} />
                 <Drawer.Screen name="Main" component={MainStack} />
@@ -312,17 +318,17 @@ export default class App extends Component {
                 <Drawer.Screen name="SolutionB2b" component={SolutionB2bScreen} />
                 <Drawer.Screen name="SolutionSante" component={SolutionSanteScreen} />
                 <Drawer.Screen name="SolutionVhmClasses" component={SolutionVhmClassesScreen} />
- 
+
                 <Drawer.Screen name="SolutionPortail" component={SolutionPortailScreen} />
                 <Drawer.Screen name="SolutionInformatiqueDecisionnel" component={SolutionInformatiqueDecisionnelScreen} />
-    
+
                 <Drawer.Screen name="Accueil" component={AccueilScreen} />
 
             </Drawer.Navigator>;
         return (
             <NavigationContainer>
-               
-               {navigation}
+
+                {navigation}
 
             </NavigationContainer>
         )
