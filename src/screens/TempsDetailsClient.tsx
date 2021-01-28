@@ -212,7 +212,7 @@ const TempsDetailsClient = ({ route,navigation, timeStore }: Props) => {
         
      let facturable = record.Flag_facturable || "";
      let rd = record.flag_R_et_D;
-     let tache = record.Taches.length;
+     let tache = record.Taches;
      let Nom_assignation = record.Nom_assignation || "";
  
 

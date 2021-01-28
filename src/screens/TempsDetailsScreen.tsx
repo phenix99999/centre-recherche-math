@@ -235,7 +235,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
 
      let facturable = record.Flag_facturable;
      let rd = record.flag_R_et_D;
-     let tache = record.Taches.length;
+     let tache = record.Taches;
  
 
      let Minutes_restantes = record.Minutes_restantes || "";
