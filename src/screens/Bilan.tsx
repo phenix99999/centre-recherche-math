@@ -14,6 +14,7 @@ import { get, add } from '../utils/connectorFileMaker';
 import SyncStorage from 'sync-storage';
 import { setReactionScheduler } from "mobx/lib/internal";
 import { CustomPickerRow, DetachedCustomPickerRow } from "../components/CustomPicker";
+import ProgressCircle from 'react-native-progress-circle'
 
 
 import { useIsFocused } from "@react-navigation/native";
@@ -23,13 +24,16 @@ type Props = {
 } & StackScreenProps<MainStackParamList, "Main">;
 
 
-const MainScreen = ({ navigation, timeStore }: Props) => {
+const Bilan = ({ navigation, timeStore }: Props) => {
     const [formatedDataEmploye, setFormatedDataEmploye] = React.useState<Object>([]);
     const [dataOnDateEmploye, setDataOnDateEmploye] = React.useState<Object>([]);
 
     const [formatedActivities, setFormatedActivities] = React.useState<Object>([]);
     const [formatedProjects, setFormatedProjects] = React.useState<Object>([]);
     const [project, setProject] = React.useState<Object>([]);
+    const [budject, setBudject] = React.useState<Number>(0);
+    const [heureFacturable, setHeureFacturable] = React.useState<Number>(0);
+    const [heureRestante, setHeureRestante] = React.useState<Number>(0);
     const [activity, setActivity] = React.useState<Object>([]);
 
     const [dataOnDateClient, setDateOnDateClient] = React.useState<Object>([]);
@@ -38,93 +42,43 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
 
 
     const [typeAccount, setTypeAccount] = React.useState<Number>();
-    function getActivitiesNameWithPkId(pk_id) {
-        for (let i = 0; i < activitesList.length; i++) {
-            if (activitesList[i].pk_ID == pk_id) {
-                return activitesList[i].Nom;
-            }
+    async function getNombreHeuresCompleterActivite(activite) {
+        let temps = await get(SyncStorage.get('username'), SyncStorage.get('password'), global.fmServer, global.fmDatabase, "mobile_TEMPS2"
+            , "&fk_client=" + SyncStorage.get('client_PK') + "&Flag_facturable=" + 1 + "&flag_actif=1&fk_activites=" + activite);
+        let heuresTotal = 0;
+        for (let i = 0; i < temps.length; i++) {
+            heuresTotal = parseFloat(heuresTotal) + parseFloat(temps[i].Minutes);
         }
-        return "";
-    }
-    function selectDate(date) {
-        let dateObj = new Date(date);
-        let month = ("0" + parseInt(dateObj.getMonth() + 1)).slice(-2);
-
-        let day = dateObj.getDate() < 10 ? "0" + dateObj.getDate() : dateObj.getDate();
-
-        let dateStr = month + "/" + day + "/" + dateObj.getFullYear();
-
-        // var formattedNumber = ("0" + myNumber).slice(-2);
-        let dataOnDateTemp = [];
-        let indexDataOnDate = 0;
-        let formatedData = [];
-        if (SyncStorage.get('typeAccount') == 1) {
-            formatedData = formatedDataClient;
-        } else {
-            formatedData = formatedDataEmploye;
-        }
-
-        for (let i = 0; i < formatedData.length; i++) {
-
-            if (formatedData[i].StartDate == dateStr) {
-
-                dataOnDateTemp[indexDataOnDate] = formatedData[i];
-                indexDataOnDate++;
-            }
-        }
-
-        timeStore.selectDate(date)
-        if (SyncStorage.get('typeAccount') == 1) {
-            setDateOnDateClient(dataOnDateTemp);
-        } else if (SyncStorage.get('typeAccount') == 0) {
-            setDataOnDateEmploye(dataOnDateTemp);
-        } else {
-            setDataOnDateEmploye([]);
-            setDateOnDateClient([]);
-        }
-
+        setHeureFacturable(heuresTotal);
+        return heuresTotal;
     }
 
 
-    async function getRefreshData() {
 
-        let username = SyncStorage.get('username');
-        let password = SyncStorage.get('password');
+    async function getNombreHeuresCompleterProjet(projet) {
+        let heuresTotal = 0;
+        let budjectTotale = 0;
 
-
-        let layoutTemps = "mobile_TEMPS2";
-
-        let month = timeStore.activeMonth + 1;
-        let year = timeStore.activeYear;
-        let nbJourMois = (getDaysInMonth(timeStore.activeMonth, year).length);
-        if (SyncStorage.get("typeAccount") == 1) {
-            if (SyncStorage.get('filterProject') && SyncStorage.get('filterActivity')) {
-                setFormatedDataClient(await get(username, password, global.fmServer, global.fmDatabase, layoutTemps
-                    , "&fk_client=" + SyncStorage.get('client_PK') + "&fk_projet=" + SyncStorage.get('filterProject') + "&fk_activites=" + SyncStorage.get('filterActivity') + "&flag_actif=1&StartDate=" + month + "/1/" + year + "..." + month + "/" + nbJourMois + "/" + year));
-            } else if (SyncStorage.get('filterProject')) {
-                setFormatedDataClient(await get(username, password, global.fmServer, global.fmDatabase, layoutTemps
-                    , "&fk_client=" + SyncStorage.get('client_PK') + "&fk_projet=" + SyncStorage.get('filterProject') + "&flag_actif=1&StartDate=" + month + "/1/" + year + "..." + month + "/" + nbJourMois + "/" + year));
-            } else if (SyncStorage.get('filterActivity')) {
-                setFormatedDataClient(await get(username, password, global.fmServer, global.fmDatabase, layoutTemps
-                    , "&fk_client=" + SyncStorage.get('client_PK') + "&fk_activites=" + SyncStorage.get('filterActivity') + "&flag_actif=1&StartDate=" + month + "/1/" + year + "..." + month + "/" + nbJourMois + "/" + year));
-            } else {
-                setFormatedDataClient(await get(username, password, global.fmServer, global.fmDatabase, layoutTemps
-                    , "&fk_client=" + SyncStorage.get('client_PK') + "&flag_actif=1&StartDate=" + month + "/1/" + year + "..." + month + "/" + nbJourMois + "/" + year));
-            }
-        } else {
-            let fk_assignation = -1;
-            if (SyncStorage.get('user'.pk_ID)) {
-                fk_assignation = SyncStorage.get('user').pk_ID;
-            }
-
-
-            setFormatedDataEmploye(await get(username, password, global.fmServer, global.fmDatabase, layoutTemps
-                , "&fk_assignation=" + fk_assignation + "&flag_actif=1&StartDate=" + month + "/1/" + year + "..." + month + "/" + nbJourMois + "/" + year));
+        for (let i = 0; i < formatedActivities.length; i++) {
+            heuresTotal = parseFloat(heuresTotal) + parseFloat(await getNombreHeuresCompleterActivite(formatedActivities[i].pk_ID));
         }
 
 
+
+        setBudject(getBudjectForProject());
+        setHeureFacturable(heuresTotal);
     }
-    const isFocused = useIsFocused();
+
+    function getBudjectForProject() {
+        let budjectTotale = 0;
+        for (let i = 0; i < formatedActivities.length; i++) {
+            budjectTotale = parseFloat(budjectTotale) + parseFloat(formatedActivities[i].Heures_budget);
+        }
+        return budjectTotale;
+    }
+
+
+
 
     React.useEffect(() => {
         let username = SyncStorage.get('username');
@@ -135,29 +89,17 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
         let layoutActivite = "mobile_ACTIVITES2";
         let layoutTemps = "mobile_TEMPS2";
         let layoutAccount = "mobile_ACCOUNT2";
-        // if (SyncStorage.get('filterProject')) {
-        //     setProject(SyncStorage.get('filterProject'));
-        // }
-        // if (SyncStorage.get('filterActivity')) {
-        //     setActivity(SyncStorage.get('filterActivity'));
-
-        // }
 
         const setData = async (username, password, server, db, layoutClient, layoutProjet, layoutActivite) => {
             // setFormatedClients(await get(username, password, server, db, layoutClient));
-            setFormatedProjects(await get(username, password, server, db, layoutProjet, "&fk_client=" + SyncStorage.get('client_PK')));
-            setFormatedActivities(await get(username, password, server, db, layoutActivite, "&fk_client=" + SyncStorage.get('client_PK')));
+            setFormatedProjects(await get(username, password, global.fmServer, global.fmDatabase, layoutProjet, "&fk_client=" + SyncStorage.get('client_PK')));
+            setFormatedActivities(await get(username, password, global.fmServer, global.fmDatabase, layoutActivite, "&fk_client=" + SyncStorage.get('client_PK')));
         };
 
 
         setData(username, password, global.fmServer, global.fmDatabase, layoutClient, layoutProjet, layoutActivite);
 
     }, []);
-
-    let notEmptyDates;
-
-    notEmptyDates = getNotEmptyDates(formatedDataClient, "StartDate");
-
 
 
     let render;
@@ -168,7 +110,7 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
     } else {
 
         // alert(SyncStorage.get('filterActivity') > 0);
-    
+
         render = (
             <Container style={{ flex: 1 }}>
                 <Header>
@@ -184,8 +126,9 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
                         </Button>
 
                     </Left>
- 
+
                 </Header>
+
                 <View style={{ padding: 20 }}>
                     <CustomPickerRow<Projet>
                         records={formatedProjects}
@@ -195,6 +138,8 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
                         onChange={async (value) => {
                             setFormatedActivities(await get(SyncStorage.get('username'), SyncStorage.get('password'), global.fmServer, global.fmDatabase, "mobile_ACTIVITES2", "&fk_client=" + SyncStorage.get('client_PK') + "&fk_projet=" + value));
                             setProject(Number(value));
+
+                            getNombreHeuresCompleterProjet(value);
                         }}
                         placeholder={"Projets"}
                     />
@@ -211,15 +156,59 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
                                 if (formatedActivities[i].pk_ID == Number(value)) {
                                     projet = (formatedActivities[i].fk_projet);
                                     setProject(Number(projet));
+                                    setBudject(formatedActivities[i].Heures_budget)
                                 }
                             }
-
                             setActivity(Number(value));
+
+                            getNombreHeuresCompleterActivite(value);
+
+
                         }}
                         placeholder={"Activités"}
                     />
-
                 </View>
+
+                {activity != "" || project != "" ?
+                    <View style={{ padding: 20 }}>
+
+                        <View style={{ flexDirection: 'row', marginTop: 25 }}>
+                            <Text>
+                                Nombre d'heures restantes : {budject - heureFacturable}
+                            </Text>
+                        </View>
+                        <View style={{ flexDirection: 'row', marginTop: 5 }}>
+                            <Text>
+                                Nombre d'heures complétés : {heureFacturable} / {budject}
+                            </Text>
+                        </View>
+                        <View style={{ flexDirection: 'row', marginTop: 5 }}>
+                            <Text>
+                                Nombre d'heures facturables : {heureFacturable}
+                            </Text>
+                        </View>
+
+
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 25 }}>
+                            <ProgressCircle
+                                percent={((heureFacturable / budject) * 100)}
+                                radius={50}
+                                borderWidth={8}
+                                color="#1f4598"
+                                shadowColor="#999"
+                                bgColor="#fff"
+                            >
+                                <Text style={{ fontSize: 18 }}>{((heureFacturable / budject)).toFixed(2) * 100}%</Text>
+                            </ProgressCircle>
+                        </View>
+
+
+                    </View>
+                    :
+
+                    null
+                }
+
 
             </Container>
         );
@@ -229,7 +218,7 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
     );
 
 };
-export default inject("timeStore")(observer(MainScreen));
+export default inject("timeStore")(observer(Bilan));
 
 const styles = StyleSheet.create({
     container: {
