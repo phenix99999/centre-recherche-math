@@ -511,12 +511,12 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                 <View style={styles.inputWrapper}>
                     <Text>Nombre d'heures planifiées:</Text>
                     {editionMode == "update" ? 
-                    <Text> {record.Minutes_planifie}</Text>
+                    <Text> {record.Minutes_planifie == "-1" ? "" : record.Minutes_planifie}</Text>
                     : 
                     <Input
                     style={styles.inputBorder}
                     placeholder={"Écrivez ici"}
-                    value={record.Minutes_planifie}
+                    value={record.Minutes_planifie == -1 ? "" : record.Minutes_planifie}
                     onChangeText={(text) =>  setRecord({...record,"Minutes_planifie": text})}
                     keyboardType={"numeric"}
            
@@ -528,7 +528,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                     <Input
                         style={styles.inputBorder}
                         placeholder={"Écrivez ici"}
-                        value={record.Minutes}
+                        value={record.Minutes == -1 ? "" : record.Minutes}
                         onChangeText={(text) => setRecord({...record,"Minutes": text})}
                         keyboardType={"numeric"}
         
@@ -789,7 +789,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                             <Input
                                 style={styles.inputBorder}
                                 placeholder={"Écrivez ici"}
-                                value={record.Minutes_restantes}
+                                value={record.Minutes_restantes == -1 ? "" : record.Minutes_restantes}
                                 onChangeText={(text) => setRecord({...record,"Minutes_restantes":text})}
                                 keyboardType={"numeric"}
                                
@@ -804,7 +804,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                                 underline
                                 style={styles.inputBorder}
                                 rowSpan={5}
-                                value={record.Minutes_restantes_tache}
+                                value={record.Minutes_restantes_tache == -1 ? "" : record.Minutes_restantes_tache}
                                 onChangeText={(text) =>  setRecord({...record,"Minutes_restantes_tache":text})}
                                
                             />

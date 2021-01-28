@@ -394,21 +394,21 @@ const TempsDetailsClient = ({ route,navigation, timeStore }: Props) => {
                 <View style={styles.inputWrapper}>
                     <Text>Description:</Text>
                     <Text>
-                    {record.Description}
+                    {record.Description == "-1" ? "" : record.Description}
                     </Text>
                     
                 </View>
                 <View style={styles.inputWrapper}>
                     <Text>Nombre d'heures planifiées:</Text>
                     
-                    <Text> {record.Minutes_planifie}</Text>
+                    <Text> {record.Minutes_planifie == "-1" ? "" : record.Minutes_planifie}</Text>
                    
                 
                 </View>
                 <View style={styles.inputWrapper}>
                     <Text>Nombre d'heures réelles:</Text>
                  
-                    <Text> {record.Minutes}</Text>
+                    <Text> {record.Minutes == "-1" ? "" : record.Minutes}</Text>
                    
                 </View>
 
