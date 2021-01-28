@@ -90,9 +90,9 @@ const LoginScreen = ({ navigation, authStore }: Props) => {
                                         SyncStorage.set('user', user[0]);
                                         //1 = client 0 = employe
                                         if (user[0].PrivilegeSet == 1) {
-                                            SyncStorage.set('typeAccount', 1)
+                                            await SyncStorage.set('typeAccount', 1)
                                         } else {
-                                            SyncStorage.set('typeAccount', 0)
+                                            await SyncStorage.set('typeAccount', 0)
                                         }
                                         if (user[0].PrivilegeSet == 1) {
                                             //Client id

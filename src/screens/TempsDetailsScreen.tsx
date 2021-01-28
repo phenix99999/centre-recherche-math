@@ -55,12 +55,13 @@ let formatedTaches = [
 "Recherche",
 "Design",
 ];
-let initialJobComplete = -1;
+// let initialJobComplete = -1;
 
-let initialFacturable = -1;
+// let initialFacturable = -1;
 
-let initialRd = -1;
+// let initialRd = -1;
 
+let jobComplet = -1;
 
 const TempsDetails = ({ route,navigation, timeStore }: Props) => {
     const editionMode = route.params.editionMode;
@@ -76,9 +77,15 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
     const [activity, setActivity] = React.useState<Object>({});
     const [projectName, setProjectName] = React.useState<String>("");
     const [project, setProject] = React.useState<Object>({});
-
+    
     const [initialeValueFlagComplet, setInitialeValueFlagComplet] = React.useState<String>("");
- 
+    const [initialJobComplete, setInitialJobComplete] = React.useState<Number>();
+    const [initialFacturable, setInitialFacturable] = React.useState<Number>();
+    const [initialRd, setInitialRd] = React.useState<Number>();
+
+
+    
+
 
     async function getProjects(fk_client){
         let username = SyncStorage.get('username');
@@ -125,11 +132,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
         setProjectName(project[0].Nom);
     }
 
-
-
-
     React.useEffect(() => {
-        // alert(route.params.pk_ID);
         let username = SyncStorage.get('username');
         let password = SyncStorage.get('password');
   
@@ -143,23 +146,58 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
         if(editionMode == "update"){
  
              pk_ID = route.params.pk_ID;
+          
         }
+
         const setDataToUpdate = async (pk_ID) => {
       
             if(editionMode == "update"){
-       
                 let theRecord = (await get(username, password, global.fmServer, global.fmDatabase, layoutTemps,"&pk_ID="+pk_ID));
-                 if(theRecord[0].Flag_termine.localeCompare("1") == 0){
-                    setInitialeValueFlagComplet("0");
-                } else if(theRecord[0].Flag_termine.localeCompare("0") == 0){
-                    setInitialeValueFlagComplet("1");
-                } 
-                setInitialeValueFlagComplet("1");
-            
+                
+                // alert(theRecord[0].Flag_termine);
+ 
                
                 setActivityData(theRecord[0].fk_activites);
                 
+                // alert(theRecord[0].Flag_termine);
+                            
+                if(theRecord[0].Flag_termine == "1"){
+                    // initialJobComplete =0;
+                    setInitialJobComplete(0);
+                    jobComplet = 0;
+                } else if(theRecord[0].Flag_termine == "0"){
+                    // alert("ICI");
+                    setInitialJobComplete(1);
+                    jobComplet = 1;
+                    // initialJobComplete = 1;
+                } else {
+                    jobComplet = -1;
+                    setInitialJobComplete(-1);
+           
+                }
        
+                if(theRecord[0].Flag_facturable == 1){
+                    // initialFacturable = 0;
+                    setInitialFacturable(0);
+                } else if(theRecord[0].Flag_facturable == 0){
+                    // initialFacturable = 1;
+                    setInitialFacturable(1);
+                } else {
+                    setInitialFacturable(-1);
+                    // initialFacturable = -1;
+                }
+
+
+                if(theRecord[0].flag_R_et_D == "1"){
+                
+                    setInitialRd(0);
+                } else if(theRecord[0].flag_R_et_D == "0"){
+                    setInitialRd(1);
+                } else {
+                    setInitialRd(-1);
+                }
+
+   
                 setRecord(theRecord[0]);
             }
         };
@@ -174,20 +212,9 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
         setData(username,password,  global.fmServer, global.fmDatabase,layoutClient,layoutProjet,layoutActivite);
         if(editionMode == "update"){
              setDataToUpdate(pk_ID);
+            //  alert(initialJobComplete);
+            //  alert(initialFacturable);
         }
-
-        // if (editionMode === "update") {
-        //     if (crud.shownValue("Flag_termine").localeCompare("0") == 0) {
-        //         initialJobComplete =0;
-        //         setShowQuestion(1);
-        //     } else if (crud.shownValue("Flag_termine").localeCompare("1") == 0) {
-        //         initialJobComplete =0;
-        //         setShowQuestion(0);
-        //     } else {
-        //         initialJobComplete =-1;
-        //     }
- 
-        // }
     }, []);
 
     function addAndUpdateQuery(deleteVar=false){
@@ -202,16 +229,19 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
      let fk_activites = record.fk_activites || "";
      let flag_actif = deleteVar == true ? 0 : 1;
      let Description = record.Description || "";
-     let Flag_termine = record.Flag_termine || "";
-        
-     let facturable = record.Flag_facturable || "";
+    
+
+     let Flag_termine = record.Flag_termine;
+
+     let facturable = record.Flag_facturable;
      let rd = record.flag_R_et_D;
      let tache = record.Taches.length;
  
 
      let Minutes_restantes = record.Minutes_restantes || "";
      let Minutes_restantes_tache = record.Minutes_restantes_tache || "";
-    
+    //  alert("Length " + record.Flag_termine.length);
+    // console.log("FLAG TERMINE " + Flag_termine);
      return "&StartDate=" + StartDate + "&fk_assignation=" + fk_assignation +"&fk_client=" + fk_client +"&fk_projet=" + fk_projet+"&Taches=" + tache +"&Flag_facturable="+facturable+"&flag_R_et_D=" + rd
      + "&Minutes="+Minutes+"&Minutes_planifie="+Minutes_planifie+"&AM_PM="+AM_PM+"&fk_activites="+fk_activites+"&flag_actif="+flag_actif+"&Description="+Description+"&Flag_termine=" + Flag_termine + "&Minutes_restantes=" + Minutes_restantes + "&Minutes_restantes_tache="+Minutes_restantes_tache;
 
@@ -246,14 +276,26 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
          let password = SyncStorage.get('password');
          
  
-                  let db = "vhmsoft";
-        
+        let db = "vhmsoft";
+ 
          let layoutTemps = "mobile_TEMPS2";
         if(record.Minutes_restantes_tache.length == 0  && record.Flag_termine == 0){
             alert("Veuillez entrez une description de ce qui reste à accomplir s.v.p.")
-        }
+            return false;
+        } else {
+            await edit(username,password,global.fmServer,global.fmDatabase,layoutTemps,record['record-id'],addAndUpdateQuery());
+            if(record.Flag_termine == 0 && initialJobComplete == -1){
+                let scriptName = "replanification";
+                let scriptParam = record.pk_ID;
+                let username = SyncStorage.get('username');
+                let password = SyncStorage.get('password');
+                let layoutClient = "mobile_CLIENTS2";
 
-        await edit(username,password,global.fmServer,global.fmDatabase,layoutTemps,record['record-id'],addAndUpdateQuery());
+                execScript(username,password,global.fmServer,global.fmDatabase,layoutClient,scriptName,scriptParam);
+           
+            }
+            return true;
+        }
     }
  
     const computeColor = (activite?: Record<Activite>) => {
@@ -281,24 +323,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
 
     const color = computeColor(activity);
 
-    if(record.Flag_termine == "1"){
-        initialJobComplete =0;
-    } else if(record.Flag_termine == "0"){
-        initialJobComplete = 1;
-    }
- 
-    if(record.Flag_facturable == "1"){
-        initialFacturable = 0;
-    } else if(record.Flag_facturable == "0"){
-        initialFacturable = 1;
-    }
-
-
-    if(record.flag_R_et_D == "1"){
-        initialRd = 0;
-    } else if(record.flag_R_et_D == "0"){
-        initialRd = 1;
-    }
+    // alert(initialFacturable);
 
 
     return (
@@ -327,25 +352,11 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                     {editionMode == "update" ? 
                     <Button
                     transparent
-                    onPress={async (initialValueCompleteJob) => {
-                       
-                       
-                        update();
-
-                        if(record.Flag_termine == 0 && initialValueCompleteJob == -1){
-                            let scriptName = "replanification";
-                            let scriptParam = record.pk_ID;
-                            let username = SyncStorage.get('username');
-                            let password = SyncStorage.get('password');
-                
-                            let db = "vhmsoft";
-                    
-                            let layoutClient = "mobile_CLIENTS2";
-
-                            execScript(username,password,server,db,layoutClient,scriptName,scriptParam);
+                    onPress={async () => {
+         
+                        if(await update()){
+                            navigation.replace('Main');
                         }
-                         navigation.replace('Main');
-
                     }}
                 >
                     <Text>Modifier</Text>
@@ -544,23 +555,66 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                
                         <View style={styles.inputWrapper}>
                         <Text>Est-ce que c'est facturable?</Text>
+                   
                         <View style={{ flexDirection: 'row' }}>
                             
+                            {record.Flag_facturable == 1 ? 
+                                    <RadioForm
+                                    radio_props={radio_props}
+                                    initial={(0)}
+                                    formHorizontal={true}
+                                    labelHorizontal={true}
+                                    style={{ left: 10 }}
+                                    radioStyle={{ paddingRight: 20 }}
+                                    onPress={(value) => {
+                                        setRecord({...record,"Flag_facturable":Number(value)})
+                                        
+                                    }
+                                    }
+                                />
+                            : 
                             
-                            <RadioForm
-                            radio_props={radio_props}
-                            initial={initialFacturable}
-                            formHorizontal={true}
-                            labelHorizontal={true}
-                            style={{ left: 10 }}
-                            radioStyle={{ paddingRight: 20 }}
-                            onPress={(value) => {
-                                setRecord({...record,"Flag_facturable":Number(value)})
-                               
-                            }
-                            }
-                        />
-                        
+                            null}
+
+                        {record.Flag_facturable == 0 ? 
+                                    <RadioForm
+                                    radio_props={radio_props}
+                                    initial={(1)}
+                                    formHorizontal={true}
+                                    labelHorizontal={true}
+                                    style={{ left: 10 }}
+                                    radioStyle={{ paddingRight: 20 }}
+                                    onPress={(value) => {
+                                        setRecord({...record,"Flag_facturable":Number(value)})
+                                        
+                                    }
+                                    }
+                                />
+                            : 
+                            
+                            null}
+
+
+
+                        {record.Flag_facturable == -1 ? 
+                                    <RadioForm
+                                    radio_props={radio_props}
+                                    initial={(-1)}
+                                    formHorizontal={true}
+                                    labelHorizontal={true}
+                                    style={{ left: 10 }}
+                                    radioStyle={{ paddingRight: 20 }}
+                                    onPress={(value) => {
+                                        setRecord({...record,"Flag_facturable":Number(value)})
+                                        
+                                    }
+                                    }
+                                />
+                            : 
+                            
+                            null}
+
+
                             
                         </View>
 
@@ -568,22 +622,60 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
 
 
                         <View style={styles.inputWrapper}>
-                        <Text>Est-ce que c'est du R&D ?</Text>
-                        <View style={{ flexDirection: 'row' }}>
-                            
-                            
+                    <Text>Est-ce que c'est du R&D ?</Text>
+                    <View style={{ flexDirection: 'row' }}>
+                                            
+                    {record.flag_R_et_D == 1 ? 
                             <RadioForm
                             radio_props={radio_props}
-                            initial={initialRd}
+                            initial={(0)}
                             formHorizontal={true}
                             labelHorizontal={true}
                             style={{ left: 10 }}
-                            radioStyle={{ paddingRight: 20 }}
-                            onPress={(value) => {
-                                setRecord({...record,"flag_R_et_D":Number(value)})                               
-                            }
-                            }
-                        />
+                                radioStyle={{ paddingRight: 20 }}
+                                onPress={(value) => {
+                                    setRecord({...record,"flag_R_et_D":Number(value)})                               
+                                }
+                                }
+                            />
+                                :
+                                null
+                                    }
+
+                    {record.flag_R_et_D == 0 ? 
+                                <RadioForm
+                                radio_props={radio_props}
+                                initial={(1)}
+                                formHorizontal={true}
+                                labelHorizontal={true}
+                                style={{ left: 10 }}
+                                radioStyle={{ paddingRight: 20 }}
+                                onPress={(value) => {
+                                    setRecord({...record,"flag_R_et_D":Number(value)})                               
+                                }
+                                }
+                            />
+                    :
+                                null
+                                    }
+                                {record.flag_R_et_D == -1 ? 
+                                <RadioForm
+                                radio_props={radio_props}
+                                initial={(-1)}
+                                formHorizontal={true}
+                                labelHorizontal={true}
+                                style={{ left: 10 }}
+                                radioStyle={{ paddingRight: 20 }}
+                                onPress={(value) => {
+                                    setRecord({...record,"flag_R_et_D":Number(value)})                               
+                                }
+                                        }
+                                    />
+                            :
+                            null
+                    }
+                    
+                
                         
                             
                         </View>
@@ -594,7 +686,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
  
                         
 
-                        {editionMode == "update" ? 
+                        {editionMode == "update" && record.Flag_termine == 1 ? 
                         <View style={styles.inputWrapper}>
                         <Text>Est-ce que ça complète la tâche?(Oui/Non)</Text>
                         <View style={{ flexDirection: 'row' }}>
@@ -602,14 +694,16 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                             
                             <RadioForm
                             radio_props={radio_props}
-                            initial={initialJobComplete}
+                            initial={(0)}
                             formHorizontal={true}
                             labelHorizontal={true}
                             style={{ left: 10 }}
                             radioStyle={{ paddingRight: 20 }}
                             onPress={(value) => {
+
+                                // alert(Number(value));
                             
-                                setRecord({...record,"Flag_termine":value})
+                                setRecord({...record,"Flag_termine":Number(value)})
                                
                             }
                             }
@@ -623,7 +717,72 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                         :
                         null
                         }
-                {(record.Flag_termine == "0" || initialJobComplete == 1) && editionMode == "update" ?
+
+                {editionMode == "update" && record.Flag_termine ==0 ? 
+                        <View style={styles.inputWrapper}>
+                        <Text>Est-ce que ça complète la tâche?(Oui/Non)</Text>
+                        <View style={{ flexDirection: 'row' }}>
+                            
+                            
+                            <RadioForm
+                            radio_props={radio_props}
+                            initial={(1)}
+                            formHorizontal={true}
+                            labelHorizontal={true}
+                            style={{ left: 10 }}
+                            radioStyle={{ paddingRight: 20 }}
+                            onPress={(value) => {
+
+                                // alert(Number(value));
+                            
+                                setRecord({...record,"Flag_termine":Number(value)})
+                               
+                            }
+                            }
+                        />
+                        
+                            
+                        </View>
+
+                        </View>
+
+                        :
+                        null
+                        }
+
+                {editionMode == "update" && record.Flag_termine == -1 ? 
+                        <View style={styles.inputWrapper}>
+                        <Text>Est-ce que ça complète la tâche?(Oui/Non)</Text>
+                        <View style={{ flexDirection: 'row' }}>
+                            
+                            
+                            <RadioForm
+                            radio_props={radio_props}
+                            initial={(-1)}
+                            formHorizontal={true}
+                            labelHorizontal={true}
+                            style={{ left: 10 }}
+                            radioStyle={{ paddingRight: 20 }}
+                            onPress={(value) => {
+
+                                // alert(Number(value));
+                            
+                                setRecord({...record,"Flag_termine":Number(value)})
+                               
+                            }
+                            }
+                        />
+                        
+                            
+                        </View>
+
+                        </View>
+
+                        :
+                        null
+                        }
+
+                {(record.Flag_termine == "0") && editionMode == "update" ?
                     <View>
                         <View style={styles.inputWrapper}>
                             <Text>Combien d'heure de plus ça prendrait pour terminer la tâche? </Text>

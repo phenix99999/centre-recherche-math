@@ -39,8 +39,11 @@ export function formatData(records) {
             if (indexField == 0) {
                 formatedDataTemp[indexRecord] = {};
             }
-
-            formatedDataTemp[indexRecord][records[indexRecord].children[indexField].attributes.name] = records[indexRecord].children[indexField].children[0].value;
+            if (records[indexRecord].children[indexField].children[0].value == "") {
+                formatedDataTemp[indexRecord][records[indexRecord].children[indexField].attributes.name] = "-1";
+            } else {
+                formatedDataTemp[indexRecord][records[indexRecord].children[indexField].attributes.name] = records[indexRecord].children[indexField].children[0].value;
+            }
             formatedDataTemp[indexRecord]['record-id'] = records[indexRecord]['attributes']['record-id'];
 
         }
@@ -68,6 +71,7 @@ export async function add(username, password, server, db, layout, query) {
         headers: { 'Authorization': authHeader }
     }).then(function (response) {
         data = new XMLParser().parseFromString(response.data);
+
         return true;
     }).catch(function (error) {
         alert("ERROR");
@@ -108,8 +112,7 @@ export async function edit(username, password, server, db, layout, recid, query)
 
     // https://vhmsoft.com/fmi/xml/fmresultset.xml?-db=vhmsoft_Lyes&-lay=mobile_TEMPS&AM_PM=PM&-new
     let url = "https://" + server + "/fmi/xml/fmresultset.xml?-db=" + db + "&-lay=" + layout + "&-recid=" + recid + query + "&-edit";
-    console.log("Inside the thing ");
-    console.log(url);
+
 
     await axios.post(url, {}, {
         headers: { 'Authorization': authHeader }
@@ -139,6 +142,7 @@ export async function get(username, password, server, db, layout, query = null) 
         headers: { 'Authorization': authHeader }
     }).then(function (response) {
         data = new XMLParser().parseFromString(response.data);
+
     }).catch(function (error) {
         errorAuth = true;
     });
