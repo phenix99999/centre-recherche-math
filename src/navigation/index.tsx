@@ -111,9 +111,9 @@ export default class App extends Component {
 
 
         function MainStack() {
-
-            return (
-                <Tab.Navigator
+            let render = null;
+            if (SyncStorage.get('typeAccount') == "1") {
+                render = <Tab.Navigator
                     tabBarOptions={{
                         activeTintColor: '#1f4598',
                         inactiveTintColor: 'gray',
@@ -132,7 +132,6 @@ export default class App extends Component {
                             ),
 
                         }} name="Main" component={CalendrierStack} />
-
                     <Stack.Screen options=
                         {{
                             tabBarLabel: 'Mode Liste',
@@ -141,19 +140,27 @@ export default class App extends Component {
                             ),
 
                         }} name="CalendrierModeList" component={CalendrierListeStack} />
-
-
                     <Stack.Screen options=
                         {{
                             tabBarLabel: 'Mode Bilan',
                             tabBarIcon: ({ color, size }) => (
                                 <Entypo name="bar-graph" color={"#1f4598"} size={size} />
                             ),
-
                         }} name="BilanStack" component={BilanStack} />
-
-
                 </Tab.Navigator>
+
+
+            } else {
+                render = <Stack.Navigator screenOptions={{ headerShown: false }} mode="modal" >
+                    <Stack.Screen name="Main" component={MainScreen} />
+                    <Stack.Screen name="PageIntro" component={PageIntro} />
+                    <Stack.Screen name="TempsDetailsFilter" component={TempsDetailsFilter} />
+                    <Stack.Screen name="TempsDetails" component={TempsDetailsScreen} />
+                    <Stack.Screen name="Login" component={LoginScreen} />
+                </Stack.Navigator>
+            }
+            return (
+                render
 
             );
         }

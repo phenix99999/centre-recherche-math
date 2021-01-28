@@ -129,7 +129,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
 
 
     React.useEffect(() => {
-        alert(route.params.pk_ID);
+        // alert(route.params.pk_ID);
         let username = SyncStorage.get('username');
         let password = SyncStorage.get('password');
   
@@ -314,7 +314,9 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                         }}
                         transparent
                     >
-                        {editionMode === "create" ? <Text>Annuler</Text> : <Icon name="arrow-back"></Icon>}
+                        {editionMode === "create" ?                             <Icon name="back" type="AntDesign" style={{ fontSize: 30, marginLeft: 2, color: '#1f4598' }} />
+ :                    <Icon name="back" type="AntDesign" style={{ fontSize: 30, marginLeft: 2, color: '#1f4598' }} />
+}
                     </Button>
                 </Left>
 
@@ -356,7 +358,8 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
             
                 }}
             >
-                <Text>Créer</Text>
+    <Icon name="plus" type="AntDesign" style={{ fontSize: 30, marginLeft: 2, color: '#1f4598' }} />
+
             </Button>
                 }
                
@@ -672,7 +675,19 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                     >
                         <Text>Supprimer</Text>
                     </Button>
-                ) : null}
+                ) :
+                <View style={{flexDirection:'row',left:'15%'}}>
+                <Button
+  
+                onPress={() => {
+                    create();
+            
+                }}
+            >
+<Text>Créer</Text>
+            </Button>
+            </View>
+                }
             </Content>
         </Container>
     );

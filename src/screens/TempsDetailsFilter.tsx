@@ -62,8 +62,14 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
 
         const setData = async (username, password, server, db, layoutClient, layoutProjet, layoutActivite) => {
             // setFormatedClients(await get(username, password, server, db, layoutClient));
-            setFormatedProjects(await get(username, password, server, db, layoutProjet, "&fk_client=" + SyncStorage.get('client_PK')));
-            setFormatedActivities(await get(username, password, server, db, layoutActivite, "&fk_client=" + SyncStorage.get('client_PK')));
+            if (SyncStorage.get('typeAccount') == "1") {
+                setFormatedProjects(await get(username, password, server, db, layoutProjet, "&fk_client=" + SyncStorage.get('client_PK') + "&flag_actif=1"));
+                setFormatedActivities(await get(username, password, server, db, layoutActivite, "&fk_client=" + SyncStorage.get('client_PK') + "&flag_actif=1"));
+            } else {
+                setFormatedProjects(await get(username, password, server, db, layoutProjet, "&flag_actif=1"));
+                setFormatedActivities(await get(username, password, server, db, layoutActivite, "&flag_actif=1"));
+            }
+
         };
 
 
@@ -118,7 +124,7 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
                     getLabel={(projet: Record<Projet>) => projet.Nom}
                     selectedValue={project}
                     onChange={async (value) => {
-                        setFormatedActivities(await get(SyncStorage.get('username'), SyncStorage.get('password'), global.fmServer, global.fmDatabase, "mobile_ACTIVITES2", "&fk_client=" + SyncStorage.get('client_PK') + "&fk_projet=" + value));
+                        setFormatedActivities(await get(SyncStorage.get('username'), SyncStorage.get('password'), global.fmServer, global.fmDatabase, "mobile_ACTIVITES2", "&fk_projet=" + value));
                         setProject(Number(value));
                     }}
                     placeholder={"Projets"}

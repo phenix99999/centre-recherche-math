@@ -90,6 +90,7 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
         let year = timeStore.activeYear;
         let nbJourMois = (getDaysInMonth(timeStore.activeMonth, year).length);
         if (SyncStorage.get("typeAccount") == 1) {
+            // alert("ICI");
             if (SyncStorage.get('filterProject') && SyncStorage.get('filterActivity')) {
                 setFormatedDataClient(await get(username, password, global.fmServer, global.fmDatabase, layoutTemps
                     , "&fk_client=" + SyncStorage.get('client_PK') + "&fk_projet=" + SyncStorage.get('filterProject') + "&fk_activites=" + SyncStorage.get('filterActivity') + "&flag_actif=1&StartDate=" + month + "/1/" + year + "..." + month + "/" + nbJourMois + "/" + year));
@@ -105,10 +106,9 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
             }
         } else {
             let fk_assignation = -1;
-            if (SyncStorage.get('user'.pk_ID)) {
+            if (SyncStorage.get('user').pk_ID) {
                 fk_assignation = SyncStorage.get('user').pk_ID;
             }
-
 
             setFormatedDataEmploye(await get(username, password, global.fmServer, global.fmDatabase, layoutTemps
                 , "&fk_assignation=" + fk_assignation + "&flag_actif=1&StartDate=" + month + "/1/" + year + "..." + month + "/" + nbJourMois + "/" + year));
@@ -201,7 +201,6 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
 
             // alert(SyncStorage.get('pk_ID'));
         } else {
-
             getDataOnDateEmploye(username, password, global.fmServer, global.fmDatabase, month, year, nbJourMois, timeStore.selectedDate);
             setDataEmploye(username, password, global.fmServer, global.fmDatabase, month, year, nbJourMois, timeStore);
         }
@@ -215,7 +214,6 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
         notEmptyDates = getNotEmptyDates(formatedDataEmploye, "StartDate");
     }
 
-
     let render;
 
     if (SyncStorage.get('typeAccount') == null) {
@@ -224,29 +222,43 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
     } else {
 
         // alert(SyncStorage.get('filterActivity') > 0);
-        let rightHeader = <View style={{ flexDirection: 'row' }}>
+        let rightHeader;
 
-            <Button
-                transparent
-                onPress={async () => {
-                    navigation.navigate('TempsDetailsFilter', { from: 'Main' });
+        if (SyncStorage.get('typeAccount') == "1") {
+            rightHeader = <View style={{ flexDirection: 'row' }}>
+                <Button
+                    transparent
+                    onPress={async () => {
+                        navigation.openDrawer();
 
-                }}
-            >
+                    }}
+                >
+                    <Icon name="menu" type={"MaterialIcons"} style={{ fontSize: 30, color: '#1f4598' }} />
+                </Button>
 
-                {SyncStorage.get('filterProject') && SyncStorage.get('filterProject') > 0 || SyncStorage.get('filterActivity') && SyncStorage.get('filterActivity') > 0 ?
-                    <Icon name="filter" type={"AntDesign"} style={{ fontSize: 30, marginRight: 0, color: 'red' }} >
 
-                    </Icon>
-                    :
-                    <Icon name="filter" type={"AntDesign"} style={{ fontSize: 30, marginRight: 0, color: '#1f4598' }} >
 
-                    </Icon>
-                }
-            </Button>
-        </View>;
+                <Button
+                    transparent
+                    onPress={async () => {
+                        navigation.navigate('TempsDetailsFilter', { from: 'CalendrierModeList' });
 
-        if (SyncStorage.get('typeAccount') == 0) {
+                    }}
+                >
+
+                    {SyncStorage.get('filterProject') && SyncStorage.get('filterProject') > 0 || SyncStorage.get('filterActivity') && SyncStorage.get('filterActivity') > 0 ?
+                        <Icon name="filter" type={"AntDesign"} style={{ fontSize: 30, marginRight: 0, color: 'red' }} >
+
+                        </Icon>
+                        :
+                        <Icon name="filter" type={"AntDesign"} style={{ fontSize: 30, marginRight: 0, color: '#1f4598' }} >
+
+                        </Icon>
+                    }
+                </Button>
+
+            </View>
+        } else {
             rightHeader = <View style={{ flexDirection: 'row' }}>
                 <Button
                     transparent
@@ -261,6 +273,8 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
             </View>
         }
 
+
+
         render = (
             <Container style={{ flex: 1 }}>
                 <Header>
@@ -268,11 +282,11 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
                         <Button
                             transparent
                             onPress={async () => {
-                                navigation.openDrawer();
+                                navigation.goBack();
 
                             }}
                         >
-                            <Icon name="menu" type={"MaterialIcons"} style={{ fontSize: 30, color: '#1f4598' }} />
+                            <Icon name="back" type="AntDesign" style={{ fontSize: 30, marginLeft: 2, color: '#1f4598' }} />
                         </Button>
 
                     </Left>

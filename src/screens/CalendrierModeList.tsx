@@ -348,7 +348,15 @@ const CalendarModeList = ({ navigation, timeStore }: Props) => {
         >
             <Header>
                 <Left>
+                    <Button
+                        transparent
+                        onPress={async () => {
+                            navigation.goBack();
 
+                        }}
+                    >
+                        <Icon name="back" type="AntDesign" style={{ fontSize: 30, marginLeft: 2, color: '#1f4598' }} />
+                    </Button>
 
                 </Left>
                 <Right>
