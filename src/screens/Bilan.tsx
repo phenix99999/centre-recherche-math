@@ -168,43 +168,7 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
     } else {
 
         // alert(SyncStorage.get('filterActivity') > 0);
-        let rightHeader = <View style={{ flexDirection: 'row' }}>
-
-            <Button
-                transparent
-                onPress={async () => {
-                    navigation.navigate('TempsDetailsFilter', { from: 'Main' });
-
-                }}
-            >
-
-                {SyncStorage.get('filterProject') && SyncStorage.get('filterProject') > 0 || SyncStorage.get('filterActivity') && SyncStorage.get('filterActivity') > 0 ?
-                    <Icon name="filter" type={"AntDesign"} style={{ fontSize: 30, marginRight: 0, color: 'red' }} >
-
-                    </Icon>
-                    :
-                    <Icon name="filter" type={"AntDesign"} style={{ fontSize: 30, marginRight: 0, color: '#1f4598' }} >
-
-                    </Icon>
-                }
-            </Button>
-        </View>;
-
-        if (SyncStorage.get('typeAccount') == 0) {
-            rightHeader = <View style={{ flexDirection: 'row' }}>
-                <Button
-                    transparent
-                    onPress={async () => {
-                        navigation.openDrawer();
-
-                    }}
-                >
-                    <Icon name="menu" type={"MaterialIcons"} style={{ fontSize: 30, color: '#1f4598' }} />
-                </Button>
-
-            </View>
-        }
-
+    
         render = (
             <Container style={{ flex: 1 }}>
                 <Header>
@@ -220,11 +184,7 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
                         </Button>
 
                     </Left>
-                    <Right>
-                        {rightHeader}
-
-                    </Right>
-
+ 
                 </Header>
                 <View style={{ padding: 20 }}>
                     <CustomPickerRow<Projet>

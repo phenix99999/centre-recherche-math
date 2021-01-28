@@ -241,7 +241,7 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
                 <Button
                     transparent
                     onPress={async () => {
-                        navigation.navigate('TempsDetailsFilter', { from: 'CalendrierModeList' });
+                        navigation.navigate('TempsDetailsFilter', { from: 'Main' });
 
                     }}
                 >
