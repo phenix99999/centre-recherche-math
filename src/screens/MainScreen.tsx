@@ -322,7 +322,7 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
                                 transparent
                                 onPress={() => {
                                     // crud.updateEditionMode("create");
-                                    navigation.replace("TempsDetails", { editionMode: 'create' });
+                                    navigation.navigate("TempsDetails", { editionMode: 'create' });
                                 }}
                             >
                                 <Text style={{ color: '#1f4598' }}>+ Nouvelle entrée</Text>

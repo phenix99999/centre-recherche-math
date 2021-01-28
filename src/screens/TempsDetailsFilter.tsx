@@ -156,7 +156,7 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
                 onPress={() => {
                     SyncStorage.set('filterProject', project);
                     SyncStorage.set('filterActivity', activity);
-                    navigation.replace(route.params.from);
+                    navigation.goBack();
 
                 }
                 }

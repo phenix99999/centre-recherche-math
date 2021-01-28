@@ -242,7 +242,7 @@ const TempsDetailsClient = ({ route,navigation, timeStore }: Props) => {
             let layoutTemps = "mobile_TEMPS2";
             console.log(addAndUpdateQuery());
            await add(username,password,global.fmServer,global.fmDatabase,layoutTemps,addAndUpdateQuery());
-           navigation.replace('Main');
+           navigation.goBack('Main');
         } 
     }
 
@@ -318,7 +318,7 @@ const TempsDetailsClient = ({ route,navigation, timeStore }: Props) => {
                     <Button
                         onPress={() => {
                            
-                            navigation.replace(route.params.comeFrom);
+                            navigation.goBack();
                         }}
                         transparent
                     >
@@ -428,7 +428,7 @@ const TempsDetailsClient = ({ route,navigation, timeStore }: Props) => {
                             let layoutTemps = "mobile_TEMPS2";
                            
                             await edit(username,password,server,  global.fmServer,layoutTemps,record['record-id'],addAndUpdateQuery(true));
-                            navigation.replace('Main');
+                            navigation.goBack();
 
                         }}
                     >
