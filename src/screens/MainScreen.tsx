@@ -364,7 +364,7 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
                                 >
                                     <Text>{record.AM_PM}</Text>
                                     <Text>{record.Nom_projet}</Text>
-                                    <Text>{record.Minutes} h</Text>
+                                    <Text>{record.Minutes == "-1" ? "Durée : À venir" : record.Minutes + "h"}</Text>
                                 </TouchableOpacity>
                             ))
                         )
@@ -390,9 +390,10 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
                                 style={styles.item}
                                 key={record.pk_ID}
                             >
+
                                 <Text>{record.Nom_assignation}</Text>
                                 <Text>{getActivitiesNameWithPkId(record.fk_activites)}</Text>
-                                <Text>{record.Minutes} h</Text>
+                                <Text>{record.Minutes == "-1" ? "Durée : À venir" : record.Minutes + "h"} </Text>
 
                             </TouchableOpacity>
                         ))

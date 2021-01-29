@@ -512,21 +512,19 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                         }}
                     />
                 </View>
-                <View style={styles.inputWrapper}>
+         
+                {editionMode == "update" ? 
+       
+        <View style={styles.inputWrapper}>
                     <Text>Nombre d'heures planifiées:</Text>
-                    {editionMode == "update" ? 
                     <Text> {record.Minutes_planifie == "-1" ? "" : record.Minutes_planifie}</Text>
+                    </View>
                     : 
-                    <Input
-                    style={styles.inputBorder}
-                    placeholder={"Écrivez ici"}
-                    value={record.Minutes_planifie == -1 ? "" : record.Minutes_planifie}
-                    onChangeText={(text) =>  setRecord({...record,"Minutes_planifie": text})}
-                    keyboardType={"numeric"}
+                    null
            
-                />}
+                      }
                 
-                </View>
+    
                 <View style={styles.inputWrapper}>
                     <Text>Nombre d'heures réelles:</Text>
                     <Input
