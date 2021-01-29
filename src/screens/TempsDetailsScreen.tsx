@@ -229,12 +229,16 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
      let fk_activites = record.fk_activites || "";
      let flag_actif = deleteVar == true ? 0 : 1;
      let Description = record.Description || "";
-    
-
      let Flag_termine = record.Flag_termine;
 
      let facturable = record.Flag_facturable;
      let rd = record.flag_R_et_D;
+
+        if(editionMode == "create"){
+            Flag_termine = -1;
+
+        } 
+
      let tache = record.Taches;
  
 
@@ -279,7 +283,8 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
         let db = "vhmsoft";
  
          let layoutTemps = "mobile_TEMPS2";
-        if(record.Minutes_restantes_tache.length == 0  && record.Flag_termine == 0){
+        //  alert(record.Minutes_restantes_tache.length);
+        if(record.Minutes_restantes_tache.length < 5  && record.Flag_termine == 0){
             alert("Veuillez entrez une description de ce qui reste à accomplir s.v.p.")
             return false;
         } else {
@@ -501,7 +506,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                         underline
                         style={styles.inputBorder}
                         rowSpan={5}
-                        value={record.Description}
+                        value={record.Description == -1 ? "" : record.Description}
                         onChangeText={(text) => {
                             setRecord({...record,"Description": text});
                         }}
@@ -714,12 +719,12 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                     
                 
                         
-                            
+                       
                         </View>
 
                         </View>
  
-
+                    
  
                         
 
