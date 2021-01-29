@@ -614,6 +614,25 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                             null}
 
 
+                    {record.Flag_facturable == null ? 
+                                    <RadioForm
+                                    radio_props={radio_props}
+                                    initial={(-1)}
+                                    formHorizontal={true}
+                                    labelHorizontal={true}
+                                    style={{ left: 10 }}
+                                    radioStyle={{ paddingRight: 20 }}
+                                    onPress={(value) => {
+                                        setRecord({...record,"Flag_facturable":Number(value)})
+                                        
+                                    }
+                                    }
+                                />
+                            : 
+                            
+                            null}
+
+
                             
                         </View>
 
@@ -673,6 +692,25 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                             :
                             null
                     }
+
+
+                    {record.flag_R_et_D == null ? 
+                                <RadioForm
+                                radio_props={radio_props}
+                                initial={(-1)}
+                                formHorizontal={true}
+                                labelHorizontal={true}
+                                style={{ left: 10 }}
+                                radioStyle={{ paddingRight: 20 }}
+                                onPress={(value) => {
+                                    setRecord({...record,"flag_R_et_D":Number(value)})                               
+                                }
+                                        }
+                                    />
+                            :
+                            null
+                    }
+
                     
                 
                         
