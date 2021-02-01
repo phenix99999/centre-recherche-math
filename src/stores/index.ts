@@ -15,7 +15,6 @@ export class RootStore {
 
   timeStore: TimeStore;
   authStore: AuthStore;
-  api: FilemakerClient;
 
   constructor() {
     this.authStore = new AuthStore(this);

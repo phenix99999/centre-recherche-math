@@ -30,7 +30,14 @@ class PageIntro extends Component {
     super(props);
   }
 
+  componentDidMount() {
+    // alert("Component did mount");
+  }
+
+
+
   render() {
+
     return (
       <View style={{ height: '100%' }}>
 
@@ -131,6 +138,7 @@ class PageIntro extends Component {
           <TouchableOpacity
             style={styles.buttonLogin}
             onPress={() => {
+              // alert(SyncStorage.get('connected'));
               if (SyncStorage.get('connected')) {
                 this.props.navigation.navigate('Main');
               } else {

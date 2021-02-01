@@ -138,7 +138,7 @@ const TempsDetailsClient = ({ route,navigation, timeStore }: Props) => {
 
 
     React.useEffect(() => {
-
+        alert(route.params.pk_ID);
         let username = SyncStorage.get('username');
         let password = SyncStorage.get('password');
   

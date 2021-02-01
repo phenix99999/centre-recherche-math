@@ -39,11 +39,9 @@ export function formatData(records) {
             if (indexField == 0) {
                 formatedDataTemp[indexRecord] = {};
             }
-            if (records[indexRecord].children[indexField].children[0].value == "") {
-                formatedDataTemp[indexRecord][records[indexRecord].children[indexField].attributes.name] = "-1";
-            } else {
-                formatedDataTemp[indexRecord][records[indexRecord].children[indexField].attributes.name] = records[indexRecord].children[indexField].children[0].value;
-            }
+
+            formatedDataTemp[indexRecord][records[indexRecord].children[indexField].attributes.name] = records[indexRecord].children[indexField].children[0].value;
+
             formatedDataTemp[indexRecord]['record-id'] = records[indexRecord]['attributes']['record-id'];
 
         }
@@ -64,8 +62,7 @@ export async function add(username, password, server, db, layout, query) {
 
     // https://vhmsoft.com/fmi/xml/fmresultset.xml?-db=vhmsoft_Lyes&-lay=mobile_TEMPS&AM_PM=PM&-new
     let url = "https://" + server + "/fmi/xml/fmresultset.xml?-db=" + db + "&-lay=" + layout + query + "&-new";
-
-    console.log("Inside the thing ");
+    console.log("Add bug");
     console.log(url);
     await axios.post(url, {}, {
         headers: { 'Authorization': authHeader }
@@ -144,6 +141,7 @@ export async function get(username, password, server, db, layout, query = null) 
         data = new XMLParser().parseFromString(response.data);
 
     }).catch(function (error) {
+        // alert("No connexion!");
         errorAuth = true;
     });
 

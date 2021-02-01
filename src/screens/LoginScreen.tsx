@@ -30,10 +30,11 @@ import {
 import { Image, ImageBackground, RefreshControl, ScrollView, View } from "react-native";
 import AuthStore from "../stores/AuthStore";
 import { authentification, get } from '../utils/connectorFileMaker';
-
+import NetworkUtils from '../utils/NetworkUtils';
 type Props = {
     authStore: AuthStore;
 } & StackScreenProps<RootStackParamList, "Logout">;
+import RNRestart from 'react-native-restart'; // Import package from node modules
 
 
 
@@ -45,6 +46,9 @@ const LoginScreen = ({ navigation, authStore }: Props) => {
         }
     });
 
+    if (!NetworkUtils.isNetworkAvailable()) {
+        alert("Erreur de connexion");
+    }
 
     return (
         <Root>

@@ -14,6 +14,8 @@ import { get, add } from '../utils/connectorFileMaker';
 import SyncStorage from 'sync-storage';
 import { setReactionScheduler } from "mobx/lib/internal";
 import { useIsFocused } from "@react-navigation/native";
+import NetworkUtils from '../utils/NetworkUtils';
+
 import { Badge } from 'react-native-paper';
 type Props = {
     timeStore: TimeStore;
@@ -30,6 +32,11 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
 
 
     const [typeAccount, setTypeAccount] = React.useState<Number>();
+
+    if (!NetworkUtils.isNetworkAvailable()) {
+        alert("Erreur de connexion.");
+    }
+
     function getActivitiesNameWithPkId(pk_id) {
         for (let i = 0; i < activitesList.length; i++) {
             if (activitesList[i].pk_ID == pk_id) {
@@ -146,8 +153,9 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
 
 
         const getDataOnDateEmploye = async (username, password, server, db, month, year, nbJourMois, dateSelected) => {
+            month = parseInt(dateSelected.getMonth() + 1);
             setDataOnDateEmploye(await get(username, password, server, db, layoutTemps
-                , "&fk_assignation=" + fk_assignation + "&flag_actif=1&StartDate=" + dateSelected.getMonth() + 1 + "/" + dateSelected.getDate() + "/" + dateSelected.getFullYear()));
+                , "&fk_assignation=" + fk_assignation + "&flag_actif=1&StartDate=" + month + "/" + dateSelected.getDate() + "/" + dateSelected.getFullYear()));
         }
 
         const getDataOnDateClient = async (username, password, server, db, month, year, nbJourMois, dateSelected) => {
@@ -182,13 +190,13 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
 
         setTypeAccount(typeAccount);
 
+
         let fk_assignation = SyncStorage.get('user') ? SyncStorage.get('user').pk_ID : -1;
         let pkIdClient;
         let username = SyncStorage.get('username');
         let password = SyncStorage.get('password');
         let db = "vhmsoft";
         let layoutTemps = "mobile_TEMPS2";
-        selectDate(timeStore.selectedDate);
         let month = timeStore.activeMonth + 1;
         let year = timeStore.activeYear;
         let nbJourMois = (getDaysInMonth(timeStore.activeMonth, year).length);
@@ -201,9 +209,12 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
 
             // alert(SyncStorage.get('pk_ID'));
         } else {
+            // alert("ICI");
             getDataOnDateEmploye(username, password, global.fmServer, global.fmDatabase, month, year, nbJourMois, timeStore.selectedDate);
             setDataEmploye(username, password, global.fmServer, global.fmDatabase, month, year, nbJourMois, timeStore);
+            selectDate(timeStore.selectedDate);
         }
+
 
 
     }, [isFocused]);
@@ -212,6 +223,10 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
         notEmptyDates = getNotEmptyDates(formatedDataClient, "StartDate");
     } else {
         notEmptyDates = getNotEmptyDates(formatedDataEmploye, "StartDate");
+    }
+
+    if (!NetworkUtils.isNetworkAvailable()) {
+        alert("Erreur de connexion");
     }
 
     let render;
@@ -345,7 +360,7 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
                         />
                     }
                 >
-                    {SyncStorage.get('typeAccount') == 0 && dataOnDateEmploye.length === 0 || (dataOnDateEmploye.length == undefined) ? (
+                    {SyncStorage.get('typeAccount') == 0 && dataOnDateEmploye.length === 0 ? (
                         <Text style={styles.noItemText}>Aucune entrée de temps ne correspond à la date sélectionnée</Text>
                     ) : null}
 

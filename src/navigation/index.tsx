@@ -1,7 +1,7 @@
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import React, { Component } from 'react';
 import { NavigationContainer } from "@react-navigation/native";
-import { ColorSchemeName, View, Text, ImageBackground, Image, TouchableOpacity } from "react-native";
+import { ColorSchemeName, View, Text, ImageBackground, Image, TouchableOpacity, DevSettings, Alert } from "react-native";
 
 import { createDrawerNavigator, DrawerContentComponentProps, DrawerContentOptions } from "@react-navigation/drawer";
 //import BarcodeScreen from "../screens/BarcodeScreen";
@@ -13,6 +13,7 @@ import WelcomeScreen from "../screens/WelcomeScreen";
 import PageIntro from "../screens/PageIntro";
 import ClientScreen from "../screens/ClientScreen";
 import Entypo from "react-native-vector-icons/Entypo";
+import { EventRegister } from 'react-native-event-listeners'
 
 import MainScreen from "../screens/MainScreen";
 import Bilan from "../screens/Bilan";
@@ -56,6 +57,7 @@ export default class App extends Component {
 
 
     async componentDidMount() {
+        // alert("Component did mount");
 
         const data = await SyncStorage.init();
         if (SyncStorage.get('typeAccount')) {
@@ -65,11 +67,103 @@ export default class App extends Component {
     }
 
 
+
+
+
     render() {
+        // alert("Render navig");
+
         const Tab = createBottomTabNavigator();
         const Stack = createStackNavigator();
         const Drawer = createDrawerNavigator();
+        // alert(this.state.typeAccount);
 
+        let Object = this;
+
+        function CustomDrawerContent(props) {
+            return (
+                <View>
+
+                    <ImageBackground style={{ width: '100%', height: '100%' }}
+                        source={require("../assets/images/accueil.png")}
+                    >
+
+                        <View>
+                            <Image source={require("../assets/images/vhiculeMedia.png")} style={{ width: 175, top: 10, left: 25 }} resizeMode={'contain'} />
+                        </View>
+
+
+
+
+                        <View style={{ flexDirection: 'row', top: 25, height: 50, alignItems: 'center' }}>
+                            <TouchableOpacity onPress={() => {
+                                props.navigation.goBack()
+                                props.navigation.navigate("PageIntro")
+                            }
+                            }
+                            >
+                                <Text style={{ color: '#1C1E53', fontWeight: 'bold' }}>  <Icon name="home" type="Ionicons" style={{ top: 15, fontSize: 24, color: "#1C1E53" }}> </Icon> Accueil </Text>
+                            </TouchableOpacity>
+                        </View>
+
+
+                        {SyncStorage.get('connected') ?
+                            <View style={{ flexDirection: 'row', top: 25, height: 50, alignItems: 'center' }}>
+                                <TouchableOpacity onPress={() => props.navigation.navigate("Main")}>
+                                    <Text style={{ color: '#1C1E53', fontWeight: 'bold' }}>  <Icon name="calendar" style={{ top: 15, fontSize: 24, color: '#1C1E53' }}> </Icon> Calendrier </Text>
+                                </TouchableOpacity>
+                            </View>
+
+
+                            : null}
+
+                        <View style={{ flexDirection: 'row', top: 25, height: 50, alignItems: 'center' }}>
+                            <TouchableOpacity onPress={() => props.navigation.navigate("SolutionsScreen")}>
+                                <Text style={{ color: "#1C1E53", fontWeight: 'bold' }}>  <Icon name="lightbulb" type={"Foundation"} style={{ top: 15, fontSize: 24, color: '#1C1E53' }}> </Icon> Solutions </Text>
+
+                            </TouchableOpacity>
+                        </View>
+
+
+                        <View style={{ flexDirection: 'row', top: 25, height: 50, alignItems: 'center' }}>
+                            <TouchableOpacity onPress={() => props.navigation.navigate("Support")} >
+                                <Text style={{ color: "#1C1E53", fontWeight: 'bold' }}>  <Icon name="customerservice" type="AntDesign" style={{ top: 15, fontSize: 24, color: "#1C1E53" }}> </Icon> Support </Text>
+
+                            </TouchableOpacity>
+                        </View>
+
+                        {SyncStorage.get("connected") ?
+                            <View style={{ flexDirection: 'row', top: 25, height: 50, alignItems: 'center' }}>
+                                <TouchableOpacity onPress={async () => {
+                                    await SyncStorage.getAllKeys().map(k => SyncStorage.remove(k));
+
+                                    SyncStorage.set('typeAccount', 1);
+                                    Object.setState({ typeAccount: "1" });
+                                    props.navigation.navigate("PageIntro");
+                                }
+                                }>
+                                    <Text style={{ color: "#1C1E53", fontWeight: 'bold' }}>  <Icon name="logout" type="AntDesign" style={{ top: 15, fontSize: 24, color: "#1C1E53" }}> </Icon> Deconnexion </Text>
+                                </TouchableOpacity>
+                            </View>
+                            :
+                            <View style={{ flexDirection: 'row', top: 25, height: 50, alignItems: 'center' }}>
+                                <TouchableOpacity onPress={() => props.navigation.navigate("Login")}>
+                                    <Text style={{ color: "#1C1E53", fontWeight: 'bold' }}>  <Icon name="login" type="AntDesign" style={{ top: 15, fontSize: 24, color: "#1C1E53" }}> </Icon> Connexion </Text>
+                                </TouchableOpacity>
+                            </View>
+                        }
+
+                        {SyncStorage.get("connected") ?
+                            <View style={{ position: 'absolute', bottom: 0, height: 50, }}>
+                                <Text style={{ color: 'black', fontWeight: 'bold', fontSize: 16 }}>  {SyncStorage.get('user')._C_nomComplet} </Text>
+                            </View>
+                            :
+                            null
+                        }
+                    </ImageBackground>
+                </View>
+            );
+        }
 
         function CalendrierStack() {
 
@@ -111,6 +205,7 @@ export default class App extends Component {
 
 
         function MainStack() {
+
             let render = null;
             if (SyncStorage.get('typeAccount') == "1") {
                 render = <Tab.Navigator
@@ -250,122 +345,6 @@ export default class App extends Component {
 
 
 
-        function CustomDrawerContent(props) {
-            return (
-                <View>
-
-                    <ImageBackground style={{ width: '100%', height: '100%' }}
-                        source={require("../assets/images/accueil.png")}
-                    >
-                        <View>
-                            <Image source={require("../assets/images/vhiculeMedia.png")} style={{ width: 175, top: 10, left: 25 }} resizeMode={'contain'} />
-                        </View>
-                        <View style={{ flexDirection: 'row', top: 25, height: 50, alignItems: 'center' }}>
-                            <TouchableOpacity onPress={() => {
-                                props.navigation.goBack()
-                                props.navigation.navigate("PageIntro")
-                            }
-                            }
-                            >
-                                <Text style={{ color: '#1C1E53', fontWeight: 'bold' }}>  <Icon name="home" type="Ionicons" style={{ top: 15, fontSize: 24, color: "#1C1E53" }}> </Icon> Accueil </Text>
-                            </TouchableOpacity>
-                        </View>
-
-
-                        {SyncStorage.get('connected') ?
-                            <View style={{ flexDirection: 'row', top: 25, height: 50, alignItems: 'center' }}>
-                                <TouchableOpacity onPress={() => props.navigation.navigate("Main")}>
-                                    <Text style={{ color: '#1C1E53', fontWeight: 'bold' }}>  <Icon name="calendar" style={{ top: 15, fontSize: 24, color: '#1C1E53' }}> </Icon> Calendrier </Text>
-                                </TouchableOpacity>
-                            </View>
-
-
-                            : null}
-
-                        <View style={{ flexDirection: 'row', top: 25, height: 50, alignItems: 'center' }}>
-                            <TouchableOpacity onPress={() => props.navigation.navigate("SolutionsScreen")}>
-                                <Text style={{ color: "#1C1E53", fontWeight: 'bold' }}>  <Icon name="lightbulb" type={"Foundation"} style={{ top: 15, fontSize: 24, color: '#1C1E53' }}> </Icon> Solutions </Text>
-
-                            </TouchableOpacity>
-                        </View>
-
-
-                        <View style={{ flexDirection: 'row', top: 25, height: 50, alignItems: 'center' }}>
-                            <TouchableOpacity onPress={() => props.navigation.navigate("Support")} >
-                                <Text style={{ color: "#1C1E53", fontWeight: 'bold' }}>  <Icon name="customerservice" type="AntDesign" style={{ top: 15, fontSize: 24, color: "#1C1E53" }}> </Icon> Support </Text>
-
-                            </TouchableOpacity>
-                        </View>
-
-
-
-                        {SyncStorage.get("connected") ?
-
-                            <View style={{ flexDirection: 'row', top: 25, height: 50, alignItems: 'center' }}>
-                                <TouchableOpacity onPress={() => {
-                                    SyncStorage.getAllKeys().map(k => SyncStorage.remove(k));
-                                    props.navigation.navigate("PageIntro");
-                                }
-                                }>
-                                    <Text style={{ color: "#1C1E53", fontWeight: 'bold' }}>  <Icon name="logout" type="AntDesign" style={{ top: 15, fontSize: 24, color: "#1C1E53" }}> </Icon> Deconnexion </Text>
-                                </TouchableOpacity>
-                            </View>
-
-                            :
-
-
-                            <View style={{ flexDirection: 'row', top: 25, height: 50, alignItems: 'center' }}>
-                                <TouchableOpacity onPress={() => props.navigation.navigate("Login")}>
-                                    <Text style={{ color: "#1C1E53", fontWeight: 'bold' }}>  <Icon name="login" type="AntDesign" style={{ top: 15, fontSize: 24, color: "#1C1E53" }}> </Icon> Connexion </Text>
-                                </TouchableOpacity>
-                            </View>
-
-
-                        }
-
-
-
-
-                    </ImageBackground>
-
-                </View>
-            );
-        }
-
-        function CalendrierFormateur() {
-
-            return <Tab.Navigator
-                tabBarOptions={{
-                    activeTintColor: '#1f4598',
-                    inactiveTintColor: 'gray',
-                }}
-                style={{
-                    backgroundColor: 'blue',
-                }}
-
-            >
-                <Stack.Screen options=
-                    {{
-
-                        tabBarLabel: 'Mode Calendrier',
-                        tabBarIcon: ({ color, size }) => (
-                            <Entypo name="calendar" color={"#1f4598"} size={size} />
-                        ),
-
-                    }} name="Main" component={MainNavigatorCalendarFormateur} />
-
-                <Stack.Screen options=
-                    {{
-                        tabBarLabel: 'Mode Liste',
-                        tabBarIcon: ({ color, size }) => (
-                            <Entypo name="list" color={"#1f4598"} size={size} />
-                        ),
-
-                    }} name="Liste" component={MainNavigatorListe} />
-
-            </Tab.Navigator>;
-        }
-
 
 
         let initialRoute = "Accueil";
@@ -388,7 +367,6 @@ export default class App extends Component {
                 drawerContent={(props) => <CustomDrawerContent {...props} />}
 
             >
-
                 <Drawer.Screen name="PageIntro" component={PageIntro} />
                 <Drawer.Screen name="Main" component={MainStack} />
                 <Drawer.Screen name="TempsDetails" component={TempsDetailsScreen} />

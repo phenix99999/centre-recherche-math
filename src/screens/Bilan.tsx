@@ -92,8 +92,8 @@ const Bilan = ({ navigation, timeStore }: Props) => {
 
         const setData = async (username, password, server, db, layoutClient, layoutProjet, layoutActivite) => {
             // setFormatedClients(await get(username, password, server, db, layoutClient));
-            setFormatedProjects(await get(username, password, global.fmServer, global.fmDatabase, layoutProjet, "&fk_client=" + SyncStorage.get('client_PK')));
-            setFormatedActivities(await get(username, password, global.fmServer, global.fmDatabase, layoutActivite, "&fk_client=" + SyncStorage.get('client_PK')));
+            setFormatedProjects(await get(username, password, global.fmServer, global.fmDatabase, layoutProjet, "&flag_actif=1&fk_client=" + SyncStorage.get('client_PK') + "&-sortfield.1=Nom&-sortorder.1=ascend"));
+            setFormatedActivities(await get(username, password, global.fmServer, global.fmDatabase, layoutActivite, "&flag_actif=1&fk_client=" + SyncStorage.get('client_PK') + "&-sortfield.1=Nom&-sortorder.1=ascend"));
         };
 
 
