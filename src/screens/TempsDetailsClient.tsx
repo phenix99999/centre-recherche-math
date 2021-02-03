@@ -115,7 +115,6 @@ const TempsDetailsClient = ({ route,navigation, timeStore }: Props) => {
  
         let db = "vhmsoft";
         let layoutActivite = "mobile_ACTIVITES2";
-        console.log(fk_activites);
         let activity = await get(username, password,   global.fmServer,  global.fmDatabase, layoutActivite,"&pk_ID=" + fk_activites);
         setActivity(activity[0]);
         setActivityName(activity[0].Nom);
@@ -138,7 +137,6 @@ const TempsDetailsClient = ({ route,navigation, timeStore }: Props) => {
 
 
     React.useEffect(() => {
-        alert(route.params.pk_ID);
         let username = SyncStorage.get('username');
         let password = SyncStorage.get('password');
   
@@ -164,7 +162,6 @@ const TempsDetailsClient = ({ route,navigation, timeStore }: Props) => {
         const setDataToUpdate = async (pk_ID) => {
                 let theRecord = (await get(username, password, global.fmServer, global.fmDatabase, layoutTemps,"&pk_ID="+pk_ID));
                 setActivityData(theRecord[0].fk_activites);
-                console.log(theRecord[0]);
     
                 setRecord(theRecord[0]);
              
@@ -398,13 +395,18 @@ const TempsDetailsClient = ({ route,navigation, timeStore }: Props) => {
                     </Text>
                     
                 </View>
-                <View style={styles.inputWrapper}>
-                    <Text>Nombre d'heures planifiées:</Text>
-                    
-                    <Text> {record.Minutes_planifie == "-1" ? "" : record.Minutes_planifie}</Text>
-                   
-                
-                </View>
+                {record.Minutes_planifie ? 
+                         <View style={styles.inputWrapper}>
+                         <Text>Nombre d'heures planifiées:</Text>
+                         
+                         <Text> {record.Minutes_planifie}</Text>
+                        
+                     
+                     </View>
+                    :
+                    null
+            }
+       
                 <View style={styles.inputWrapper}>
                     <Text>Nombre d'heures réelles:</Text>
                  

@@ -108,7 +108,6 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
  
         let db = "vhmsoft";
         let layoutActivite = "mobile_ACTIVITES2";
-        console.log(fk_activites);
         let activity = await get(username, password,   global.fmServer,  global.fmDatabase, layoutActivite,"&pk_ID=" + fk_activites);
         setActivity(activity[0]);
         setActivityName(activity[0].Nom);
@@ -182,7 +181,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
         };
 
         const setData = async (username,password,server,db,layoutClient,layoutProjet,layoutActivite) => {
-            setFormatedClients(await get(username, password, server, db, layoutClient));
+            setFormatedClients(await get(username, password, server, db, layoutClient,"&pk_ID=>0&-sortfield.1=Nom&-sortorder.1=ascend"));
             setFormatedProjects(await get(username, password, server, db, layoutProjet,"&flag_actif=1&-sortfield.1=Nom&-sortorder.1=ascend"));
         };
     
@@ -237,7 +236,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
             let db = "vhmsoft";
            
             let layoutTemps = "mobile_TEMPS2";
-            console.log(addAndUpdateQuery());
+
            await add(username,password,global.fmServer,global.fmDatabase,layoutTemps,addAndUpdateQuery());
            navigation.goBack();
         } 
@@ -367,7 +366,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                     valueKey={"pk_ID"}
                     getLabel={(client: Record<Client>) => client.Nom}
                     selectedValue={Number(record.fk_client)}
-                 
+                    name={"Sélectionner Client"}
                     onChange={(value) => {
                         setRecord({...record,"fk_client":value});
                         getProjects(value);
@@ -391,6 +390,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                     <CustomPickerRow<Projet>
                         records={formatedProjects}
                         valueKey={"pk_ID"}
+                        name={"Sélectionner Projet"}
                         getLabel={(projet: Record<Projet>) => projet.Nom}
                         selectedValue={Number(record.fk_projet)} 
                         onChange={(value) => {
@@ -414,6 +414,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                 : 
 
                 <CustomPickerRow<Activite>
+                name={"Sélectionner Activité"}
                 records={formatedActivities}
                 valueKey={"pk_ID"}
                 getLabel={(activite: Record<Activite>) => activite.Nom}
@@ -439,6 +440,8 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                         :
 
                 <DetachedCustomPickerRow
+     
+                        name={"Sélectionner Tâches"}
                         values={formatedTaches}
                         label={(tache: Record<Activite>) => tache.name}
                         selectedValue={record.Taches}
@@ -454,6 +457,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                 <View style={styles.inputWrapper}>
               
                     <DetachedCustomPickerRow
+                         name={"Sélectionner Période"}
                         values={["AM", "PM"]}
                         label={(activite: Record<Activite>) => activite.fields.Nom}
                         selectedValue={record.AM_PM}

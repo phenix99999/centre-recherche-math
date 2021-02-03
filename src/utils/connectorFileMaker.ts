@@ -52,6 +52,7 @@ export function formatData(records) {
 
 export async function authentification(username, password, server, db, layout, query) {
     const authHeader = 'Basic ' + base64.encode(`${username}:${password}`);
+    console.log("INSIDE AUTHENTIFICATION");
     let data = await get(username, password, server, db, layout, query);
     return data;
 }
@@ -62,8 +63,7 @@ export async function add(username, password, server, db, layout, query) {
 
     // https://vhmsoft.com/fmi/xml/fmresultset.xml?-db=vhmsoft_Lyes&-lay=mobile_TEMPS&AM_PM=PM&-new
     let url = "https://" + server + "/fmi/xml/fmresultset.xml?-db=" + db + "&-lay=" + layout + query + "&-new";
-    console.log("Add bug");
-    console.log(url);
+
     await axios.post(url, {}, {
         headers: { 'Authorization': authHeader }
     }).then(function (response) {

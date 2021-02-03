@@ -1,7 +1,7 @@
 import { Icon } from "native-base";
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { areSameDates, getDaysInMonth, groupDaysByWeek } from "../utils/date";
+import { areSameDates, dateToFrench, getDaysInMonth, groupDaysByWeek } from "../utils/date";
 type OnSelect = (date: Date) => void;
 const FIRST_DAY = 0;
 interface DayCellProps {
@@ -14,10 +14,12 @@ interface DayCellProps {
 const DayCell = (props: DayCellProps) => {
     const isWeekend = props.date.getDay() === 0 || props.date.getDay() === 6;
     const isSelected = areSameDates(props.selected, props.date);
- 
+
 
     const today = new Date();
     const isToday = areSameDates(today, props.date);
+
+
     return (
         <View style={[styles.baseCell, styles.dayCell]}>
             <TouchableOpacity
@@ -28,6 +30,9 @@ const DayCell = (props: DayCellProps) => {
                     isSelected ? styles.selectedDayButton : {},
                     isToday ? styles.todayButton : {},
                     isToday && isSelected ? styles.todayAndSelectedButton : {},
+                    props.isNotEmpty && props.date > today ? styles.futureButton : {},
+
+
                 ]}
             >
                 <Text
@@ -35,6 +40,7 @@ const DayCell = (props: DayCellProps) => {
                         isWeekend ? styles.cellWeekend : styles.cellWeekday,
                         isSelected ? styles.selectedDayText : {},
                         isToday ? styles.selectedDayText : {},
+                        props.isNotEmpty && props.date > today ? styles.futureButtonText : {},
                     ]}
                 >
                     {props.date.getDate()}
@@ -207,6 +213,15 @@ const styles = StyleSheet.create({
     todayAndSelectedButton: {
         backgroundColor: "rgb(242,79,59)",
     },
+    futureButton: {
+        backgroundColor: "#1f4598",
+    },
+
+    futureButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+    },
+
     monthRow: {
         height: 50,
         flexDirection: "row",
@@ -228,6 +243,6 @@ const styles = StyleSheet.create({
         fontSize: 17,
         fontWeight: "bold",
         textAlign: "center",
-        color:'#1f4598',
+        color: '#1f4598',
     },
 });

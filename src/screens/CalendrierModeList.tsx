@@ -123,7 +123,7 @@ const renderItem = ({ item }) => {
         <View>
 
             {showHeader ? <View style={{ flexDirection: 'row', alignSelf: 'center', borderTopColor: 'black' }}><Text style={{ "fontWeight": 'bold', color: 'black', fontSize: 17 }}> {dateToFrench(new Date(item.startDate))}</Text></View> : null}
-            <Seance pk_ID={item.pk_ID} startDate={item.startDate} nomAssignation={item.nomAssignation} nomActivite={item.nomActivite} duree={item.duree} nomProjet={item.nomProjet} navigation={item.navigation}
+            <Seance pk_ID={item.pk_ID || ""} startDate={item.startDate} nomAssignation={item.nomAssignation} nomActivite={item.nomActivite} duree={item.duree} nomProjet={item.nomProjet} navigation={item.navigation}
             >
             </Seance>
         </View>

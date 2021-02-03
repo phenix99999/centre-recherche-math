@@ -15,28 +15,29 @@ import ClientScreen from "../screens/ClientScreen";
 import Entypo from "react-native-vector-icons/Entypo";
 import { EventRegister } from 'react-native-event-listeners'
 
+
+import FilterLecture from "../screens/planificateur/FilterLecture";
+import MainLecture from "../screens/planificateur/MainLecture";
+import MainPlanification from "../screens/planificateur/MainPlanification";
+import Planification from "../screens/planificateur/Planification";
+
+
+
 import MainScreen from "../screens/MainScreen";
 import Bilan from "../screens/Bilan";
-
 import SupportScreen from "../screens/SupportScreen";
-
-
-import Sidebar from "../components/Sidebar";
 import SyncStorage from 'sync-storage';
 import TempsDetailsScreen from "../screens/TempsDetailsScreen";
 import TempsDetailsClient from "../screens/TempsDetailsClient";
 import TempsDetailsFilter from "../screens/TempsDetailsFilter";
-
 import { Icon } from "native-base";
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import SolutionMobileScreen from "../screens/SolutionMobileScreen";
 import CalendrierModeList from "../screens/CalendrierModeList";
-
 import SolutionSanteScreen from "../screens/SolutionSanteScreen";
 import SolutionPortailScreen from "../screens/SolutionPortailScreen";
 import SolutionVhmClassesScreen from "../screens/SolutionVhmClassesScreen";
 import SolutionB2bScreen from "../screens/SolutionB2bScreen";
-
 import SolutionScreen from "../screens/SolutionScreen";
 
 import AccueilScreen from "../screens/AccueilScreen";
@@ -204,6 +205,25 @@ export default class App extends Component {
         }
 
 
+        function CalendrierPlanificateurStack() {
+            return (
+                <Stack.Navigator screenOptions={{ headerShown: false }} mode="modal" >
+                    <Stack.Screen name="MainPlanification" component={MainPlanification} />
+                    <Stack.Screen name="Planification" component={Planification} />
+                </Stack.Navigator>
+            );
+        }
+
+        function CalendrierLectureStack() {
+            return (
+                <Stack.Navigator screenOptions={{ headerShown: false }} mode="modal" >
+                    <Stack.Screen name="MainLecture" component={MainLecture} />
+                    <Stack.Screen name="FilterLecture" component={FilterLecture} />
+                </Stack.Navigator>
+            );
+        }
+
+
         function MainStack() {
 
             let render = null;
@@ -245,6 +265,36 @@ export default class App extends Component {
                 </Tab.Navigator>
 
 
+            } else if (SyncStorage.get('typeAccount') == "2") {
+                render = <Tab.Navigator
+                    tabBarOptions={{
+                        activeTintColor: '#1f4598',
+                        inactiveTintColor: 'gray',
+                    }}
+                    style={{
+                        backgroundColor: 'blue',
+                    }}
+
+                >
+                    <Stack.Screen options=
+                        {{
+
+                            tabBarLabel: 'Mode Planification',
+                            tabBarIcon: ({ color, size }) => (
+                                <Entypo name="calendar" color={"#1f4598"} size={size} />
+                            ),
+
+                        }} name="Main" component={CalendrierPlanificateurStack} />
+                    <Stack.Screen options=
+                        {{
+                            tabBarLabel: 'Mode Lecture',
+                            tabBarIcon: ({ color, size }) => (
+                                <Entypo name="list" color={"#1f4598"} size={size} />
+                            ),
+
+                        }} name="CalendrierModeList" component={CalendrierLectureStack} />
+
+                </Tab.Navigator>
             } else {
                 render = <Stack.Navigator screenOptions={{ headerShown: false }} mode="modal" >
                     <Stack.Screen name="Main" component={MainScreen} />
@@ -358,7 +408,7 @@ export default class App extends Component {
             initialRoute = "Calendrier"
         }
 
-        console.log("Connected " + SyncStorage.get('connected'));
+        // console.log("Connected " + SyncStorage.get('connected'));
 
 
 

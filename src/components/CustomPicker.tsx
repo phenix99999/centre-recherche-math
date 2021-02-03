@@ -1,9 +1,10 @@
 import { inject } from "mobx-react";
-import { Icon, Picker, Text, View } from "native-base";
+import { Icon, Picker, Text, View, Left, Body, Right, Header, Button } from "native-base";
 import * as React from "react";
 import { StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Record } from "../stores/FMObjectTypes";
-import Header from "./Header";
+
 
 interface CustomPickerProps<Fields> {
     records: Record<Fields>[];
@@ -30,20 +31,37 @@ export const CustomPicker = inject("timeStore")(<Fields,>(props: CustomPickerPro
             placeholderIconColor="#007aff"
             itemTextStyle={{ flex: 1 }}
             renderHeader={(goBack: any) => (
-                <Header.Header>
-                    <Header.BackButton onPress={() => goBack()} />
-                    <Header.TitleText title="Sélectionnez une valeur" />
-                </Header.Header>
+                <Header>
+                    <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                        <View style={{ width: '30%' }}>
+                            <Button
+                                onPress={() => {
+                                    goBack();
+                                }}
+                                transparent
+                            >
+                                <Icon name="back" type="AntDesign" style={{ fontSize: 30, marginLeft: 2, color: '#1f4598' }} >
+                                </Icon>
+                            </Button>
+
+                        </View>
+                        <View style={{ width: '70%' }}>
+                            <Text style={{ color: '#1f4598', fontWeight: 'bold' }}>{props.name}</Text>
+                        </View>
+                    </View>
+                </Header>
             )}
         >
-            {props.records.map((record) => (
-                <Picker.Item
-                    label={props.getLabel(record)}
-                    value={Number(record[props.valueKey])}
-                    key={record.id}
-                />
-            ))}
-        </Picker>
+            {
+                props.records.map((record) => (
+                    <Picker.Item
+                        label={props.getLabel(record)}
+                        value={Number(record[props.valueKey])}
+                        key={record.id}
+                    />
+                ))
+            }
+        </Picker >
     );
 });
 
@@ -84,15 +102,32 @@ export const DetachedCustomPickerRow = (props: DetachedCustomPickerProps) => (
                 placeholderIconColor="#007aff"
                 itemTextStyle={{ flex: 1 }}
                 renderHeader={(goBack: any) => (
-                    <Header.Header>
-                        <Header.BackButton onPress={() => goBack()} />
-                        <Header.TitleText title="Sélectionnez une valeur" />
-                    </Header.Header>
+                    <Header>
+                        <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                            <View style={{ width: '30%' }}>
+                                <Button
+                                    onPress={() => {
+                                        goBack();
+                                    }}
+                                    transparent
+                                >
+                                    <Icon name="back" type="AntDesign" style={{ fontSize: 30, marginLeft: 2, color: '#1f4598' }} >
+                                    </Icon>
+                                </Button>
+
+                            </View>
+                            <View style={{ width: '70%' }}>
+                                <Text style={{ color: '#1f4598', fontWeight: 'bold' }}>{props.name}</Text>
+                            </View>
+                        </View>
+                    </Header>
                 )}
             >
-                {props.values.map((value) => (
-                    <Picker.Item label={value} value={value} key={value} />
-                ))}
+                {
+
+                    props.values.map((value) => (
+                        <Picker.Item label={value} value={value} key={value} />
+                    ))}
             </Picker>
         </View>
     </View>
