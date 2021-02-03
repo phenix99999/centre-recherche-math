@@ -100,7 +100,7 @@ const LoginScreen = ({ navigation, authStore }: Props) => {
 
     async function _keyboardDidHide() {
         // alert("Keyboard did hide " + authStore.username.length + " " + authStore.password.length);
-        if (!isLoadingTemp) {
+        if (!isLoadingTemp && authStore.password.length > 2) {
             // alert("Avant executer onconnected");
             setLoadingTemp(true);
             await onLogin();
