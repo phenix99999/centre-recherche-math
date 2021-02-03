@@ -49,6 +49,8 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
 
     const [heureFacturable, setHeureFacturable] = React.useState<Number>(0);
     const [budject, setBudject] = React.useState<Number>(0);
+    const [pasDeBudject, setPasDeBudject] = React.useState<Number>(0);
+
 
 
     if (!NetworkUtils.isNetworkAvailable()) {
@@ -57,6 +59,8 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
 
 
     React.useEffect(() => {
+        SyncStorage.remove('modeRemplir');
+
         let username = SyncStorage.get('username');
         let password = SyncStorage.get('password');
         let db = "vhmsoft";
@@ -76,10 +80,6 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
         const setData = async (username, password, server, db, layoutClient, layoutProjet, layoutActivite) => {
             setFormatedClient(await get(username, password, server, db, layoutClient, "&pk_ID=>0&-sortfield.1=Nom&-sortorder.1=ascend"));
         }
-
-
-
-
         setData(username, password, global.fmServer, global.fmDatabase, layoutClient, layoutProjet, layoutActivite);
 
     }, []);
@@ -133,9 +133,9 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
                         let tempFormatedProjects = await get(SyncStorage.get('username'), SyncStorage.get('password'), global.fmServer, global.fmDatabase, "mobile_PROJETS2", "&fk_client=" + value + "&flag_actif=1" + "&-sortfield.1=Nom&-sortorder.1=ascend")
                         let budgetTemp = 0;
                         let pasDeBudget = false;
+
                         for (let i = 0; i < tempFormatedProjects.length; i++) {
                             if (tempFormatedProjects[i].Type_de_projet == "Pas de budget déterminé") {
-                                console.log("OKOKOKOK");
                                 pasDeBudget = true;
                             }
                             if (tempFormatedProjects[i].Heures_budget) {
@@ -143,11 +143,12 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
                             }
 
                         }
+                        let tempFormatedActivities = [];
 
-
-
-                        let tempFormatedActivities = await get(SyncStorage.get('username'), SyncStorage.get('password'), global.fmServer, global.fmDatabase, "mobile_ACTIVITES2", "&fk_client=" + value + "&flag_actif=1" + "&-sortfield.1=Nom&-sortorder.1=ascend");
-                        ;
+                        if (tempFormatedProjects.length == 1) {
+                            tempFormatedActivities = await get(SyncStorage.get('username'), SyncStorage.get('password'), global.fmServer, global.fmDatabase, "mobile_ACTIVITES2", "&flag_actif=1&fk_projet=" + tempFormatedProjects[0].pk_ID + "&-sortfield.1=Nom&-sortorder.1=ascend");
+                        }
+                        console.log(tempFormatedActivities);
                         let heureFacturableTemp = 0;
 
                         for (let i = 0; i < tempFormatedActivities.length; i++) {
@@ -155,13 +156,16 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
                                 heureFacturableTemp += parseFloat(tempFormatedActivities[i].Heures_budget_auto);
                             }
                         }
-                        console.log(heureFacturableTemp);
-                        console.log(budgetTemp);
-                        setHeureFacturable(heureFacturableTemp);
+
                         if (pasDeBudget) {
-                            budgetTemp = heureFacturableTemp;
+                            heureFacturableTemp = budgetTemp;
                         }
+
+                        setHeureFacturable(heureFacturableTemp);
+
+
                         setBudject(budgetTemp);
+                        setPasDeBudject(pasDeBudget);
 
                         setFormatedProjects(tempFormatedProjects);
                         console.log(tempFormatedActivities);
@@ -184,7 +188,7 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
                         let pasDeBudget = false;
                         for (let i = 0; i < tempFormatedProjects.length; i++) {
                             if (tempFormatedProjects[i].Type_de_projet == "Pas de budget déterminé") {
-                                console.log("OKOKOKOK");
+
                                 pasDeBudget = true;
                             }
                             if (tempFormatedProjects[i].Heures_budget) {
@@ -204,16 +208,16 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
                                 heureFacturableTemp += parseFloat(tempFormatedActivities[i].Heures_budget_auto);
                             }
                         }
-                        console.log(heureFacturableTemp);
-                        console.log(budgetTemp);
+
                         setHeureFacturable(heureFacturableTemp);
                         if (pasDeBudget) {
                             budgetTemp = heureFacturableTemp;
                         }
+                        console.log("Formated activities " + tempFormatedActivities);
                         setBudject(budgetTemp);
 
                         setFormatedProjects(tempFormatedProjects);
-                        // console.log(tempFormatedActivities);
+
                         setFormatedActivities(tempFormatedActivities); setProject(Number(value));
                     }}
                     placeholder={"Projet"}
@@ -230,10 +234,12 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
                         for (let i = 0; i < formatedActivities.length; i++) {
                             if (formatedActivities[i].pk_ID == Number(value)) {
                                 projet = (formatedActivities[i].fk_projet);
+                                setHeureFacturable(formatedActivities[i].Heures_budget_auto);
+                                setBudject(formatedActivities[i].Heures_budget);
+
                                 setProject(Number(projet));
                             }
                         }
-
                         setActivity(Number(value));
                     }}
                     placeholder={"Activité"}
@@ -243,10 +249,18 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
 
             <Button style={{ width: '100%', alignItems: 'center', justifyContent: 'center' }}
                 onPress={() => {
+                    SyncStorage.set('filterClient', client);
                     SyncStorage.set('filterProject', project);
                     SyncStorage.set('filterActivity', activity);
-                    navigation.goBack();
-
+                    SyncStorage.set('pasDeBudget', pasDeBudject);
+                    SyncStorage.set('budject', budject)
+                    SyncStorage.set('heureFacturable', heureFacturable);
+                    SyncStorage.set('modeRemplir', true);
+                    if (client && formatedProjects.length == 0) {
+                        alert("Ce client n'a aucun projet actif.")
+                    } else {
+                        navigation.goBack();
+                    }
                 }
                 }
             >
@@ -270,33 +284,111 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
             </Button>
             {2 == 2 ?
                 <ScrollView>
-                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 25 }}>
+                    <View>
+
+
                         {formatedProjects.length == 1 && project == 0 && activity == 0 && client > 0 ?
-                            <ProgressCircle
-                                percent={parseFloat(((heureFacturable / budject) * 100))}
-                                radius={50}
-                                borderWidth={8}
-                                color="#1f4598"
-                                shadowColor="#999"
-                                bgColor="#fff"
-                            >
-                                <Text style={{ fontSize: 18 }}>{((heureFacturable / budject)).toFixed(2) * 100}%</Text>
-                            </ProgressCircle>
+                            <View>
+                                <View style={{ flexDirection: 'row', padding: 20 }}>
+                                    <Text style={{ fontSize: 14, fontWeight: 'bold' }}>
+                                        Nombre d'heures complétés : {heureFacturable}/{budject}
+                                    </Text>
+                                </View>
+                                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 25 }}>
+                                    <ProgressCircle
+                                        percent={parseFloat(((heureFacturable / budject) * 100))}
+                                        radius={50}
+                                        borderWidth={8}
+                                        color="#1f4598"
+                                        shadowColor="#999"
+                                        bgColor="#fff"
+                                    >
+                                        <Text style={{ fontSize: 18 }}>{((heureFacturable / budject)).toFixed(2) * 100}%</Text>
+                                    </ProgressCircle>
+                                </View>
+                            </View>
                             :
                             null
                         }
 
+                        {activity > 0 ?
+                            <View>
+                                <View style={{ flexDirection: 'row', padding: 20 }}>
+                                    <Text style={{ fontSize: 14, fontWeight: 'bold' }}>
+                                        Nombre d'heures complétés : {heureFacturable}/{budject}
+                                    </Text>
+                                </View>
+                                <View style={{ flexDirection: 'row', padding: 20 }}>
+                                    <Text style={{ fontSize: 14, fontWeight: 'bold' }}>
+                                        {pasDeBudject ?
+                                            <Text> Nombre d'heures restantes : Pas de budget déterminé </Text>
+                                            :
+                                            <Text> Nombre d'heures restantes : {parseFloat(budject - heureFacturable)} </Text>
+                                        }
+
+                                    </Text>
+                                </View>
+                            </View>
+                            :
+                            null
+                        }
+
+                        {formatedProjects.length == 0 && client > 0 ?
+                            <View style={{ flexDirection: 'row', padding: 20 }}>
+
+                                <Text style={{ fontWeight: 'bold', color: 'red' }}>
+                                    Ce client n'a aucun projet actif.
+                            </Text>
+                            </View>
+                            :
+                            null
+                        }
+
+                        {formatedProjects.length > 1 && client > 0 ?
+                            <View style={{ flexDirection: 'row', padding: 20 }}>
+
+                                <Text style={{ fontWeight: 'bold', color: 'red' }}>
+                                    Ce client contient plusieurs projets veuillez sélectionner un projet pour obtenir les statistiques.
+                            </Text>
+                            </View>
+                            :
+                            null
+                        }
+
+
                         {activity == 0 && project > 0 ?
-                            <ProgressCircle
-                                percent={parseFloat(((heureFacturable / budject) * 100))}
-                                radius={50}
-                                borderWidth={8}
-                                color="#1f4598"
-                                shadowColor="#999"
-                                bgColor="#fff"
-                            >
-                                <Text style={{ fontSize: 18 }}>{((heureFacturable / budject)).toFixed(2) * 100}%</Text>
-                            </ProgressCircle>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 25 }}>
+
+                                <ProgressCircle
+                                    percent={parseFloat(((heureFacturable / budject) * 100))}
+                                    radius={50}
+                                    borderWidth={8}
+                                    color="#1f4598"
+                                    shadowColor="#999"
+                                    bgColor="#fff"
+                                >
+                                    <Text style={{ fontSize: 18 }}>{((heureFacturable / budject)).toFixed(2) * 100}%</Text>
+                                </ProgressCircle>
+                            </View>
+                            :
+                            null
+                        }
+
+                        {activity > 0 ?
+                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 25 }}>
+
+                                <ProgressCircle
+                                    percent={parseFloat(((heureFacturable / budject) * 100))}
+                                    radius={50}
+                                    borderWidth={8}
+                                    color="#1f4598"
+                                    shadowColor="#999"
+                                    bgColor="#fff"
+                                >
+                                    <Text style={{ fontSize: 18 }}>{((heureFacturable / budject)).toFixed(2) * 100}%</Text>
+                                </ProgressCircle>
+                            </View>
+
                             :
                             null
                         }

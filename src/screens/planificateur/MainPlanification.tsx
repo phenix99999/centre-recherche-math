@@ -2,7 +2,7 @@ import { StackScreenProps } from "@react-navigation/stack";
 import { DrawerActions } from "@react-navigation/core";
 import { inject, observer } from "mobx-react";
 import * as React from "react";
-import { RefreshControl, StyleSheet, View } from "react-native";
+import { RefreshControl, StyleSheet, View, FlatList } from "react-native";
 import TimeStore from "../../stores/TimeStore";
 import { MainStackParamList } from "../types";
 import DateSlider from "../../components/DateSlider";
@@ -29,8 +29,8 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
     const [dataOnDateClient, setDateOnDateClient] = React.useState<Object>([]);
     const [formatedDataClient, setFormatedDataClient] = React.useState<Object>([]);
     const [activitesList, setActivitesList] = React.useState<Object>([]);
-
-
+    const [modeRemplir, setModeRemplir] = React.useState<Boolean>(false);
+    const [employeList, setEmployeList] = React.useState<Object>([]);
     const [typeAccount, setTypeAccount] = React.useState<Number>();
 
     if (!NetworkUtils.isNetworkAvailable()) {
@@ -45,7 +45,16 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
         }
         return "";
     }
-    function selectDate(date) {
+    function findIndexOfEmployePk_ID(pk_ID) {
+        for (let i = 0; i < employeList.length; i++) {
+            if (employeList[i].pk_ID == pk_ID) {
+                return i;
+            }
+        }
+        return 0;
+    }
+
+    async function selectDate(date) {
         let dateObj = new Date(date);
         let month = ("0" + parseInt(dateObj.getMonth() + 1)).slice(-2);
 
@@ -57,30 +66,35 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
         let dataOnDateTemp = [];
         let indexDataOnDate = 0;
         let formatedData = [];
-        if (SyncStorage.get('typeAccount') == 1) {
-            formatedData = formatedDataClient;
-        } else {
-            formatedData = formatedDataEmploye;
+
+
+        timeStore.selectDate(date)
+
+        let feuilleTemps = await get(SyncStorage.get('username'), SyncStorage.get('password'), global.fmServer, global.fmDatabase, "mobile_TEMPS2"
+            , "&flag_actif=1&StartDate=" + month + "/" + date.getDate() + "/" + date.getFullYear())
+
+        let dispoArray = [];
+        //array == ["LyesTamazouzt"] => dispoAm : false, dispoPm:true 
+
+
+        //Creer le dispo array
+        let finalDispoArray = [];
+        for (let i = 0; i < employeList.length; i++) {
+            // dispoArray[employeList[i].pk_ID.toString()] = {};
+            employeList[i] = { ...employeList[i], AM: false, PM: false };
         }
 
-        for (let i = 0; i < formatedData.length; i++) {
 
-            if (formatedData[i].StartDate == dateStr) {
 
-                dataOnDateTemp[indexDataOnDate] = formatedData[i];
-                indexDataOnDate++;
+        for (let i = 0; i < feuilleTemps.length; i++) {
+            if (feuilleTemps[i].AM_PM == "AM") {
+                employeList[findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation)].AM = true;
+            } else {
+                employeList[findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation)].false = true;
             }
         }
 
-        timeStore.selectDate(date)
-        if (SyncStorage.get('typeAccount') == 1) {
-            setDateOnDateClient(dataOnDateTemp);
-        } else if (SyncStorage.get('typeAccount') == 0) {
-            setDataOnDateEmploye(dataOnDateTemp);
-        } else {
-            setDataOnDateEmploye([]);
-            setDateOnDateClient([]);
-        }
+        setEmployeList(employeList);
 
     }
 
@@ -123,11 +137,42 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
 
 
     }
+    const renderItem = ({ item }) => {
+        return (
+            <View style={{ padding: 10, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderBottomWidth: 1, height: 60, borderColor: '#1f4598' }}>
+                <View style={{ width: '50%' }}>
+                    <Text>{item._C_nomComplet}</Text>
+                </View>
+                <TouchableOpacity style={{ width: '12%', backgroundColor: 'transparent' }}>
+                    <Text style={{ color: item.AM ? "red" : "black" }}>{"AM"}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={{ width: '12%', backgroundColor: 'transparent' }}>
+                    <Text style={{ color: item.PM ? "red" : "black" }}>{"PM"}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={{ width: '25%', backgroundColor: 'transparent' }}>
+                    <Text style={{ color: item.AM && item.PM ? "red" : "black" }} >{"Journée"}</Text>
+                </TouchableOpacity>
+            </View>
+        );
+    }
+
+
     const isFocused = useIsFocused();
 
     React.useEffect(() => {
+        if (SyncStorage.get('modeRemplir')) {
+            setModeRemplir(true);
+        }
 
+        let username = SyncStorage.get('username');
+        let password = SyncStorage.get('password');
+        let layoutAccount = "mobile_ACCOUNT2";
+        const getListEmployes = async () => {
+            let employes = (await get(username, password, global.fmServer, global.fmDatabase, layoutAccount, "&PrivilegeSet=0"));
+            setEmployeList(employes);
+        }
 
+        getListEmployes();
 
     }, [isFocused]);
     let notEmptyDates;
@@ -161,8 +206,6 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
                 <Icon name="menu" type={"MaterialIcons"} style={{ fontSize: 30, color: '#1f4598' }} />
             </Button>
 
-
-
             <Button
                 transparent
                 onPress={async () => {
@@ -170,13 +213,9 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
 
                 }}
             >
-
                 <Icon name="plus" type={"AntDesign"} style={{ fontSize: 30, marginRight: 0, color: '#1f4598' }} >
-
                 </Icon>
-
             </Button>
-
         </View>
 
 
@@ -186,16 +225,47 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
             <Container style={{ flex: 1 }}>
                 <Header>
                     <Left>
-                        <Button
-                            transparent
-                            onPress={async () => {
-                                navigation.goBack();
 
-                            }}
-                        >
-                            <Icon name="back" type="AntDesign" style={{ fontSize: 30, marginLeft: 2, color: '#1f4598' }} />
-                        </Button>
+                        <View style={{ flexDirection: 'row' }}>
 
+                            <Button
+                                transparent
+                                onPress={async () => {
+                                    navigation.goBack();
+
+                                }}
+                            >
+                                <Icon name="back" type="AntDesign" style={{ fontSize: 30, marginLeft: 2, color: '#1f4598' }} />
+                            </Button>
+                            <Button
+                                transparent
+                                onPress={async () => {
+                                    navigation.goBack();
+
+                                }}
+                            >
+                                {modeRemplir ?
+                                    <View style={{ flexDirection: 'row' }}>
+
+                                        <Icon name="clockcircle" type="AntDesign" style={{ fontSize: 30, marginLeft: 2, color: '#1f4598' }} />
+                                        <View>
+                                            <Text style={{ marginLeft: 5, color: 'black', fontSize: 15, fontWeight: 'bold' }}>
+                                                {(SyncStorage.get('heureFacturable') + "/" + SyncStorage.get('budject'))}
+                                            </Text>
+                                            <Text style={{ marginLeft: 5, color: parseFloat(SyncStorage.get('budject') - SyncStorage.get('heureFacturable')) > 0 ? 'green' : 'red', fontSize: 15, fontWeight: 'bold' }}>
+                                                Restant :  {parseFloat(SyncStorage.get('budject') - SyncStorage.get('heureFacturable'))}
+                                            </Text>
+                                        </View>
+
+                                    </View>
+                                    :
+
+                                    null}
+
+
+                            </Button>
+
+                        </View>
                     </Left>
                     <Right>
                         {rightHeader}
@@ -221,9 +291,6 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
                         <Text style={{ fontWeight: "bold", color: '#1f4598' }}>{dateToFrench(timeStore.selectedDate)}</Text>
                     </View>
 
-
-
-
                 </View>
                 <ScrollView
                     style={styles.scrollview}
@@ -236,11 +303,20 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
                         />
                     }
                 >
+                    {modeRemplir ?
 
+                        <FlatList
+                            data={employeList}
+                            renderItem={renderItem}
+                            keyExtractor={item => item.pk_ID}
+                        />
+                        :
+                        null
+                    }
 
 
                 </ScrollView>
-            </Container>
+            </Container >
         );
     }
     return (
