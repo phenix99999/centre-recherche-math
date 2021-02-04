@@ -143,7 +143,11 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
                 <View style={{ width: '50%' }}>
                     <Text>{item._C_nomComplet}</Text>
                 </View>
-                <TouchableOpacity style={{ width: '12%', backgroundColor: 'transparent' }}>
+                <TouchableOpacity onPress={() => {
+                    navigation.navigate("SauvegarderPlanification", { nomComplet: item._C_nomComplet, pk_ID: item.pk_ID, periode: "AM" })
+
+                }
+                } style={{ width: '12%', backgroundColor: 'transparent' }}>
                     <Text style={{ color: item.AM ? "red" : "black" }}>{"AM"}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={{ width: '12%', backgroundColor: 'transparent' }}>

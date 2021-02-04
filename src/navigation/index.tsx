@@ -20,8 +20,7 @@ import FilterLecture from "../screens/planificateur/FilterLecture";
 import MainLecture from "../screens/planificateur/MainLecture";
 import MainPlanification from "../screens/planificateur/MainPlanification";
 import Planification from "../screens/planificateur/Planification";
-
-
+import SauvegarderPlanification from "../screens/planificateur/SauvegarderPlanification";
 
 import MainScreen from "../screens/MainScreen";
 import Bilan from "../screens/Bilan";
@@ -210,6 +209,7 @@ export default class App extends Component {
                 <Stack.Navigator screenOptions={{ headerShown: false }} mode="modal" >
                     <Stack.Screen name="MainPlanification" component={MainPlanification} />
                     <Stack.Screen name="Planification" component={Planification} />
+                    <Stack.Screen name="SauvegarderPlanification" component={SauvegarderPlanification} />
                 </Stack.Navigator>
             );
         }
@@ -309,86 +309,6 @@ export default class App extends Component {
 
             );
         }
-
-
-
-        function IntroStack() {
-
-            return (
-                <Stack.Navigator screenOptions={{ headerShown: false }} mode="modal" >
-                    <Stack.Screen name="PageIntro" component={PageIntro} />
-                    <Stack.Screen name="Main" component={MainScreen} />
-                    <Stack.Screen name="TempsDetails" component={TempsDetailsScreen} />
-                    <Stack.Screen name="Login" component={LoginScreen} />
-                    <Stack.Screen name="Support" component={SupportScreen} />
-                    <Stack.Screen name="SolutionsScreen" component={SolutionScreen} />
-                    <Stack.Screen name="SolutionMobile" component={SolutionMobileScreen} />
-                    <Stack.Screen name="SolutionB2b" component={SolutionB2bScreen} />
-                    <Stack.Screen name="SolutionSante" component={SolutionSanteScreen} />
-                    <Stack.Screen name="SolutionVhmClasses" component={SolutionVhmClassesScreen} />
-                    <Stack.Screen name="SolutionPortail" component={SolutionPortailScreen} />
-                    <Stack.Screen name="SolutionInformatiqueDecisionnel" component={SolutionInformatiqueDecisionnelScreen} />
-
-                    <Stack.Screen name="Accueil" component={AccueilScreen} />
-                </Stack.Navigator>
-            );
-        }
-
-        function AccueilStack() {
-
-            return (
-                <Stack.Navigator screenOptions={{ headerShown: false }} mode="modal" >
-                    <Stack.Screen name="Accueil" component={AccueilScreen} />
-                    <Stack.Screen name="PageIntro" component={PageIntro} />
-                    <Stack.Screen name="TempsDetails" component={TempsDetailsScreen} />
-                    <Stack.Screen name="Login" component={LoginScreen} />
-                    <Stack.Screen name="Support" component={SupportScreen} />
-                    <Stack.Screen name="SolutionsScreen" component={SolutionScreen} />
-                    <Stack.Screen name="SolutionMobile" component={SolutionMobileScreen} />
-                    <Stack.Screen name="SolutionB2b" component={SolutionB2bScreen} />
-                    <Stack.Screen name="SolutionSante" component={SolutionSanteScreen} />
-                    <Stack.Screen name="SolutionVhmClasses" component={SolutionVhmClassesScreen} />
-                    <Stack.Screen name="SolutionPortail" component={SolutionPortailScreen} />
-                    <Stack.Screen name="SolutionInformatiqueDecisionnel" component={SolutionInformatiqueDecisionnelScreen} />
-
-                    <Stack.Screen name="Accueil" component={AccueilScreen} />
-                </Stack.Navigator>
-            );
-        }
-
-
-        function ClientStack() {
-
-            return (
-                <Stack.Navigator screenOptions={{ headerShown: false }} mode="modal" >
-                    <Stack.Screen name="Client" component={ClientScreen} />
-                    <Stack.Screen name="PageIntro" component={PageIntro} />
-                </Stack.Navigator>
-            );
-        }
-
-
-        function SolutionStack() {
-
-            return (
-                <Stack.Navigator screenOptions={{ headerShown: false }} mode="modal" >
-                    <Stack.Screen name="SolutionsScreen" component={SolutionScreen} />
-                    <Stack.Screen name="PageIntro" component={PageIntro} />
-                </Stack.Navigator>
-            );
-        }
-
-
-        function SupportStack() {
-
-            return (
-                <Stack.Navigator screenOptions={{ headerShown: false }} mode="modal" >
-                    <Stack.Screen name="SupportScreen" component={SupportScreen} />
-                    <Stack.Screen name="PageIntro" component={PageIntro} />
-                </Stack.Navigator>
-            );
-        }
-
 
 
 

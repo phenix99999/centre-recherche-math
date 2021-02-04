@@ -33,6 +33,7 @@ import CrudResource from "../../stores/FMMobxResource";
 import { get, add, edit, execScript } from '../../utils/connectorFileMaker';
 import { create } from "mobx-persist";
 import { extendObservableObjectWithProperties } from "mobx/lib/internal";
+import { onChange } from "react-native-reanimated";
 type Props = {
     timeStore: TimeStore;
 } & StackScreenProps<MainStackParamList, "Main">;
@@ -42,16 +43,16 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
     const [formatedProjects, setFormatedProjects] = React.useState<Object>([]);
     const [formatedClient, setFormatedClient] = React.useState<Object>([]);
 
-    const [project, setProject] = React.useState<Number>(0);
-    const [activity, setActivity] = React.useState<Number>(0);
-
     const [client, setClient] = React.useState<Number>(0);
+    const [clientName, setClientName] = React.useState<String>("");
+    const [project, setProject] = React.useState<Number>(0);
+    const [projectName, setProjectName] = React.useState<String>("");
+    const [activity, setActivity] = React.useState<Number>(0);
+    const [activityName, setActivityName] = React.useState<String>("");
 
     const [heureFacturable, setHeureFacturable] = React.useState<Number>(0);
     const [budject, setBudject] = React.useState<Number>(0);
     const [pasDeBudject, setPasDeBudject] = React.useState<Number>(0);
-
-
 
     if (!NetworkUtils.isNetworkAvailable()) {
         alert("Erreur de connexion.");
@@ -60,6 +61,8 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
 
     React.useEffect(() => {
         SyncStorage.remove('modeRemplir');
+
+
 
         let username = SyncStorage.get('username');
         let password = SyncStorage.get('password');
@@ -79,12 +82,147 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
 
         const setData = async (username, password, server, db, layoutClient, layoutProjet, layoutActivite) => {
             setFormatedClient(await get(username, password, server, db, layoutClient, "&pk_ID=>0&-sortfield.1=Nom&-sortorder.1=ascend"));
+            setFormatedProjects(await get(username, password, server, db, layoutProjet, "&flag_actif=1" + "&-sortfield.1=Nom&-sortorder.1=ascend"));
+            setFormatedActivities(await get(username, password, server, db, layoutActivite, "&flag_actif=1" + "&-sortfield.1=Nom&-sortorder.1=ascend"));
         }
         setData(username, password, global.fmServer, global.fmDatabase, layoutClient, layoutProjet, layoutActivite);
 
     }, []);
 
+    function getClientNameWithClientId(id) {
+        alert("ICI");
+        for (let i = 0; i < formatedClient.length; i++) {
+            if (formatedClient[i].pk_ID == id) {
+                return formatedClient[i].Nom;
+            }
+        }
+        return "";
+    }
 
+
+    function getProjectNameWithProjectId(id) {
+        for (let i = 0; i < formatedProjects.length; i++) {
+            if (formatedProjects[i].pk_ID == id) {
+                return formatedProjects[i].Nom;
+            }
+        }
+        return "";
+    }
+
+
+    function getActivityNameWithActivityId(id) {
+        for (let i = 0; i < formatedActivities.length; i++) {
+            if (formatedActivities[i].pk_ID == id) {
+                return formatedActivities[i].Nom;
+            }
+        }
+        return "";
+    }
+
+
+    async function onChangeClient(value) {
+        let tempFormatedProjects = await get(SyncStorage.get('username'), SyncStorage.get('password'), global.fmServer, global.fmDatabase, "mobile_PROJETS2", "&fk_client=" + value + "&flag_actif=1" + "&-sortfield.1=Nom&-sortorder.1=ascend")
+        let budgetTemp = 0;
+        let pasDeBudget = false;
+
+        for (let i = 0; i < tempFormatedProjects.length; i++) {
+            if (tempFormatedProjects[i].Type_de_projet == "Pas de budget déterminé") {
+                pasDeBudget = true;
+            }
+            if (tempFormatedProjects[i].Heures_budget) {
+                budgetTemp += parseFloat(tempFormatedProjects[i].Heures_budget);
+            }
+
+        }
+        let tempFormatedActivities = [];
+
+        if (tempFormatedProjects.length == 1) {
+            tempFormatedActivities = await get(SyncStorage.get('username'), SyncStorage.get('password'), global.fmServer, global.fmDatabase, "mobile_ACTIVITES2", "&flag_actif=1&fk_projet=" + tempFormatedProjects[0].pk_ID + "&-sortfield.1=Nom&-sortorder.1=ascend");
+        }
+
+        let heureFacturableTemp = 0;
+
+        for (let i = 0; i < tempFormatedActivities.length; i++) {
+            if (tempFormatedActivities[i].Heures_budget_auto) {
+                heureFacturableTemp += parseFloat(tempFormatedActivities[i].Heures_budget_auto);
+            }
+        }
+
+        if (pasDeBudget) {
+            heureFacturableTemp = budgetTemp;
+        }
+
+        setHeureFacturable(heureFacturableTemp);
+
+
+        setBudject(budgetTemp);
+        setPasDeBudject(pasDeBudget);
+
+        setFormatedProjects(tempFormatedProjects);
+
+        setFormatedActivities(tempFormatedActivities);
+        setClient(Number(value));
+
+        setClientName(getClientNameWithClientId(value));
+    }
+
+    async function onChangeProject(value) {
+        let tempFormatedProjects = await get(SyncStorage.get('username'), SyncStorage.get('password'), global.fmServer, global.fmDatabase, "mobile_PROJETS2", "&pk_ID=" + value + "&fk_client=" + client + "&flag_actif=1" + "&-sortfield.1=Nom&-sortorder.1=ascend")
+        let budgetTemp = 0;
+        let pasDeBudget = false;
+        for (let i = 0; i < tempFormatedProjects.length; i++) {
+            if (tempFormatedProjects[i].Type_de_projet == "Pas de budget déterminé") {
+
+                pasDeBudget = true;
+            }
+            if (tempFormatedProjects[i].Heures_budget) {
+                budgetTemp += parseFloat(tempFormatedProjects[i].Heures_budget);
+            }
+
+        }
+
+
+
+        let tempFormatedActivities = await get(SyncStorage.get('username'), SyncStorage.get('password'), global.fmServer, global.fmDatabase, "mobile_ACTIVITES2", "&fk_projet=" + value + "&fk_client=" + client + "&flag_actif=1" + "&-sortfield.1=Nom&-sortorder.1=ascend");
+        ;
+        let heureFacturableTemp = 0;
+
+        for (let i = 0; i < tempFormatedActivities.length; i++) {
+            if (tempFormatedActivities[i].Heures_budget_auto) {
+                heureFacturableTemp += parseFloat(tempFormatedActivities[i].Heures_budget_auto);
+            }
+        }
+
+        setHeureFacturable(heureFacturableTemp);
+        if (pasDeBudget) {
+            budgetTemp = heureFacturableTemp;
+        }
+        console.log("Formated activities " + tempFormatedActivities);
+        setBudject(budgetTemp);
+
+        setFormatedProjects(tempFormatedProjects);
+
+        setFormatedActivities(tempFormatedActivities);
+        setProject(Number(value));
+        console.log("PROJECT NAME WITH PROJECT ID ");
+        console.log(getProjectNameWithProjectId(value));
+        setProjectName(getProjectNameWithProjectId(value));
+    }
+
+    function onChangeActivity(value) {
+        let projet;
+        for (let i = 0; i < formatedActivities.length; i++) {
+            if (formatedActivities[i].pk_ID == Number(value)) {
+                projet = (formatedActivities[i].fk_projet);
+                setHeureFacturable(formatedActivities[i].Heures_budget_auto);
+                setBudject(formatedActivities[i].Heures_budget);
+
+                setProject(Number(projet));
+            }
+        }
+        setActivity(Number(value));
+        setActivityName(getActivityNameWithActivityId(value));
+    }
 
     return (
 
@@ -104,23 +242,10 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
                 </Left>
 
                 <Body>
-                    <Text style={{ color: '#1f4598', fontWeight: 'bold' }}>Filtre</Text>
+                    <Text style={{ color: '#1f4598', fontWeight: 'bold' }}>Planification</Text>
                 </Body>
                 <Right>
-                    <Button
-                        transparent
-                        onPress={async () => {
-                            SyncStorage.set('filterProject', project);
-                            SyncStorage.set('filterActivity', activity);
-                            navigation.goBack();
 
-                        }}
-                    >
-
-                        {SyncStorage.get('filterProject') && SyncStorage.get('filterProject') > 0 || SyncStorage.get('filterActivity') && SyncStorage.get('filterActivity') > 0 ?
-                            <Icon name="filter" type={"AntDesign"} style={{ fontSize: 30, marginLeft: 2, color: 'red' }} /> :
-                            <Icon name="filter" type={"AntDesign"} style={{ fontSize: 30, marginLeft: 2, color: '#1f4598' }} />}
-                    </Button>
                 </Right>
             </Header>
             <View style={{ padding: 20 }}>
@@ -130,47 +255,7 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
                     getLabel={(client: Record<Client>) => client.Nom}
                     selectedValue={client}
                     onChange={async (value) => {
-                        let tempFormatedProjects = await get(SyncStorage.get('username'), SyncStorage.get('password'), global.fmServer, global.fmDatabase, "mobile_PROJETS2", "&fk_client=" + value + "&flag_actif=1" + "&-sortfield.1=Nom&-sortorder.1=ascend")
-                        let budgetTemp = 0;
-                        let pasDeBudget = false;
-
-                        for (let i = 0; i < tempFormatedProjects.length; i++) {
-                            if (tempFormatedProjects[i].Type_de_projet == "Pas de budget déterminé") {
-                                pasDeBudget = true;
-                            }
-                            if (tempFormatedProjects[i].Heures_budget) {
-                                budgetTemp += parseFloat(tempFormatedProjects[i].Heures_budget);
-                            }
-
-                        }
-                        let tempFormatedActivities = [];
-
-                        if (tempFormatedProjects.length == 1) {
-                            tempFormatedActivities = await get(SyncStorage.get('username'), SyncStorage.get('password'), global.fmServer, global.fmDatabase, "mobile_ACTIVITES2", "&flag_actif=1&fk_projet=" + tempFormatedProjects[0].pk_ID + "&-sortfield.1=Nom&-sortorder.1=ascend");
-                        }
-                        console.log(tempFormatedActivities);
-                        let heureFacturableTemp = 0;
-
-                        for (let i = 0; i < tempFormatedActivities.length; i++) {
-                            if (tempFormatedActivities[i].Heures_budget_auto) {
-                                heureFacturableTemp += parseFloat(tempFormatedActivities[i].Heures_budget_auto);
-                            }
-                        }
-
-                        if (pasDeBudget) {
-                            heureFacturableTemp = budgetTemp;
-                        }
-
-                        setHeureFacturable(heureFacturableTemp);
-
-
-                        setBudject(budgetTemp);
-                        setPasDeBudject(pasDeBudget);
-
-                        setFormatedProjects(tempFormatedProjects);
-                        console.log(tempFormatedActivities);
-                        setFormatedActivities(tempFormatedActivities);
-                        setClient(Number(value));
+                        await onChangeClient(value);
                     }}
                     placeholder={"Client"}
                 />
@@ -183,42 +268,7 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
                     getLabel={(projet: Record<Projet>) => projet.Nom}
                     selectedValue={project}
                     onChange={async (value) => {
-                        let tempFormatedProjects = await get(SyncStorage.get('username'), SyncStorage.get('password'), global.fmServer, global.fmDatabase, "mobile_PROJETS2", "&pk_ID=" + value + "&fk_client=" + client + "&flag_actif=1" + "&-sortfield.1=Nom&-sortorder.1=ascend")
-                        let budgetTemp = 0;
-                        let pasDeBudget = false;
-                        for (let i = 0; i < tempFormatedProjects.length; i++) {
-                            if (tempFormatedProjects[i].Type_de_projet == "Pas de budget déterminé") {
-
-                                pasDeBudget = true;
-                            }
-                            if (tempFormatedProjects[i].Heures_budget) {
-                                budgetTemp += parseFloat(tempFormatedProjects[i].Heures_budget);
-                            }
-
-                        }
-
-
-
-                        let tempFormatedActivities = await get(SyncStorage.get('username'), SyncStorage.get('password'), global.fmServer, global.fmDatabase, "mobile_ACTIVITES2", "&fk_projet=" + value + "&fk_client=" + client + "&flag_actif=1" + "&-sortfield.1=Nom&-sortorder.1=ascend");
-                        ;
-                        let heureFacturableTemp = 0;
-
-                        for (let i = 0; i < tempFormatedActivities.length; i++) {
-                            if (tempFormatedActivities[i].Heures_budget_auto) {
-                                heureFacturableTemp += parseFloat(tempFormatedActivities[i].Heures_budget_auto);
-                            }
-                        }
-
-                        setHeureFacturable(heureFacturableTemp);
-                        if (pasDeBudget) {
-                            budgetTemp = heureFacturableTemp;
-                        }
-                        console.log("Formated activities " + tempFormatedActivities);
-                        setBudject(budgetTemp);
-
-                        setFormatedProjects(tempFormatedProjects);
-
-                        setFormatedActivities(tempFormatedActivities); setProject(Number(value));
+                        await onChangeProject(value);
                     }}
                     placeholder={"Projet"}
                 />
@@ -229,18 +279,8 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
                     valueKey={"pk_ID"}
                     getLabel={(activite: Record<Activite>) => activite.Nom}
                     selectedValue={activity}
-                    onChange={(value) => {
-                        let projet;
-                        for (let i = 0; i < formatedActivities.length; i++) {
-                            if (formatedActivities[i].pk_ID == Number(value)) {
-                                projet = (formatedActivities[i].fk_projet);
-                                setHeureFacturable(formatedActivities[i].Heures_budget_auto);
-                                setBudject(formatedActivities[i].Heures_budget);
-
-                                setProject(Number(projet));
-                            }
-                        }
-                        setActivity(Number(value));
+                    onChange={async (value) => {
+                        onChangeActivity(value);
                     }}
                     placeholder={"Activité"}
                 />
@@ -249,23 +289,36 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
 
             <Button style={{ width: '100%', alignItems: 'center', justifyContent: 'center' }}
                 onPress={() => {
-                    SyncStorage.set('filterClient', client);
-                    SyncStorage.set('filterProject', project);
-                    SyncStorage.set('filterActivity', activity);
-                    SyncStorage.set('pasDeBudget', pasDeBudject);
-                    SyncStorage.set('budject', budject)
-                    SyncStorage.set('heureFacturable', heureFacturable);
-                    SyncStorage.set('modeRemplir', true);
-                    if (client && formatedProjects.length == 0) {
-                        alert("Ce client n'a aucun projet actif.")
+                    if (!client || !project || !activity) {
+                        alert("Veuillez entrez un client,projet et activite");
                     } else {
-                        navigation.goBack();
+                        SyncStorage.set('filterClient', client);
+                        SyncStorage.set('filterProject', project);
+                        SyncStorage.set('filterActivity', activity);
+
+                        SyncStorage.set('filterClientName', clientName);
+                        SyncStorage.set('filterProjectName', projectName);
+                        SyncStorage.set('filterActivityName', activityName);
+
+                        SyncStorage.set('pasDeBudget', pasDeBudject);
+                        SyncStorage.set('budject', budject)
+                        SyncStorage.set('heureFacturable', heureFacturable);
+                        SyncStorage.set('modeRemplir', true);
+
+                        if (client && formatedProjects.length == 0) {
+                            alert("Ce client n'a aucun projet actif.")
+                        } else {
+                            navigation.goBack();
+                        }
                     }
                 }
+
+
+
                 }
             >
                 <Text style={{ textAlign: 'center' }}>
-                    Rechercher
+                    Ajouter des planifications
                 </Text>
             </Button>
 
@@ -282,83 +335,19 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
                     Annuler les filtres
                 </Text>
             </Button>
-            {2 == 2 ?
-                <ScrollView>
-                    <View>
+
+            <ScrollView>
+                <View>
 
 
-                        {formatedProjects.length == 1 && project == 0 && activity == 0 && client > 0 ?
-                            <View>
-                                <View style={{ flexDirection: 'row', padding: 20 }}>
-                                    <Text style={{ fontSize: 14, fontWeight: 'bold' }}>
-                                        Nombre d'heures complétés : {heureFacturable}/{budject}
-                                    </Text>
-                                </View>
-                                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 25 }}>
-                                    <ProgressCircle
-                                        percent={parseFloat(((heureFacturable / budject) * 100))}
-                                        radius={50}
-                                        borderWidth={8}
-                                        color="#1f4598"
-                                        shadowColor="#999"
-                                        bgColor="#fff"
-                                    >
-                                        <Text style={{ fontSize: 18 }}>{((heureFacturable / budject)).toFixed(2) * 100}%</Text>
-                                    </ProgressCircle>
-                                </View>
-                            </View>
-                            :
-                            null
-                        }
-
-                        {activity > 0 ?
-                            <View>
-                                <View style={{ flexDirection: 'row', padding: 20 }}>
-                                    <Text style={{ fontSize: 14, fontWeight: 'bold' }}>
-                                        Nombre d'heures complétés : {heureFacturable}/{budject}
-                                    </Text>
-                                </View>
-                                <View style={{ flexDirection: 'row', padding: 20 }}>
-                                    <Text style={{ fontSize: 14, fontWeight: 'bold' }}>
-                                        {pasDeBudject ?
-                                            <Text> Nombre d'heures restantes : Pas de budget déterminé </Text>
-                                            :
-                                            <Text> Nombre d'heures restantes : {parseFloat(budject - heureFacturable)} </Text>
-                                        }
-
-                                    </Text>
-                                </View>
-                            </View>
-                            :
-                            null
-                        }
-
-                        {formatedProjects.length == 0 && client > 0 ?
+                    {formatedProjects.length == 1 && project == 0 && activity == 0 && client > 0 ?
+                        <View>
                             <View style={{ flexDirection: 'row', padding: 20 }}>
-
-                                <Text style={{ fontWeight: 'bold', color: 'red' }}>
-                                    Ce client n'a aucun projet actif.
-                            </Text>
+                                <Text style={{ fontSize: 14, fontWeight: 'bold' }}>
+                                    Nombre d'heures complétés : {heureFacturable}/{budject}
+                                </Text>
                             </View>
-                            :
-                            null
-                        }
-
-                        {formatedProjects.length > 1 && client > 0 ?
-                            <View style={{ flexDirection: 'row', padding: 20 }}>
-
-                                <Text style={{ fontWeight: 'bold', color: 'red' }}>
-                                    Ce client contient plusieurs projets veuillez sélectionner un projet pour obtenir les statistiques.
-                            </Text>
-                            </View>
-                            :
-                            null
-                        }
-
-
-                        {activity == 0 && project > 0 ?
                             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 25 }}>
-
                                 <ProgressCircle
                                     percent={parseFloat(((heureFacturable / budject) * 100))}
                                     radius={50}
@@ -370,35 +359,96 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
                                     <Text style={{ fontSize: 18 }}>{((heureFacturable / budject)).toFixed(2) * 100}%</Text>
                                 </ProgressCircle>
                             </View>
-                            :
-                            null
-                        }
+                        </View>
+                        :
+                        null
+                    }
 
-                        {activity > 0 ?
-                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 25 }}>
-
-                                <ProgressCircle
-                                    percent={parseFloat(((heureFacturable / budject) * 100))}
-                                    radius={50}
-                                    borderWidth={8}
-                                    color="#1f4598"
-                                    shadowColor="#999"
-                                    bgColor="#fff"
-                                >
-                                    <Text style={{ fontSize: 18 }}>{((heureFacturable / budject)).toFixed(2) * 100}%</Text>
-                                </ProgressCircle>
+                    {activity > 0 ?
+                        <View>
+                            <View style={{ flexDirection: 'row', padding: 20 }}>
+                                <Text style={{ fontSize: 14, fontWeight: 'bold' }}>
+                                    Nombre d'heures complétés : {heureFacturable}/{budject}
+                                </Text>
                             </View>
+                            <View style={{ flexDirection: 'row', padding: 20 }}>
+                                <Text style={{ fontSize: 14, fontWeight: 'bold' }}>
+                                    {pasDeBudject ?
+                                        <Text> Nombre d'heures restantes : Pas de budget déterminé </Text>
+                                        :
+                                        <Text> Nombre d'heures restantes : {parseFloat(budject - heureFacturable)} </Text>
+                                    }
 
-                            :
-                            null
-                        }
+                                </Text>
+                            </View>
+                        </View>
+                        :
+                        null
+                    }
 
-                    </View>
+                    {formatedProjects.length == 0 && client > 0 ?
+                        <View style={{ flexDirection: 'row', padding: 20 }}>
 
-                </ScrollView>
-                :
+                            <Text style={{ fontWeight: 'bold', color: 'red' }}>
+                                Ce client n'a aucun projet actif.
+                            </Text>
+                        </View>
+                        :
+                        null
+                    }
 
-                null}
+                    {formatedProjects.length > 1 && client > 0 ?
+                        <View style={{ flexDirection: 'row', padding: 20 }}>
+
+                            <Text style={{ fontWeight: 'bold', color: 'red' }}>
+                                Ce client contient plusieurs projets veuillez sélectionner un projet pour obtenir les statistiques.
+                            </Text>
+                        </View>
+                        :
+                        null
+                    }
+
+
+                    {activity == 0 && project > 0 ?
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 25 }}>
+
+                            <ProgressCircle
+                                percent={parseFloat(((heureFacturable / budject) * 100))}
+                                radius={50}
+                                borderWidth={8}
+                                color="#1f4598"
+                                shadowColor="#999"
+                                bgColor="#fff"
+                            >
+                                <Text style={{ fontSize: 18 }}>{((heureFacturable / budject)).toFixed(2) * 100}%</Text>
+                            </ProgressCircle>
+                        </View>
+                        :
+                        null
+                    }
+
+                    {activity > 0 ?
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 25 }}>
+
+                            <ProgressCircle
+                                percent={parseFloat(((heureFacturable / budject) * 100))}
+                                radius={50}
+                                borderWidth={8}
+                                color="#1f4598"
+                                shadowColor="#999"
+                                bgColor="#fff"
+                            >
+                                <Text style={{ fontSize: 18 }}>{((heureFacturable / budject)).toFixed(2) * 100}%</Text>
+                            </ProgressCircle>
+                        </View>
+
+                        :
+                        null
+                    }
+
+                </View>
+
+            </ScrollView>
 
 
 
