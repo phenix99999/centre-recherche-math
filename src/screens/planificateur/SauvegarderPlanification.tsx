@@ -165,36 +165,32 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
 
             <Button style={{ width: '100%', justifyContent: 'center', backgroundColor: '#1f4598' }}
                 onPress={async () => {
+                    SyncStorage.remove('planification');
                     let planification = SyncStorage.get('planification');
                     if (!planification) {
-                        //pk_ID
-                        //selectedDate
-                        //AM
-                        //duree
-                        //client
-                        //projet
-                        //activity
                         planification = [];
                         planification[0] = {};
                         planification[0].employerPkId = route.params.pk_ID;
                         planification[0].duree = heure;
-                        planification[0].client = SyncStorage.get('client');
-                        planification[0].projet = "";
-                        planification[0].activity = "";
-
-                        console.log(planification);
+                        planification[0].client = SyncStorage.get('filterClient');
+                        planification[0].projet = SyncStorage.get('filterProject');
+                        planification[0].activity = SyncStorage.get('filterActivity');
+                        planification[0].periode = route.params.periode;
+                        planification[0].date = route.params.date;
                     } else {
-                        planification[planification.length] = {};
-                        planification[planification.length].employerPkId = "";
-                        planification[planification.length].duree = "";
-                        planification[planification.length].client = "";
-                        planification[planification.length].projet = "";
-                        planification[planification.length].activity = "";
-
+                        let planificationLength = (planification.length);
+                        planification[planificationLength] = {};
+                        planification[planificationLength].employerPkId = route.params.pk_ID;
+                        planification[planificationLength].periode = route.params.periode;
+                        planification[planificationLength].duree = heure;
+                        planification[planificationLength].client = SyncStorage.get('filterClient');
+                        planification[planificationLength].projet = SyncStorage.get('filterProject');
+                        planification[planificationLength].activity = SyncStorage.get('filterActivity');
+                        planification[planificationLength].date = route.params.date;
                     }
 
-                    console.log(planification);
-
+                    SyncStorage.set('planification', planification);
+                    navigation.goBack();
 
                 }}
             >

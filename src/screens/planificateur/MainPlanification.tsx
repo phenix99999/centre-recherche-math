@@ -9,7 +9,7 @@ import DateSlider from "../../components/DateSlider";
 import { ScrollView, TouchableOpacity } from "react-native";
 import { Container, Header, Button, Left, Icon, Text, Right, Body } from "native-base";
 import { setNavigationState } from "../../utils/PersistState";
-import { dateToFrench, getNotEmptyDates, getDaysInMonth } from "../../utils/date";
+import { dateToFrench, getNotEmptyDates, getDaysInMonth, dateToFMDate } from "../../utils/date";
 import { get, add } from '../../utils/connectorFileMaker';
 import SyncStorage from 'sync-storage';
 import { setReactionScheduler } from "mobx/lib/internal";
@@ -46,6 +46,8 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
         return "";
     }
     function findIndexOfEmployePk_ID(pk_ID) {
+        console.log(pk_ID);
+        console.log(employeList);
         for (let i = 0; i < employeList.length; i++) {
             if (employeList[i].pk_ID == pk_ID) {
                 return i;
@@ -54,7 +56,14 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
         return 0;
     }
 
-    async function selectDate(date) {
+    async function selectDate(date, employeListTemp = false) {
+        // console.log(employeListTemp);
+        let employeListe = [];
+        if (employeListTemp) {
+            employeListe = employeListTemp;
+        } else {
+            employeListe = employeList;
+        }
         let dateObj = new Date(date);
         let month = ("0" + parseInt(dateObj.getMonth() + 1)).slice(-2);
 
@@ -79,22 +88,47 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
 
         //Creer le dispo array
         let finalDispoArray = [];
-        for (let i = 0; i < employeList.length; i++) {
+
+        for (let i = 0; i < employeListe.length; i++) {
             // dispoArray[employeList[i].pk_ID.toString()] = {};
-            employeList[i] = { ...employeList[i], AM: false, PM: false };
+            employeListe[i] = { ...employeListe[i], AM: "black", PM: "black", "AM_PM": "" };
         }
 
+        // console.log("Feuille temps au retour");
+        // console.log(feuilleTemps);
 
+        let planification = SyncStorage.get("planification");
 
+        console.log(planification);
         for (let i = 0; i < feuilleTemps.length; i++) {
+            // employeListe[findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation)].AM_PM = feuilleTemps[i].AM_PM;
+
             if (feuilleTemps[i].AM_PM == "AM") {
-                employeList[findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation)].AM = true;
+                console.log("ICI", feuilleTemps[i].fk_assignation, findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation));
+                employeListe[findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation)].AM = "red";
             } else {
-                employeList[findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation)].false = true;
+                console.log("ICI2");
+                employeListe[findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation)].PM = "red";
+            }
+
+
+        }
+        // console.log(feuilleTemps[0]);
+        for (let j = 0; j < planification.length; j++) {
+            if (planification[j].date == timeStore.selectedDate) {
+                alert("ICI");
+                console.log(findIndexOfEmployePk_ID(planification[j].employerPkId));
+                employeListe[findIndexOfEmployePk_ID(planification[j].employerPkId)][planification[j].periode] = "green";
             }
         }
 
-        setEmployeList(employeList);
+
+
+
+        // console.log("Employe list ");
+        // console.log(employeListe);
+
+        setEmployeList(employeListe);
 
     }
 
@@ -138,33 +172,36 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
 
     }
     const renderItem = ({ item }) => {
+
+
         return (
             <View style={{ padding: 10, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderBottomWidth: 1, height: 60, borderColor: '#1f4598' }}>
                 <View style={{ width: '50%' }}>
+
                     <Text>{item._C_nomComplet}</Text>
                 </View>
                 <TouchableOpacity onPress={() => {
-                    navigation.navigate("SauvegarderPlanification", { nomComplet: item._C_nomComplet, pk_ID: item.pk_ID, periode: "AM" })
+                    navigation.navigate("SauvegarderPlanification", { date: timeStore.selectedDate, nomComplet: item._C_nomComplet, pk_ID: item.pk_ID, periode: "AM" })
 
                 }
                 } style={{ width: '12%', backgroundColor: 'transparent' }}>
-                    <Text style={{ color: item.AM ? "red" : "black" }}>{"AM"}</Text>
+                    <Text style={{ color: item.AM }}>{"AM"}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     onPress={() => {
-                        navigation.navigate("SauvegarderPlanification", { nomComplet: item._C_nomComplet, pk_ID: item.pk_ID, periode: "PM" })
+                        navigation.navigate("SauvegarderPlanification", { date: timeStore.selectedDate, nomComplet: item._C_nomComplet, pk_ID: item.pk_ID, periode: "PM" })
 
                     }}
                     style={{ width: '12%', backgroundColor: 'transparent' }}>
-                    <Text style={{ color: item.PM ? "red" : "black" }}>{"PM"}</Text>
+                    <Text style={{ color: item.PM }}>{"PM"}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     onPress={() => {
-                        navigation.navigate("SauvegarderPlanification", { nomComplet: item._C_nomComplet, pk_ID: item.pk_ID, periode: "ALL" })
+                        navigation.navigate("SauvegarderPlanification", { date: timeStore.selectedDate, nomComplet: item._C_nomComplet, pk_ID: item.pk_ID, periode: "ALL" })
 
                     }}
                     style={{ width: '25%', backgroundColor: 'transparent' }}>
-                    <Text style={{ color: item.AM && item.PM ? "red" : "black" }} >{"Journée"}</Text>
+                    <Text style={{ color: item.AM == "red" && item.PM == "red" ? "red" : "black" }} >{"Journée"}</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -174,6 +211,8 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
     const isFocused = useIsFocused();
 
     React.useEffect(() => {
+        console.log("Planification");
+        console.log(SyncStorage.get('planification'));
         if (SyncStorage.get('modeRemplir')) {
             setModeRemplir(true);
         }
@@ -183,11 +222,12 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
         let layoutAccount = "mobile_ACCOUNT2";
         const getListEmployes = async () => {
             let employes = (await get(username, password, global.fmServer, global.fmDatabase, layoutAccount, "&PrivilegeSet=0"));
-            setEmployeList(employes);
+            selectDate(timeStore.selectedDate, employes);
+            return employes;
         }
+        let employes = getListEmployes();
 
-        getListEmployes();
-
+        setEmployeList(employes);
     }, [isFocused]);
     let notEmptyDates;
     if (SyncStorage.get('typeAccount') == 1) {
