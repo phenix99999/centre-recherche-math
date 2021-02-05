@@ -21,6 +21,7 @@ import MainLecture from "../screens/planificateur/MainLecture";
 import MainPlanification from "../screens/planificateur/MainPlanification";
 import Planification from "../screens/planificateur/Planification";
 import SauvegarderPlanification from "../screens/planificateur/SauvegarderPlanification";
+import ConfirmerPlanification from "../screens/planificateur/ConfirmerPlanification";
 
 import MainScreen from "../screens/MainScreen";
 import Bilan from "../screens/Bilan";
@@ -210,6 +211,7 @@ export default class App extends Component {
                     <Stack.Screen name="MainPlanification" component={MainPlanification} />
                     <Stack.Screen name="Planification" component={Planification} />
                     <Stack.Screen name="SauvegarderPlanification" component={SauvegarderPlanification} />
+                    <Stack.Screen name="ConfirmationPlanification" component={ConfirmerPlanification} />
                 </Stack.Navigator>
             );
         }

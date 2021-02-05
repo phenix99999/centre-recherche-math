@@ -22,7 +22,7 @@ import { dateToFrench, getNotEmptyDates, getDaysInMonth, dateToFMDate } from "..
 import NetworkUtils from '../../utils/NetworkUtils';
 
 import * as React from "react";
-import { Alert, StyleSheet, unstable_batchedUpdates, View } from "react-native";
+import { Alert, StyleSheet, unstable_batchedUpdates, View, ScrollView } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { CustomPickerRow, DetachedCustomPickerRow } from "../../components/CustomPicker";
 import { Record, Client, Activite, Projet, Type_de_projet } from "../../stores/FMObjectTypes";
@@ -36,7 +36,7 @@ type Props = {
     timeStore: TimeStore;
 } & StackScreenProps<MainStackParamList, "Main">;
 
-const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
+const ConfirmerPlanification = ({ route, navigation, timeStore }: Props) => {
     const [heure, setHeure] = React.useState<Number>(0);
 
 
@@ -111,95 +111,64 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
 
 
             <Content style={{ flex: 1, flexDirection: "column" }}>
-                <View style={styles.inputWrapper}>
+                <ScrollView>
+
+                    {SyncStorage.get('planification').map((planification) => (
+                        <View>
+                            <View style={styles.inputWrapper}>
 
 
-                    <Text>Nom Employé assigné :  </Text>
-                    <View style={{ marginLeft: 'auto' }}>
-                        <Text> {route.params.nomComplet} </Text>
-                    </View>
-                </View>
+                                <Text>Nom Employé assigné :  </Text>
+                                <View style={{ marginLeft: 'auto' }}>
+                                    <Text> {planification.nom} </Text>
+                                </View>
+                            </View>
 
-                <View style={styles.inputWrapper}>
+                            <View style={styles.inputWrapper}>
 
-                    <Text>Client :  </Text>
-                    <View style={{ marginLeft: 'auto' }}>
-                        <Text style={{ fontWeight: 'bold' }}>{SyncStorage.get('filterClientName')} </Text>
-                    </View>
+                                <Text>Client :  </Text>
+                                <View style={{ marginLeft: 'auto' }}>
+                                    <Text style={{ fontWeight: 'bold' }}>{planification.clientName} </Text>
+                                </View>
 
-                </View>
-
-
-
-                <View style={styles.inputWrapper}>
-                    <Text>Projet :  </Text>
-                    <View style={{ marginLeft: 'auto' }}>
-                        <Text style={{ fontSize: 13, fontWeight: 'bold' }}>{SyncStorage.get('filterProjectName')} </Text>
-                    </View>
-
-                </View>
-
-                <View style={styles.inputWrapper}>
-                    <Text>Activité :  </Text>
-                    <View style={{ marginLeft: 'auto', }}>
-                        <Text style={{ fontSize: 13, fontWeight: 'bold' }}>{SyncStorage.get('filterActivityName')} </Text>
-                    </View>
-
-                </View>
+                            </View>
 
 
 
-                <View style={{ flexDirection: 'row', padding: 20 }}>
-                    <Text>Nb d'heure :</Text>
-                    <View style={{ marginLeft: 'auto' }}>
-                        <TextInput
-                            keyboardType='numeric'
-                            value={heure}
-                            onChange={(e) => (setHeure(e.nativeEvent.text))}
-                            placeholder="Nombre d'heure"
-                        />
-                    </View>
-                </View>
+                            <View style={styles.inputWrapper}>
+                                <Text>Projet :  </Text>
+                                <View style={{ marginLeft: 'auto' }}>
+                                    <Text style={{ fontSize: 13, fontWeight: 'bold' }}>{planification.projectName} </Text>
+                                </View>
+
+                            </View>
+
+                            <View style={styles.inputWrapper}>
+                                <Text>Activité :  </Text>
+                                <View style={{ marginLeft: 'auto', }}>
+                                    <Text numberOfLines={0.5} ellipsizeMode='tail' style={{ fontSize: 12, fontWeight: 'bold' }}>{planification.activityName} </Text>
+                                </View>
+
+                            </View>
+
+
+
+                            <View style={{ flexDirection: 'row', padding: 20 }}>
+                                <Text>Nb d'heure :</Text>
+                                <View style={{ marginLeft: 'auto', }}>
+                                    <Text style={{ fontSize: 13, fontWeight: 'bold' }}>{planification.duree} </Text>
+                                </View>
+                            </View>
+                        </View>
+                    ))
+                    }
+                </ScrollView>
             </Content>
 
 
             <Button style={{ width: '100%', justifyContent: 'center', backgroundColor: '#1f4598' }}
                 onPress={async () => {
-                    // SyncStorage.remove('planification');
-                    let planification = SyncStorage.get('planification');
-                    if (!planification) {
-                        planification = [];
-                        planification[0] = {};
-                        planification[0].employerPkId = route.params.pk_ID;
-                        planification[0].duree = heure;
-                        planification[0].nom = route.params.nomComplet;
-                        planification[0].clientName = SyncStorage.get('filterClientName');
-                        planification[0].projectName = SyncStorage.get('filterProjectName');
-                        planification[0].activityName = SyncStorage.get('filterActivityName');
-                        planification[0].client = SyncStorage.get('filterClient');
-                        planification[0].projet = SyncStorage.get('filterProject');
-                        planification[0].activity = SyncStorage.get('filterActivity');
-                        planification[0].periode = route.params.periode;
-                        planification[0].date = route.params.date;
-                    } else {
-                        let planificationLength = (planification.length);
-                        planification[planificationLength] = {};
-
-                        planification[planificationLength].nom = route.params.nomComplet;
-                        planification[planificationLength].employerPkId = route.params.pk_ID;
-                        planification[planificationLength].periode = route.params.periode;
-                        planification[planificationLength].clientName = SyncStorage.get('filterClientName');
-                        planification[planificationLength].projectName = SyncStorage.get('filterProjectName');
-                        planification[planificationLength].activityName = SyncStorage.get('filterActivityName');
-                        planification[planificationLength].duree = heure;
-                        planification[planificationLength].client = SyncStorage.get('filterClient');
-                        planification[planificationLength].projet = SyncStorage.get('filterProject');
-                        planification[planificationLength].activity = SyncStorage.get('filterActivity');
-                        planification[planificationLength].date = route.params.date;
-                    }
-
-                    SyncStorage.set('planification', planification);
-                    navigation.goBack();
+                    alert("a venir!")
 
                 }}
             >
@@ -225,7 +194,7 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
         </Container>
     );
 };
-export default inject("timeStore")(observer(SauvegarderPlanification));
+export default inject("timeStore")(observer(ConfirmerPlanification));
 
 const styles = StyleSheet.create({
     container: {

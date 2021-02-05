@@ -46,14 +46,14 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
         return "";
     }
     function findIndexOfEmployePk_ID(pk_ID) {
-        console.log(pk_ID);
-        console.log(employeList);
+        // console.log(pk_ID);
+        // console.log(employeList);
         for (let i = 0; i < employeList.length; i++) {
             if (employeList[i].pk_ID == pk_ID) {
                 return i;
             }
         }
-        return 0;
+        return -1;
     }
 
     async function selectDate(date, employeListTemp = false) {
@@ -99,28 +99,46 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
 
         let planification = SyncStorage.get("planification");
 
-        console.log(planification);
+        // console.log(planification);
+        console.log("Voici les feuilles de temps : ");
+        // console.log(feuilleTemps);
         for (let i = 0; i < feuilleTemps.length; i++) {
             // employeListe[findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation)].AM_PM = feuilleTemps[i].AM_PM;
+            if (feuilleTemps[i].fk_assignation == 68) {
+                // console.log(feuilleTemps[i]);
+            }
+            // console.log(feuilleTemps[i]);
 
             if (feuilleTemps[i].AM_PM == "AM") {
-                console.log("ICI", feuilleTemps[i].fk_assignation, findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation));
-                employeListe[findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation)].AM = "red";
+                // console.log("ICI", feuilleTemps[i].fk_assignation, findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation));
+                if (findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation) != -1) {
+                    employeListe[findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation)].AM = "red";
+                }
             } else {
-                console.log("ICI2");
-                employeListe[findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation)].PM = "red";
+                if (findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation) != -1) {
+
+                    employeListe[findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation)].PM = "red";
+                }
             }
 
 
         }
         // console.log(feuilleTemps[0]);
-        for (let j = 0; j < planification.length; j++) {
-            if (planification[j].date == timeStore.selectedDate) {
-                alert("ICI");
-                console.log(findIndexOfEmployePk_ID(planification[j].employerPkId));
-                employeListe[findIndexOfEmployePk_ID(planification[j].employerPkId)][planification[j].periode] = "green";
+        if (planification) {
+            console.log(planification[0].date);
+            console.log(timeStore.selectedDate);
+
+            console.log(planification);
+            for (let j = 0; j < planification.length; j++) {
+                if (planification[j].date.toString().substring(0, 10) == timeStore.selectedDate.toString().substring(0, 10)) {
+
+                    // console.log(findIndexOfEmployePk_ID(planification[j].employerPkId));
+                    employeListe[findIndexOfEmployePk_ID(planification[j].employerPkId)][planification[j].periode] = "green";
+                }
             }
+
         }
+        // console.log(employeListe[0]);
 
 
 
@@ -211,8 +229,8 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
     const isFocused = useIsFocused();
 
     React.useEffect(() => {
-        console.log("Planification");
-        console.log(SyncStorage.get('planification'));
+        // console.log("Planification");
+        // console.log(SyncStorage.get('planification'));
         if (SyncStorage.get('modeRemplir')) {
             setModeRemplir(true);
         }
@@ -341,9 +359,19 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
                     onSelect={(date: Date) => selectDate(date)}
                 />
                 <View style={{ maxHeight: 40, flex: 1, flexDirection: "row", paddingLeft: 20 }}>
-                    <View style={{ height: 50, flex: 1, justifyContent: "center" }}>
+                    <View style={{ width: '50%', height: 50, flex: 1, justifyContent: "center" }}>
                         <Text style={{ fontWeight: "bold", color: '#1f4598' }}>{dateToFrench(timeStore.selectedDate)}</Text>
                     </View>
+
+
+                    <TouchableOpacity
+                        onPress={() =>
+                            navigation.navigate("ConfirmationPlanification")
+                        }
+                        style={{ width: '50%', height: 50, flex: 1, justifyContent: "center" }}>
+                        <Text style={{ fontWeight: "bold", color: '#1f4598' }}>Confirmer planification</Text>
+                    </TouchableOpacity>
+
 
                 </View>
                 <ScrollView
