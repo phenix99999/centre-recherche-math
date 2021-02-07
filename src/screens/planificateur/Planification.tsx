@@ -90,7 +90,7 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
     }, []);
 
     function getClientNameWithClientId(id) {
-        alert("ICI");
+        // alert("ICI");
         for (let i = 0; i < formatedClient.length; i++) {
             if (formatedClient[i].pk_ID == id) {
                 return formatedClient[i].Nom;

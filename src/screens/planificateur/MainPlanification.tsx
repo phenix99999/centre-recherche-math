@@ -45,11 +45,19 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
         }
         return "";
     }
-    function findIndexOfEmployePk_ID(pk_ID) {
+    function findIndexOfEmployePk_ID(pk_ID, employeListe = null) {
+        let employeListeOfficiel = [];
+        if (!employeListe) {
+            employeListeOfficiel = employeList;
+        } else {
+            employeListeOfficiel = employeListe;
+        }
         // console.log(pk_ID);
         // console.log(employeList);
-        for (let i = 0; i < employeList.length; i++) {
-            if (employeList[i].pk_ID == pk_ID) {
+        console.log
+
+        for (let i = 0; i < employeListeOfficiel.length; i++) {
+            if (employeListeOfficiel[i].pk_ID == pk_ID) {
                 return i;
             }
         }
@@ -58,6 +66,7 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
 
     async function selectDate(date, employeListTemp = false) {
         // console.log(employeListTemp);
+        setModeRemplir(false);
         let employeListe = [];
         if (employeListTemp) {
             employeListe = employeListTemp;
@@ -82,13 +91,6 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
         let feuilleTemps = await get(SyncStorage.get('username'), SyncStorage.get('password'), global.fmServer, global.fmDatabase, "mobile_TEMPS2"
             , "&flag_actif=1&StartDate=" + month + "/" + date.getDate() + "/" + date.getFullYear())
 
-        let dispoArray = [];
-        //array == ["LyesTamazouzt"] => dispoAm : false, dispoPm:true 
-
-
-        //Creer le dispo array
-        let finalDispoArray = [];
-
         for (let i = 0; i < employeListe.length; i++) {
             // dispoArray[employeList[i].pk_ID.toString()] = {};
             employeListe[i] = { ...employeListe[i], AM: "black", PM: "black", "AM_PM": "" };
@@ -98,56 +100,82 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
         // console.log(feuilleTemps);
 
         let planification = SyncStorage.get("planification");
-
+        console.log(planification);
+        // console.log("Planification " + planification);
         // console.log(planification);
-        console.log("Voici les feuilles de temps : ");
+        console.log("FEUILLE TEMPS");
         // console.log(feuilleTemps);
+
         for (let i = 0; i < feuilleTemps.length; i++) {
             // employeListe[findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation)].AM_PM = feuilleTemps[i].AM_PM;
             if (feuilleTemps[i].fk_assignation == 68) {
-                // console.log(feuilleTemps[i]);
+                console.log("Voici la fueille de temps");
+                console.log(feuilleTemps[i]);
+                console.log(findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation, employeListe));
             }
             // console.log(feuilleTemps[i]);
 
             if (feuilleTemps[i].AM_PM == "AM") {
                 // console.log("ICI", feuilleTemps[i].fk_assignation, findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation));
-                if (findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation) != -1) {
-                    employeListe[findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation)].AM = "red";
+                if (findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation, employeListe) != -1) {
+                    employeListe[findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation, employeListe)].AM = "red";
                 }
             } else {
-                if (findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation) != -1) {
+                if (findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation, employeListe) != -1) {
 
-                    employeListe[findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation)].PM = "red";
+                    employeListe[findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation, employeListe)].PM = "red";
                 }
             }
-
-
         }
+
         // console.log(feuilleTemps[0]);
+        // console.log("Planification");
+        // console.log(planification);
+
         if (planification) {
-            console.log(planification[0].date);
-            console.log(timeStore.selectedDate);
-
-            console.log(planification);
             for (let j = 0; j < planification.length; j++) {
-                if (planification[j].date.toString().substring(0, 10) == timeStore.selectedDate.toString().substring(0, 10)) {
+                let month = parseInt(timeStore.selectedDate.getMonth()) + 1;
+                // console.log("Month" + month);
+                if (month < 10) {
+                    month = "0" + month;
+                }
 
-                    // console.log(findIndexOfEmployePk_ID(planification[j].employerPkId));
-                    employeListe[findIndexOfEmployePk_ID(planification[j].employerPkId)][planification[j].periode] = "green";
+                let day = parseInt(timeStore.selectedDate.getDate()) + 1;
+                if (day < 10) {
+                    day = "0" + day;
+                }
+
+                let monthPlanification = parseInt(new Date(planification[j].date).getMonth()) + 1;
+                // console.log("Month" + month);
+                if (monthPlanification < 10) {
+                    monthPlanification = "0" + monthPlanification;
+                }
+
+                let dayPlanification = parseInt(new Date(planification[j].date).getDate()) + 1;
+                if (dayPlanification < 10) {
+                    dayPlanification = "0" + dayPlanification;
+                }
+                let datePlanification = new Date(planification[j].date).getFullYear() + "-" + monthPlanification + "-" + dayPlanification;
+                let dateTimeStore = timeStore.selectedDate.getFullYear() + "-" + month + "-" + day;
+                console.log("Date planification");
+                console.log(datePlanification);
+                console.log("Date time store");
+                console.log(dateTimeStore);
+                if (datePlanification == dateTimeStore) {
+                    console.log("index ", findIndexOfEmployePk_ID(planification[j].employerPkId, employeListe));
+                    // if (findIndexOfEmployePk_ID(planification[j].employerPkId, employeListe) != -1) {
+                    employeListe[findIndexOfEmployePk_ID(planification[j].employerPkId, employeListe)][planification[j].periode] = "green";
+
+                    // }
                 }
             }
 
         }
+        // console.log(" Main planification");
         // console.log(employeListe[0]);
-
-
-
-
-        // console.log("Employe list ");
-        // console.log(employeListe);
-
+        // console.log("################");
         setEmployeList(employeListe);
-
+        setModeRemplir(true);
     }
 
 
@@ -228,24 +256,42 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
 
     const isFocused = useIsFocused();
 
+    function getNbHeuresAssigner() {
+
+        let planification = SyncStorage.get('planification');
+        let nbHeures = 0;
+        if (planification) {
+            for (let i = 0; i < planification.length; i++) {
+                nbHeures = parseInt(planification[i].duree) + parseInt(nbHeures);
+            }
+        }
+        console.log("Nb heures");
+        console.log(nbHeures);
+        return nbHeures;
+    }
+
     React.useEffect(() => {
         // console.log("Planification");
         // console.log(SyncStorage.get('planification'));
-        if (SyncStorage.get('modeRemplir')) {
-            setModeRemplir(true);
-        }
+        // alert(SyncStorage.get('modeRemplir'));
+        // if (SyncStorage.get('modeRemplir') == true) {
+        //     setModeRemplir(true);
+        // } else {
+        //     setModeRemplir(false);
+        // }
 
         let username = SyncStorage.get('username');
         let password = SyncStorage.get('password');
         let layoutAccount = "mobile_ACCOUNT2";
         const getListEmployes = async () => {
             let employes = (await get(username, password, global.fmServer, global.fmDatabase, layoutAccount, "&PrivilegeSet=0"));
-            selectDate(timeStore.selectedDate, employes);
+            await selectDate(timeStore.selectedDate, employes);
             return employes;
         }
         let employes = getListEmployes();
+        selectDate(timeStore.selectedDate, employes);
+        // setEmployeList(employes);
 
-        setEmployeList(employes);
     }, [isFocused]);
     let notEmptyDates;
     if (SyncStorage.get('typeAccount') == 1) {
@@ -316,7 +362,7 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
 
                                 }}
                             >
-                                {modeRemplir ?
+                                {SyncStorage.get('budject') ?
                                     <View style={{ flexDirection: 'row' }}>
 
                                         <Icon name="clockcircle" type="AntDesign" style={{ fontSize: 30, marginLeft: 2, color: '#1f4598' }} />
@@ -325,7 +371,7 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
                                                 {(SyncStorage.get('heureFacturable') + "/" + SyncStorage.get('budject'))}
                                             </Text>
                                             <Text style={{ marginLeft: 5, color: parseFloat(SyncStorage.get('budject') - SyncStorage.get('heureFacturable')) > 0 ? 'green' : 'red', fontSize: 15, fontWeight: 'bold' }}>
-                                                Restant :  {parseFloat(SyncStorage.get('budject') - SyncStorage.get('heureFacturable'))}
+                                                Restant :  {parseFloat(SyncStorage.get('budject') - SyncStorage.get('heureFacturable') - getNbHeuresAssigner())}
                                             </Text>
                                         </View>
 
@@ -356,7 +402,7 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
                     month={timeStore.activeMonth}
                     year={timeStore.activeYear}
                     selected={timeStore.selectedDate}
-                    onSelect={(date: Date) => selectDate(date)}
+                    onSelect={async (date: Date) => await selectDate(date)}
                 />
                 <View style={{ maxHeight: 40, flex: 1, flexDirection: "row", paddingLeft: 20 }}>
                     <View style={{ width: '50%', height: 50, flex: 1, justifyContent: "center" }}>
@@ -364,13 +410,14 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
                     </View>
 
 
-                    <TouchableOpacity
+                    {SyncStorage.get('planification') ? <TouchableOpacity
                         onPress={() =>
                             navigation.navigate("ConfirmationPlanification")
                         }
                         style={{ width: '50%', height: 50, flex: 1, justifyContent: "center" }}>
                         <Text style={{ fontWeight: "bold", color: '#1f4598' }}>Confirmer planification</Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> : null}
+
 
 
                 </View>

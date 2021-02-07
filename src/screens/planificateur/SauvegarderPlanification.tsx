@@ -131,7 +131,7 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
 
 
 
-                <View style={styles.inputWrapper}>
+                <View style={{ padding: 30 }}>
                     <Text>Projet :  </Text>
                     <View style={{ marginLeft: 'auto' }}>
                         <Text style={{ fontSize: 13, fontWeight: 'bold' }}>{SyncStorage.get('filterProjectName')} </Text>
@@ -139,7 +139,7 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
 
                 </View>
 
-                <View style={styles.inputWrapper}>
+                <View style={{ padding: 30 }}>
                     <Text>Activité :  </Text>
                     <View style={{ marginLeft: 'auto', }}>
                         <Text style={{ fontSize: 13, fontWeight: 'bold' }}>{SyncStorage.get('filterActivityName')} </Text>
@@ -197,8 +197,8 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
                         planification[planificationLength].activity = SyncStorage.get('filterActivity');
                         planification[planificationLength].date = route.params.date;
                     }
-
                     SyncStorage.set('planification', planification);
+
                     navigation.goBack();
 
                 }}
@@ -207,6 +207,7 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
                 <Text style={{ textAlign: 'center' }}>
                     Confirmer planification
                 </Text>
+
             </Button>
 
 
@@ -222,7 +223,7 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
             </Button>
 
 
-        </Container>
+        </Container >
     );
 };
 export default inject("timeStore")(observer(SauvegarderPlanification));

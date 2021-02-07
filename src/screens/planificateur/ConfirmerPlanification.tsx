@@ -44,6 +44,25 @@ const ConfirmerPlanification = ({ route, navigation, timeStore }: Props) => {
         alert("Erreur de connexion.");
     }
 
+    async function addAndUpdateQuery(records) {
+        console.log("INSIDE ADD");
+        console.log(records);
+        let query = "";
+        let layout = "mobile_TEMPS2";
+        for (let i = 0; i < records.length; i++) {
+            let username = SyncStorage.get('username');
+            let password = SyncStorage.get('password');
+            query = "&StartDate=" + records[i].StartDate + "&fk_assignation=" + records[i].fk_assignation + "&fk_client=" + records[i].fk_client + "&fk_projet=" + records[i].fk_projet + "&Taches=" + "Programmation"
+                + "&Minutes_planifie=" + records[i].Minutes_planifie + "&AM_PM=" + records[i].AM_PM + "&fk_activites=" + records[i].fk_activities + "&flag_actif=" + 1;
+            await add(username, password, global.fmServer, global.fmDatabase, layout, query);
+
+        }
+
+
+        // return "&StartDate=" + StartDate + "&fk_assignation=" + fk_assignation + "&fk_client=" + fk_client + "&fk_projet=" + fk_projet + "&Taches=" + tache + "&Flag_facturable=" + facturable + "&flag_R_et_D=" + rd
+        //     + "&Minutes=" + Minutes + "&Minutes_planifie=" + Minutes_planifie + "&AM_PM=" + AM_PM + "&fk_activites=" + fk_activites + "&flag_actif=" + flag_actif + "&Description=" + Description + "&Flag_termine=" + Flag_termine + "&Minutes_restantes=" + Minutes_restantes + "&Minutes_restantes_tache=" + Minutes_restantes_tache;
+
+    }
 
 
     React.useEffect(() => {
@@ -135,7 +154,7 @@ const ConfirmerPlanification = ({ route, navigation, timeStore }: Props) => {
 
 
 
-                            <View style={styles.inputWrapper}>
+                            <View style={{ padding: 30 }}>
                                 <Text>Projet :  </Text>
                                 <View style={{ marginLeft: 'auto' }}>
                                     <Text style={{ fontSize: 13, fontWeight: 'bold' }}>{planification.projectName} </Text>
@@ -143,7 +162,7 @@ const ConfirmerPlanification = ({ route, navigation, timeStore }: Props) => {
 
                             </View>
 
-                            <View style={styles.inputWrapper}>
+                            <View style={{ padding: 30 }}>
                                 <Text>Activité :  </Text>
                                 <View style={{ marginLeft: 'auto', }}>
                                     <Text numberOfLines={0.5} ellipsizeMode='tail' style={{ fontSize: 12, fontWeight: 'bold' }}>{planification.activityName} </Text>
@@ -159,7 +178,11 @@ const ConfirmerPlanification = ({ route, navigation, timeStore }: Props) => {
                                     <Text style={{ fontSize: 13, fontWeight: 'bold' }}>{planification.duree} </Text>
                                 </View>
                             </View>
+                            <View style={{ borderBottomWidth: 1, borderColor: 'black' }}>
+
+                            </View>
                         </View>
+
                     ))
                     }
                 </ScrollView>
@@ -168,8 +191,38 @@ const ConfirmerPlanification = ({ route, navigation, timeStore }: Props) => {
 
             <Button style={{ width: '100%', justifyContent: 'center', backgroundColor: '#1f4598' }}
                 onPress={async () => {
-                    alert("a venir!")
 
+                    console.log(SyncStorage.get('planification'));
+                    // alert("a venir!")
+                    let planification = SyncStorage.get('planification');
+                    let StartDate = "";
+                    let fk_assignation = "";
+                    let fk_client = "";
+                    let fk_projet = "";
+                    let Minutes_planifie = "";
+                    let AM_PM = "";
+                    let fk_actif = 1;
+                    //TACHE ?!
+                    // let tache = "Programmation";
+                    let records = [];
+                    for (let i = 0; i < planification.length; i++) {
+                        records[i] = {};
+                        records[i].StartDate = dateToFMDate(new Date(planification[i].date));
+                        records[i].fk_assignation = planification[i].employerPkId;
+                        records[i].fk_client = planification[i].client;
+                        records[i].fk_projet = planification[i].projet;
+                        records[i].fk_activities = planification[i].activity;
+                        records[i].Minutes_planifie = planification[i].duree;
+                        records[i].fk_actif = "1";
+                        records[i].AM_PM = planification[i].periode;
+                    }
+                    console.log(records);
+                    await addAndUpdateQuery(records);
+                    SyncStorage.remove('planification');
+                    SyncStorage.remove('budject');
+                    SyncStorage.remove('modeRemplir');
+
+                    navigation.goBack();
                 }}
             >
 

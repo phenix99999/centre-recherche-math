@@ -63,7 +63,7 @@ export async function add(username, password, server, db, layout, query) {
 
     // https://vhmsoft.com/fmi/xml/fmresultset.xml?-db=vhmsoft_Lyes&-lay=mobile_TEMPS&AM_PM=PM&-new
     let url = "https://" + server + "/fmi/xml/fmresultset.xml?-db=" + db + "&-lay=" + layout + query + "&-new";
-
+    console.log("Url" + url);
     await axios.post(url, {}, {
         headers: { 'Authorization': authHeader }
     }).then(function (response) {
@@ -71,6 +71,7 @@ export async function add(username, password, server, db, layout, query) {
 
         return true;
     }).catch(function (error) {
+        console.log("ERROR IN ADDD");
         alert("ERROR");
         return false;
     });
