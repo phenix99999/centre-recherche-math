@@ -43,6 +43,10 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
     const [formatedProjects, setFormatedProjects] = React.useState<Object>([]);
     const [formatedClient, setFormatedClient] = React.useState<Object>([]);
 
+
+
+    const [employe, setEmploye] = React.useState<Number>(0);
+    const [formatedEmploye, setFormatedEmploye] = React.useState<Object>([]);
     const [client, setClient] = React.useState<Number>(0);
     const [clientName, setClientName] = React.useState<String>("");
     const [project, setProject] = React.useState<Number>(0);
@@ -60,10 +64,6 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
 
 
     React.useEffect(() => {
-        SyncStorage.remove('modeRemplir');
-
-
-
         let username = SyncStorage.get('username');
         let password = SyncStorage.get('password');
         let db = "vhmsoft";
@@ -79,14 +79,32 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
         //     setActivity(SyncStorage.get('filterActivity'));
 
         // }
+        const getListEmployes = async () => {
+            setFormatedEmploye(await get(username, password, global.fmServer, global.fmDatabase, layoutAccount, "&PrivilegeSet=0"));
+        }
 
         const setData = async (username, password, server, db, layoutClient, layoutProjet, layoutActivite) => {
             setFormatedClient(await get(username, password, server, db, layoutClient, "&pk_ID=>0&-sortfield.1=Nom&-sortorder.1=ascend"));
             setFormatedProjects(await get(username, password, server, db, layoutProjet, "&flag_actif=1" + "&-sortfield.1=Nom&-sortorder.1=ascend"));
             setFormatedActivities(await get(username, password, server, db, layoutActivite, "&flag_actif=1" + "&-sortfield.1=Nom&-sortorder.1=ascend"));
         }
-        setData(username, password, global.fmServer, global.fmDatabase, layoutClient, layoutProjet, layoutActivite);
 
+        setData(username, password, global.fmServer, global.fmDatabase, layoutClient, layoutProjet, layoutActivite);
+        // alert("ICI");
+        if (SyncStorage.get('filterCalendrier_employe')) {
+            setEmploye(SyncStorage.get('filterCalendrier_employe'));
+        }
+        if (SyncStorage.get('filterCalendrier_client')) {
+            setEmploye(SyncStorage.get('filterCalendrier_client'));
+        }
+        if (SyncStorage.get('filterCalendrier_projet')) {
+            setEmploye(SyncStorage.get('filterCalendrier_projet'));
+        }
+        if (SyncStorage.get('filterCalendrier_activite')) {
+            setEmploye(SyncStorage.get('filterCalendrier_activite'));
+        }
+
+        getListEmployes();
     }, []);
 
     function getClientNameWithClientId(id) {
@@ -181,8 +199,6 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
 
         }
 
-
-
         let tempFormatedActivities = await get(SyncStorage.get('username'), SyncStorage.get('password'), global.fmServer, global.fmDatabase, "mobile_ACTIVITES2", "&fk_projet=" + value + "&fk_client=" + client + "&flag_actif=1" + "&-sortfield.1=Nom&-sortorder.1=ascend");
         ;
         let heureFacturableTemp = 0;
@@ -197,7 +213,6 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
         if (pasDeBudget) {
             budgetTemp = heureFacturableTemp;
         }
-
         setBudject(budgetTemp);
 
         setFormatedProjects(tempFormatedProjects);
@@ -241,13 +256,32 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
                 </Left>
 
                 <Body>
-                    <Text style={{ color: '#1f4598', fontWeight: 'bold' }}>Planification</Text>
+                    <Text style={{ color: '#1f4598', fontWeight: 'bold' }}>Filtre Calendrier</Text>
                 </Body>
                 <Right>
 
                 </Right>
             </Header>
+
             <View style={{ padding: 20 }}>
+                <CustomPickerRow<Projet>
+                    records={formatedEmploye}
+                    valueKey={"pk_ID"}
+                    getLabel={(user) => user.UserAccountName}
+                    selectedValue={employe}
+                    onChange={async (value) => {
+
+                        setEmploye(value);
+                    }}
+                    placeholder={"Employé"}
+                />
+            </View>
+
+
+            <View style={{ padding: 20 }}>
+
+
+
                 <CustomPickerRow<Client>
                     records={formatedClient}
                     valueKey={"pk_ID"}
@@ -288,28 +322,16 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
 
             <Button style={{ width: '100%', alignItems: 'center', justifyContent: 'center' }}
                 onPress={() => {
-                    if (!client || !project || !activity) {
-                        alert("Veuillez entrez un client,projet et activite");
-                    } else {
-                        SyncStorage.set('filterClient', client);
-                        SyncStorage.set('filterProject', project);
-                        SyncStorage.set('filterActivity', activity);
+                    // if (employe == 0 && client == 0 && project == 0 && activity == 0) {
+                    SyncStorage.remove('filterCalendrier_employe');
+                    SyncStorage.remove('filterCalendrier_client');
+                    SyncStorage.remove('filterCalendrier_projet');
+                    SyncStorage.remove('filterCalendrier_activite');
+                    // }
 
-                        SyncStorage.set('filterClientName', clientName);
-                        SyncStorage.set('filterProjectName', projectName);
-                        SyncStorage.set('filterActivityName', activityName);
 
-                        SyncStorage.set('pasDeBudget', pasDeBudject);
-                        SyncStorage.set('budject', budject)
-                        SyncStorage.set('heureFacturable', heureFacturable);
-                        SyncStorage.set('modeRemplir', true);
+                    navigation.navigate("MainLecture", { employe: employe, client: client, project: project, activity: activity });
 
-                        if (client && formatedProjects.length == 0) {
-                            alert("Ce client n'a aucun projet actif.")
-                        } else {
-                            navigation.goBack();
-                        }
-                    }
                 }
 
 
@@ -317,17 +339,21 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
                 }
             >
                 <Text style={{ textAlign: 'center' }}>
-                    Ajouter des planifications
+                    Rechercher
                 </Text>
             </Button>
 
 
             <Button style={{ width: '100%', top: '1%', justifyContent: 'center', backgroundColor: 'red' }}
                 onPress={async () => {
-                    SyncStorage.remove("filterProject");
-                    SyncStorage.remove("filterActivity");
-                    setProject("");
-                    setActivity("");
+                    SyncStorage.remove('filterCalendrier_employe');
+                    SyncStorage.remove('filterCalendrier_client');
+                    SyncStorage.remove('filterCalendrier_projet');
+                    SyncStorage.remove('filterCalendrier_activite');
+                    setEmploye(0);
+                    setClient(0);
+                    setProject(0);
+                    setActivity(0);
                 }}
             >
                 <Text style={{ textAlign: 'center' }}>
@@ -335,119 +361,6 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
                 </Text>
             </Button>
 
-            <ScrollView>
-                <View>
-
-
-                    {formatedProjects.length == 1 && project == 0 && activity == 0 && client > 0 ?
-                        <View>
-                            <View style={{ flexDirection: 'row', padding: 20 }}>
-                                <Text style={{ fontSize: 14, fontWeight: 'bold' }}>
-                                    Nombre d'heures complétés : {heureFacturable}/{budject}
-                                </Text>
-                            </View>
-                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 25 }}>
-                                <ProgressCircle
-                                    percent={parseFloat(((heureFacturable / budject) * 100))}
-                                    radius={50}
-                                    borderWidth={8}
-                                    color="#1f4598"
-                                    shadowColor="#999"
-                                    bgColor="#fff"
-                                >
-                                    <Text style={{ fontSize: 18 }}>{((heureFacturable / budject)).toFixed(2) * 100}%</Text>
-                                </ProgressCircle>
-                            </View>
-                        </View>
-                        :
-                        null
-                    }
-
-                    {activity > 0 ?
-                        <View>
-                            <View style={{ flexDirection: 'row', padding: 20 }}>
-                                <Text style={{ fontSize: 14, fontWeight: 'bold' }}>
-                                    Nombre d'heures complétés : {heureFacturable}/{budject}
-                                </Text>
-                            </View>
-                            <View style={{ flexDirection: 'row', padding: 20 }}>
-                                <Text style={{ fontSize: 14, fontWeight: 'bold' }}>
-                                    {pasDeBudject ?
-                                        <Text> Nombre d'heures restantes : Pas de budget déterminé </Text>
-                                        :
-                                        <Text> Nombre d'heures restantes : {parseFloat(budject - heureFacturable)} </Text>
-                                    }
-
-                                </Text>
-                            </View>
-                        </View>
-                        :
-                        null
-                    }
-
-                    {formatedProjects.length == 0 && client > 0 ?
-                        <View style={{ flexDirection: 'row', padding: 20 }}>
-
-                            <Text style={{ fontWeight: 'bold', color: 'red' }}>
-                                Ce client n'a aucun projet actif.
-                            </Text>
-                        </View>
-                        :
-                        null
-                    }
-
-                    {formatedProjects.length > 1 && client > 0 ?
-                        <View style={{ flexDirection: 'row', padding: 20 }}>
-
-                            <Text style={{ fontWeight: 'bold', color: 'red' }}>
-                                Ce client contient plusieurs projets veuillez sélectionner un projet pour obtenir les statistiques.
-                            </Text>
-                        </View>
-                        :
-                        null
-                    }
-
-
-                    {activity == 0 && project > 0 ?
-                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 25 }}>
-
-                            <ProgressCircle
-                                percent={parseFloat(((heureFacturable / budject) * 100))}
-                                radius={50}
-                                borderWidth={8}
-                                color="#1f4598"
-                                shadowColor="#999"
-                                bgColor="#fff"
-                            >
-                                <Text style={{ fontSize: 18 }}>{((heureFacturable / budject)).toFixed(2) * 100}%</Text>
-                            </ProgressCircle>
-                        </View>
-                        :
-                        null
-                    }
-
-                    {activity > 0 ?
-                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 25 }}>
-
-                            <ProgressCircle
-                                percent={parseFloat(((heureFacturable / budject) * 100))}
-                                radius={50}
-                                borderWidth={8}
-                                color="#1f4598"
-                                shadowColor="#999"
-                                bgColor="#fff"
-                            >
-                                <Text style={{ fontSize: 18 }}>{((heureFacturable / budject)).toFixed(2) * 100}%</Text>
-                            </ProgressCircle>
-                        </View>
-
-                        :
-                        null
-                    }
-
-                </View>
-
-            </ScrollView>
 
 
 

@@ -36,33 +36,14 @@ type Props = {
     timeStore: TimeStore;
 } & StackScreenProps<MainStackParamList, "Main">;
 
-const ConfirmerPlanification = ({ route, navigation, timeStore }: Props) => {
+const UneJourneeEmploye = ({ route, navigation, timeStore }: Props) => {
     const [heure, setHeure] = React.useState<Number>(0);
+    const [data, setData] = React.useState<Object>([]);
 
 
     if (!NetworkUtils.isNetworkAvailable()) {
         alert("Erreur de connexion.");
     }
-
-    async function addAndUpdateQuery(records) {
-
-        let query = "";
-        let layout = "mobile_TEMPS2";
-        for (let i = 0; i < records.length; i++) {
-            let username = SyncStorage.get('username');
-            let password = SyncStorage.get('password');
-            query = "&StartDate=" + records[i].StartDate + "&fk_assignation=" + records[i].fk_assignation + "&fk_client=" + records[i].fk_client + "&fk_projet=" + records[i].fk_projet
-                + "&Minutes_planifie=" + records[i].Minutes_planifie + "&AM_PM=" + records[i].AM_PM + "&fk_activites=" + records[i].fk_activities + "&flag_actif=" + 1 + "&Taches=" + records[i].Taches;
-            await add(username, password, global.fmServer, global.fmDatabase, layout, query);
-
-        }
-
-
-        // return "&StartDate=" + StartDate + "&fk_assignation=" + fk_assignation + "&fk_client=" + fk_client + "&fk_projet=" + fk_projet + "&Taches=" + tache + "&Flag_facturable=" + facturable + "&flag_R_et_D=" + rd
-        //     + "&Minutes=" + Minutes + "&Minutes_planifie=" + Minutes_planifie + "&AM_PM=" + AM_PM + "&fk_activites=" + fk_activites + "&flag_actif=" + flag_actif + "&Description=" + Description + "&Flag_termine=" + Flag_termine + "&Minutes_restantes=" + Minutes_restantes + "&Minutes_restantes_tache=" + Minutes_restantes_tache;
-
-    }
-
 
     React.useEffect(() => {
         let username = SyncStorage.get('username');
@@ -73,29 +54,40 @@ const ConfirmerPlanification = ({ route, navigation, timeStore }: Props) => {
         let layoutActivite = "mobile_ACTIVITES2";
         let layoutTemps = "mobile_TEMPS2";
         let layoutAccount = "mobile_ACCOUNT2";
-        // if (SyncStorage.get('filterProject')) {
-        //     setProject(SyncStorage.get('filterProject'));
-        // }
-        // if (SyncStorage.get('filterActivity')) {
-        //     setActivity(SyncStorage.get('filterActivity'));
+        let date = route.params.date;
+        let pk_id = route.params.pk_ID;
 
-        // }
 
-        const setData = async (username, password, server, db, layoutClient, layoutProjet, layoutActivite) => {
-            // setFormatedClients(await get(username, password, server, db, layoutClient));
-            if (SyncStorage.get('typeAccount') == "1") {
-                setFormatedProjects(await get(username, password, server, db, layoutProjet, "&fk_client=" + SyncStorage.get('client_PK') + "&flag_actif=1" + "&-sortfield.1=Nom&-sortorder.1=ascend"));
-                setFormatedActivities(await get(username, password, server, db, layoutActivite, "&fk_client=" + SyncStorage.get('client_PK') + "&flag_actif=1" + "&-sortfield.1=Nom&-sortorder.1=ascend"));
-            } else {
-                setFormatedProjects(await get(username, password, server, db, layoutProjet, "&flag_actif=1&-sortfield.1 = Nom & -sortorder.1 = ascend"));
-                setFormatedActivities(await get(username, password, server, db, layoutActivite, "&flag_actif=1&-sortfield.1 = Nom & -sortorder.1 = ascend"));
+
+        const getData = async () => {
+            let month = route.params.date.getMonth() + 1;
+            let day = route.params.date.getDate() + 1;
+            // alert(month);
+
+            if (day < 10) {
+                day = "0" + day;
             }
+
+
+
+
+            if (month < 10) {
+                month = "0" + month;
+            }
+            // setFormatedClients(await get(username, password, server, db, layoutClient));
+            let query = "&StartDate=" + month + "/" + day + "/" + timeStore.selectedDate.getFullYear();
+            let theData = await get(username, password, global.fmServer, global.fmDatabase, layoutTemps,
+                query);
+
+            console.log("Voici les datas");
+            console.log(theData);
+
+
+            setData(theData);
 
         };
 
-
-        // setData(username, password, global.fmServer, global.fmDatabase, layoutClient, layoutProjet, layoutActivite);
-
+        getData();
     }, []);
 
 
@@ -119,10 +111,9 @@ const ConfirmerPlanification = ({ route, navigation, timeStore }: Props) => {
                 </Left>
 
                 <Body>
-                    <Text style={{ color: '#1f4598', fontWeight: 'bold' }}>Confirmation planification</Text>
+                    <Text style={{ color: '#1f4598', fontWeight: 'bold' }}>{route.params.nomComplet}</Text>
                 </Body>
                 <Right>
-
 
                 </Right>
             </Header>
@@ -131,7 +122,7 @@ const ConfirmerPlanification = ({ route, navigation, timeStore }: Props) => {
             <Content style={{ flex: 1, flexDirection: "column" }}>
                 <ScrollView>
 
-                    {SyncStorage.get('planification').map((planification) => (
+                    {/* {SyncStorage.get('planification').map((planification) => (
                         <View>
                             <View style={styles.inputWrapper}>
                                 <Text>Date: </Text>
@@ -193,13 +184,14 @@ const ConfirmerPlanification = ({ route, navigation, timeStore }: Props) => {
                         </View>
 
                     ))
-                    }
+                    } */}
                 </ScrollView>
             </Content>
 
 
             <Button style={{ width: '100%', justifyContent: 'center', backgroundColor: '#1f4598' }}
                 onPress={async () => {
+
 
                     let planification = SyncStorage.get('planification');
                     let StartDate = "";
@@ -209,8 +201,7 @@ const ConfirmerPlanification = ({ route, navigation, timeStore }: Props) => {
                     let Minutes_planifie = "";
                     let AM_PM = "";
                     let fk_actif = 1;
-                    //TACHE ?!
-                    // let tache = "Programmation";
+
                     let records = [];
                     for (let i = 0; i < planification.length; i++) {
                         records[i] = {};
@@ -256,7 +247,7 @@ const ConfirmerPlanification = ({ route, navigation, timeStore }: Props) => {
         </Container>
     );
 };
-export default inject("timeStore")(observer(ConfirmerPlanification));
+export default inject("timeStore")(observer(UneJourneeEmploye));
 
 const styles = StyleSheet.create({
     container: {

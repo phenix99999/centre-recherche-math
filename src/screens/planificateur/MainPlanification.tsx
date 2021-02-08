@@ -52,9 +52,6 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
         } else {
             employeListeOfficiel = employeListe;
         }
-        // console.log(pk_ID);
-        // console.log(employeList);
-        console.log
 
         for (let i = 0; i < employeListeOfficiel.length; i++) {
             if (employeListeOfficiel[i].pk_ID == pk_ID) {
@@ -65,7 +62,7 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
     }
 
     async function selectDate(date, employeListTemp = false) {
-        // console.log(employeListTemp);
+
         setModeRemplir(false);
         let employeListe = [];
         if (employeListTemp) {
@@ -93,45 +90,28 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
 
         for (let i = 0; i < employeListe.length; i++) {
             // dispoArray[employeList[i].pk_ID.toString()] = {};
-            employeListe[i] = { ...employeListe[i], AM: "black", PM: "black", "AM_PM": "" };
+            employeListe[i] = { ...employeListe[i], AM: 0, PM: 0, "AM_PM": "" };
         }
 
-        // console.log("Feuille temps au retour");
-        // console.log(feuilleTemps);
-
         let planification = SyncStorage.get("planification");
-        console.log(planification);
-        // console.log("Planification " + planification);
-        // console.log(planification);
-        console.log("FEUILLE TEMPS");
-        // console.log(feuilleTemps);
-
         for (let i = 0; i < feuilleTemps.length; i++) {
-            // employeListe[findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation)].AM_PM = feuilleTemps[i].AM_PM;
-
-            // console.log(feuilleTemps[i]);
-
             if (feuilleTemps[i].AM_PM == "AM") {
-                // console.log("ICI", feuilleTemps[i].fk_assignation, findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation));
                 if (findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation, employeListe) != -1) {
-                    employeListe[findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation, employeListe)].AM = "red";
+                    employeListe[findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation, employeListe)].AM += parseFloat(feuilleTemps[i].Minutes);
                 }
             } else {
                 if (findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation, employeListe) != -1) {
 
-                    employeListe[findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation, employeListe)].PM = "red";
+                    employeListe[findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation, employeListe)].PM += parseFloat(feuilleTemps[i].Minutes);
                 }
             }
         }
 
-        // console.log(feuilleTemps[0]);
-        // console.log("Planification");
-        // console.log(planification);
 
         if (planification && SyncStorage.get('budject')) {
             for (let j = 0; j < planification.length; j++) {
                 let month = parseInt(timeStore.selectedDate.getMonth()) + 1;
-                // console.log("Month" + month);
+
                 if (month < 10) {
                     month = "0" + month;
                 }
@@ -142,7 +122,7 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
                 }
 
                 let monthPlanification = parseInt(new Date(planification[j].date).getMonth()) + 1;
-                // console.log("Month" + month);
+
                 if (monthPlanification < 10) {
                     monthPlanification = "0" + monthPlanification;
                 }
@@ -153,24 +133,16 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
                 }
                 let datePlanification = new Date(planification[j].date).getFullYear() + "-" + monthPlanification + "-" + dayPlanification;
                 let dateTimeStore = timeStore.selectedDate.getFullYear() + "-" + month + "-" + day;
-                console.log("Date planification");
-                console.log(datePlanification);
-                console.log("Date time store");
-                console.log(dateTimeStore);
-                if (datePlanification == dateTimeStore) {
-                    console.log("index ", findIndexOfEmployePk_ID(planification[j].employerPkId, employeListe));
-                    if (findIndexOfEmployePk_ID(planification[j].employerPkId, employeListe) != -1) {
-                        employeListe[findIndexOfEmployePk_ID(planification[j].employerPkId, employeListe)][planification[j].periode] = "green";
 
+                if (datePlanification == dateTimeStore) {
+                    if (findIndexOfEmployePk_ID(planification[j].employerPkId, employeListe) != -1) {
+                        employeListe[findIndexOfEmployePk_ID(planification[j].employerPkId, employeListe)][planification[j].periode] += parseFloat(planification[j].duree);
                     }
                 }
             }
 
         }
 
-        // console.log(" Main planification");
-        // console.log(employeListe[0]);
-        // console.log("################");
         if (SyncStorage.get('budject')) {
             setModeRemplir(true);
         }
@@ -222,16 +194,28 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
 
         return (
             <View style={{ padding: 10, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderBottomWidth: 1, height: 60, borderColor: '#1f4598' }}>
-                <View style={{ width: '50%' }}>
+                <TouchableOpacity style={{ width: '50%' }}
+                    onPress={() => {
+                        if (item.AM == 0 && item.PM == 0) {
+                            alert("Cette employé n'a rien de planifié cette journée.")
+                        } else {
+                            navigation.navigate("UneJourneeEmploye", {
+                                date: timeStore.selectedDate, nomComplet: item._C_nomComplet, pk_ID: item.pk_ID
+                            })
 
-                    <Text>{item._C_nomComplet}</Text>
-                </View>
+                        }
+                    }}
+                >
+
+                    <Text style={{ color: '#1f4598', fontWeight: 'bold' }}>{item._C_nomComplet}</Text>
+                </TouchableOpacity>
+
                 <TouchableOpacity onPress={() => {
                     navigation.navigate("SauvegarderPlanification", { date: timeStore.selectedDate, nomComplet: item._C_nomComplet, pk_ID: item.pk_ID, periode: "AM" })
 
                 }
                 } style={{ width: '12%', backgroundColor: 'transparent' }}>
-                    <Text style={{ color: item.AM }}>{"AM"}</Text>
+                    <Text style={{ color: 'black' }}>{item.AM}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     onPress={() => {
@@ -239,7 +223,7 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
 
                     }}
                     style={{ width: '12%', backgroundColor: 'transparent' }}>
-                    <Text style={{ color: item.PM }}>{"PM"}</Text>
+                    <Text style={{ color: 'black' }}>{item.PM}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     onPress={() => {
@@ -247,7 +231,7 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
 
                     }}
                     style={{ width: '25%', backgroundColor: 'transparent' }}>
-                    <Text style={{ color: item.AM == "red" && item.PM == "red" ? "red" : "black" }} >{"Journée"}</Text>
+                    <Text style={{ color: item.AM == "red" && item.PM == "red" ? "red" : "black" }} >{item.AM + item.PM}</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -262,18 +246,15 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
         let nbHeures = 0;
         if (planification) {
             for (let i = 0; i < planification.length; i++) {
-                nbHeures = parseInt(planification[i].duree) + parseInt(nbHeures);
+                nbHeures = parseFloat(planification[i].duree) + parseInt(nbHeures);
             }
         }
-        console.log("Nb heures");
-        console.log(nbHeures);
+
         return nbHeures;
     }
 
     React.useEffect(() => {
-        // console.log("Planification");
-        // console.log(SyncStorage.get('planification'));
-        // alert(SyncStorage.get('modeRemplir'));
+
         if (SyncStorage.get('budject')) {
             setModeRemplir(true);
         }

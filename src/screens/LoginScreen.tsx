@@ -50,10 +50,9 @@ const LoginScreen = ({ navigation, authStore }: Props) => {
         if (!isLoadingTemp) {
             setLoadingTemp(true);
             setLoading(true);
-            console.log("Avant authentification");
+
             let user = await authentification(authStore.username, authStore.password, global.fmServer, global.fmDatabase, layout, "&_C_nomComplet=" + authStore.username);
-            // let user = -1;
-            console.log(user);
+
 
             if (user == -1) {
                 // alert("Mauvais password");

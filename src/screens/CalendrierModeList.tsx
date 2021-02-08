@@ -93,7 +93,7 @@ function convertFMDateToReactDate() {
 
 const renderItem = ({ item }) => {
 
-    // console.log("Render item");
+
     let showHeader = false;
     let dateItem = item.startDate;
 

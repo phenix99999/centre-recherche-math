@@ -22,14 +22,15 @@ type Props = {
 } & StackScreenProps<MainStackParamList, "Main">;
 
 
-const MainScreen = ({ navigation, timeStore }: Props) => {
+const MainLecture = ({ route, navigation, timeStore }: Props) => {
     const [formatedDataEmploye, setFormatedDataEmploye] = React.useState<Object>([]);
-    const [dataOnDateEmploye, setDataOnDateEmploye] = React.useState<Object>([]);
-
-    const [dataOnDateClient, setDateOnDateClient] = React.useState<Object>([]);
-    const [formatedDataClient, setFormatedDataClient] = React.useState<Object>([]);
     const [activitesList, setActivitesList] = React.useState<Object>([]);
-
+    const [formatedData, setFormatedData] = React.useState<Object>([]);
+    const [dataOnDate, setDataOnDate] = React.useState<Object>([]);
+    const [client, setClient] = React.useState<Number>(0);
+    const [project, setProject] = React.useState<Number>(0);
+    const [activity, setActivity] = React.useState<Number>(0);
+    const [employe, setEmploye] = React.useState<Number>(0);
 
     const [typeAccount, setTypeAccount] = React.useState<Number>();
 
@@ -45,7 +46,14 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
         }
         return "";
     }
-    function selectDate(date) {
+    function selectDate(date, formatedDataTemp = null) {
+        let theData = [];
+        if (formatedDataTemp) {
+            theData = formatedDataTemp;
+        } else {
+            theData = formatedData;
+        }
+
         let dateObj = new Date(date);
         let month = ("0" + parseInt(dateObj.getMonth() + 1)).slice(-2);
 
@@ -53,34 +61,24 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
 
         let dateStr = month + "/" + day + "/" + dateObj.getFullYear();
 
-        // var formattedNumber = ("0" + myNumber).slice(-2);
         let dataOnDateTemp = [];
         let indexDataOnDate = 0;
-        let formatedData = [];
-        if (SyncStorage.get('typeAccount') == 1) {
-            formatedData = formatedDataClient;
-        } else {
-            formatedData = formatedDataEmploye;
-        }
 
-        for (let i = 0; i < formatedData.length; i++) {
 
-            if (formatedData[i].StartDate == dateStr) {
 
-                dataOnDateTemp[indexDataOnDate] = formatedData[i];
+        for (let i = 0; i < theData.length; i++) {
+
+            if (theData[i].StartDate == dateStr) {
+
+                dataOnDateTemp[indexDataOnDate] = theData[i];
                 indexDataOnDate++;
             }
         }
 
+
+        setDataOnDate(dataOnDateTemp);
         timeStore.selectDate(date)
-        if (SyncStorage.get('typeAccount') == 1) {
-            setDateOnDateClient(dataOnDateTemp);
-        } else if (SyncStorage.get('typeAccount') == 0) {
-            setDataOnDateEmploye(dataOnDateTemp);
-        } else {
-            setDataOnDateEmploye([]);
-            setDateOnDateClient([]);
-        }
+
 
     }
 
@@ -96,91 +94,123 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
         let month = timeStore.activeMonth + 1;
         let year = timeStore.activeYear;
         let nbJourMois = (getDaysInMonth(timeStore.activeMonth, year).length);
-        if (SyncStorage.get("typeAccount") == 1) {
-            // alert("ICI");
-            if (SyncStorage.get('filterProject') && SyncStorage.get('filterActivity')) {
-                setFormatedDataClient(await get(username, password, global.fmServer, global.fmDatabase, layoutTemps
-                    , "&fk_client=" + SyncStorage.get('client_PK') + "&fk_projet=" + SyncStorage.get('filterProject') + "&fk_activites=" + SyncStorage.get('filterActivity') + "&flag_actif=1&StartDate=" + month + "/1/" + year + "..." + month + "/" + nbJourMois + "/" + year));
-            } else if (SyncStorage.get('filterProject')) {
-                setFormatedDataClient(await get(username, password, global.fmServer, global.fmDatabase, layoutTemps
-                    , "&fk_client=" + SyncStorage.get('client_PK') + "&fk_projet=" + SyncStorage.get('filterProject') + "&flag_actif=1&StartDate=" + month + "/1/" + year + "..." + month + "/" + nbJourMois + "/" + year));
-            } else if (SyncStorage.get('filterActivity')) {
-                setFormatedDataClient(await get(username, password, global.fmServer, global.fmDatabase, layoutTemps
-                    , "&fk_client=" + SyncStorage.get('client_PK') + "&fk_activites=" + SyncStorage.get('filterActivity') + "&flag_actif=1&StartDate=" + month + "/1/" + year + "..." + month + "/" + nbJourMois + "/" + year));
-            } else {
-                setFormatedDataClient(await get(username, password, global.fmServer, global.fmDatabase, layoutTemps
-                    , "&fk_client=" + SyncStorage.get('client_PK') + "&flag_actif=1&StartDate=" + month + "/1/" + year + "..." + month + "/" + nbJourMois + "/" + year));
-            }
-        } else {
-            let fk_assignation = -1;
-            if (SyncStorage.get('user').pk_ID) {
-                fk_assignation = SyncStorage.get('user').pk_ID;
-            }
+        let query = "&flag_actif=1&StartDate=" + month + "/1/" + year + "..." + month + "/" + nbJourMois + "/" + year;
 
-            setFormatedDataEmploye(await get(username, password, global.fmServer, global.fmDatabase, layoutTemps
-                , "&fk_assignation=" + fk_assignation + "&flag_actif=1&StartDate=" + month + "/1/" + year + "..." + month + "/" + nbJourMois + "/" + year));
+
+
+        if (SyncStorage.get("filterCalendrier_employe") != 0) {
+            query = query + "&fk_assignation=" + SyncStorage.get("filterCalendrier_employe");
         }
 
+        if (SyncStorage.get("filterCalendrier_client") != 0) {
+            query = query + "&fk_client=" + SyncStorage.get("filterCalendrier_client");
+        }
+        if (SyncStorage.get("filterCalendrier_projet") != 0) {
+            query = query + "&fk_projet=" + SyncStorage.get("filterCalendrier_projet");
+        }
+        if (SyncStorage.get("filterCalendrier_activite") != 0) {
+            query = query + "&fk_activites=" + SyncStorage.get("filterCalendrier_activite");
+        }
+
+        setFormatedData(await get(username, password, global.fmServer, global.fmDatabase, layoutTemps,
+            query));
 
     }
+
     const isFocused = useIsFocused();
 
     React.useEffect(() => {
 
-        const setDataEmploye = async (username, password, server, db, month, year, nbJourMois) => {
-            setFormatedDataEmploye(await get(username, password, server, db, layoutTemps
-                , "&fk_assignation=" + fk_assignation + "&flag_actif=1&StartDate=" + month + "/1/" + year + "..." + month + "/" + nbJourMois + "/" + year));
-        }
+        let employeTemp = 0;
+        let clientTemp = 0;
+        let projetTemp = 0;
+        let activiteTemp = 0;
+        if (route.params) {
+            SyncStorage.set('filterCalendrier_employe', route.params.employe);
+            SyncStorage.set('filterCalendrier_client', route.params.client);
+            SyncStorage.set('filterCalendrier_projet', route.params.project);
+            SyncStorage.set('filterCalendrier_activite', route.params.activity);
+            setEmploye(route.params.employe);
+            setClient(route.params.client);
+            setProject(route.params.project);
+            setActivity(route.params.activity);
+            employeTemp = route.params.employe;
+            clientTemp = route.params.client;
+            projetTemp = route.params.project;
+            activiteTemp = route.params.activity;
 
+        } else {
+            if (SyncStorage.get('filterCalendrier_employe')) {
+                setEmploye(SyncStorage.get('filterCalendrier_employe'));
+                employeTemp = SyncStorage.get('filterCalendrier_employe');
+            }
 
+            if (SyncStorage.get('filterCalendrier_client')) {
+                setClient(SyncStorage.get('filterCalendrier_client'));
+                clientTemp = SyncStorage.get('filterCalendrier_client');
+            }
 
-        const setDataClient = async (username, password, server, db, month, year, nbJourMois) => {
-            if (SyncStorage.get('filterProject') && SyncStorage.get('filterActivity')) {
-                setFormatedDataClient(await get(username, password, server, db, layoutTemps
-                    , "&fk_client=" + SyncStorage.get('client_PK') + "&fk_projet=" + SyncStorage.get('filterProject') + "&fk_activites=" + SyncStorage.get('filterActivity') + "&flag_actif=1&StartDate=" + month + "/1/" + year + "..." + month + "/" + nbJourMois + "/" + year));
-            } else if (SyncStorage.get('filterProject')) {
-                setFormatedDataClient(await get(username, password, server, db, layoutTemps
-                    , "&fk_client=" + SyncStorage.get('client_PK') + "&fk_projet=" + SyncStorage.get('filterProject') + "&flag_actif=1&StartDate=" + month + "/1/" + year + "..." + month + "/" + nbJourMois + "/" + year));
-            } else if (SyncStorage.get('filterActivity')) {
-                setFormatedDataClient(await get(username, password, server, db, layoutTemps
-                    , "&fk_client=" + SyncStorage.get('client_PK') + "&fk_activites=" + SyncStorage.get('filterActivity') + "&flag_actif=1&StartDate=" + month + "/1/" + year + "..." + month + "/" + nbJourMois + "/" + year));
-            } else {
-                setFormatedDataClient(await get(username, password, server, db, layoutTemps
-                    , "&fk_client=" + SyncStorage.get('client_PK') + "&flag_actif=1&StartDate=" + month + "/1/" + year + "..." + month + "/" + nbJourMois + "/" + year));
+            if (SyncStorage.get('filterCalendrier_projet')) {
+                setProject(SyncStorage.get('filterCalendrier_projet'));
+                projetTemp = SyncStorage.get('filterCalendrier_projet');
+
+            }
+
+            if (SyncStorage.get('filterCalendrier_activite')) {
+                setActivity(SyncStorage.get('filterCalendrier_activite'));
+                activiteTemp = SyncStorage.get('filterCalendrier_activite');
             }
 
         }
 
 
-        const getDataOnDateEmploye = async (username, password, server, db, month, year, nbJourMois, dateSelected) => {
-            month = parseInt(dateSelected.getMonth() + 1);
-            setDataOnDateEmploye(await get(username, password, server, db, layoutTemps
-                , "&fk_assignation=" + fk_assignation + "&flag_actif=1&StartDate=" + month + "/" + dateSelected.getDate() + "/" + dateSelected.getFullYear()));
-        }
 
-        const getDataOnDateClient = async (username, password, server, db, month, year, nbJourMois, dateSelected) => {
-            if (SyncStorage.get('filterProject') && SyncStorage.get('filterActivity')) {
-                setDateOnDateClient(await get(username, password, server, db, layoutTemps
-                    , "&fk_client=" + SyncStorage.get('client_PK') + "&fk_projet=" + SyncStorage.get('filterProject') + "&fk_activites=" + SyncStorage.get('filterActivity') + "&flag_actif=1&StartDate=" + dateSelected.getMonth() + 1 + "/" + dateSelected.getDate() + "/" + dateSelected.getFullYear()));
-            } else if (SyncStorage.get('filterProject')) {
-                setDateOnDateClient(await get(username, password, server, db, layoutTemps
-                    , "&fk_client=" + SyncStorage.get('client_PK') + "&fk_projet=" + SyncStorage.get('filterProject') + "&flag_actif=1&StartDate=" + dateSelected.getMonth() + 1 + "/" + dateSelected.getDate() + "/" + dateSelected.getFullYear()));
-            } else if (SyncStorage.get('filterActivity')) {
-                setDateOnDateClient(await get(username, password, server, db, layoutTemps
-                    , "&fk_client=" + SyncStorage.get('client_PK') + "&fk_activites=" + SyncStorage.get('filterActivity') + "&flag_actif=1&StartDate=" + dateSelected.getMonth() + 1 + "/" + dateSelected.getDate() + "/" + dateSelected.getFullYear()));
-            } else {
-                setDateOnDateClient(await get(username, password, server, db, layoutTemps
-                    , "&fk_client=" + SyncStorage.get('client_PK') + "&flag_actif=1&StartDate=" + dateSelected.getMonth() + 1 + "/" + dateSelected.getDate() + "/" + dateSelected.getFullYear()));
+        // alert(SyncStorage.get('filterCalendrier_employe'));
+        const setDataMonth = async (username, password, server, db, month, year, day) => {
+            let query = "&flag_actif=1&StartDate=" + month + "/1/" + year + "..." + month + "/" + nbJourMois + "/" + year;
+            if (employeTemp != 0) {
+                query = query + "&fk_assignation=" + employeTemp;
             }
 
+            if (clientTemp != 0) {
+                query = query + "&fk_client=" + clientTemp;
+            }
+            if (projetTemp != 0) {
+                query = query + "&fk_projet=" + projetTemp;
+            }
+            if (activiteTemp != 0) {
+                query = query + "&fk_activites=" + activiteTemp;
+            }
 
-
+            setFormatedData(await get(username, password, server, db, layoutTemps, query));
+            selectDate(timeStore.selectedDate, await get(username, password, server, db, layoutTemps, query));
         }
+
+
+        const setDataDay = async (username, password, server, db, month, year, nbJourMois) => {
+            let query = "&flag_actif=1&StartDate=" + month + "/" + day + "/" + timeStore.selectedDate.getFullYear();
+            if (employeTemp != 0) {
+                query = query + "&fk_assignation=" + employeTemp;
+            }
+
+            if (clientTemp != 0) {
+                query = query + "&fk_client=" + clientTemp;
+            }
+            if (projetTemp != 0) {
+                query = query + "&fk_projet=" + projetTemp;
+            }
+            if (activiteTemp != 0) {
+                query = query + "&fk_activites=" + activiteTemp;
+            }
+
+            setDataOnDate(await get(username, password, server, db, layoutTemps,
+                query));
+        }
+
+
 
         const setListActivities = async () => {
-            setActivitesList(await get(username, password, global.fmServer, global.fmDatabase, "mobile_ACTIVITES2"
-                , "&fk_client=" + SyncStorage.get('client_PK')));
-
+            setActivitesList(await get(username, password, global.fmServer, global.fmDatabase, "mobile_ACTIVITES2"));
         }
 
 
@@ -197,33 +227,36 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
         let password = SyncStorage.get('password');
         let db = "vhmsoft";
         let layoutTemps = "mobile_TEMPS2";
-        let month = timeStore.activeMonth + 1;
-        let year = timeStore.activeYear;
-        let nbJourMois = (getDaysInMonth(timeStore.activeMonth, year).length);
-        if (typeAccount == 1) { //PrivilegeSet est la valeur qui determine le compte (1 ==> client //  le reste ==> employé)
-            //pk_id du client 
-            pkIdClient = SyncStorage.get('client_PK');
-            getDataOnDateClient(username, password, global.fmServer, global.fmDatabase, month, year, nbJourMois, timeStore.selectedDate);
-            setDataClient(username, password, global.fmServer, global.fmDatabase, month, year, nbJourMois, timeStore);
-            setListActivities();
+        let month = timeStore.selectedDate.getMonth() + 1;
+        let day = timeStore.selectedDate.getDate() + 1;
+        // alert(month);
 
-            // alert(SyncStorage.get('pk_ID'));
-        } else {
-            // alert("ICI");
-            getDataOnDateEmploye(username, password, global.fmServer, global.fmDatabase, month, year, nbJourMois, timeStore.selectedDate);
-            setDataEmploye(username, password, global.fmServer, global.fmDatabase, month, year, nbJourMois, timeStore);
-            selectDate(timeStore.selectedDate);
+        if (day < 10) {
+            day = "0" + day;
         }
 
-
+        if (month < 10) {
+            month = "0" + month;
+        }
+        // alert(day);
+        let year = timeStore.activeYear;
+        let nbJourMois = (getDaysInMonth(timeStore.activeMonth, year).length);
+        //pk_id du client 
+        pkIdClient = SyncStorage.get('client_PK');
+        setDataDay(username, password, global.fmServer, global.fmDatabase, month, year, day);
+        setDataMonth(username, password, global.fmServer, global.fmDatabase, month, year, nbJourMois, timeStore);
+        setListActivities();
 
     }, [isFocused]);
+
+
+
+
+
     let notEmptyDates;
-    if (SyncStorage.get('typeAccount') == 1) {
-        notEmptyDates = getNotEmptyDates(formatedDataClient, "StartDate");
-    } else {
-        notEmptyDates = getNotEmptyDates(formatedDataEmploye, "StartDate");
-    }
+
+    notEmptyDates = getNotEmptyDates(formatedData, "StartDate");
+
 
     if (!NetworkUtils.isNetworkAvailable()) {
         alert("Erreur de connexion");
@@ -239,54 +272,44 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
         // alert(SyncStorage.get('filterActivity') > 0);
         let rightHeader;
 
-        if (SyncStorage.get('typeAccount') == "1") {
-            rightHeader = <View style={{ flexDirection: 'row' }}>
-                <Button
-                    transparent
-                    onPress={async () => {
-                        navigation.openDrawer();
 
-                    }}
-                >
-                    <Icon name="menu" type={"MaterialIcons"} style={{ fontSize: 30, color: '#1f4598' }} />
-                </Button>
+        rightHeader = <View style={{ flexDirection: 'row' }}>
+            <Button
+                transparent
+                onPress={async () => {
+                    navigation.openDrawer();
 
+                }}
+            >
+                <Icon name="menu" type={"MaterialIcons"} style={{ fontSize: 30, color: '#1f4598' }} />
+            </Button>
 
+            <Button
+                transparent
+                onPress={async () => {
+                    navigation.navigate('FilterModeLecture');
 
-                <Button
-                    transparent
-                    onPress={async () => {
-                        navigation.navigate('TempsDetailsFilter', { from: 'Main' });
+                }}
+            >
+                {(SyncStorage.get("filterCalendrier_client") && SyncStorage.get("filterCalendrier_client") > 0) ||
+                    (SyncStorage.get("filterCalendrier_projet") && SyncStorage.get("filterCalendrier_projet") > 0) ||
+                    (SyncStorage.get("filterCalendrier_activite") && SyncStorage.get("filterCalendrier_activite") > 0) ||
+                    (SyncStorage.get("filterCalendrier_employe") && SyncStorage.get("filterCalendrier_employe") > 0)
 
-                    }}
-                >
+                    ?
 
-                    {SyncStorage.get('filterProject') && SyncStorage.get('filterProject') > 0 || SyncStorage.get('filterActivity') && SyncStorage.get('filterActivity') > 0 ?
-                        <Icon name="filter" type={"AntDesign"} style={{ fontSize: 30, marginRight: 0, color: 'red' }} >
+                    <Icon name="filter" type={"AntDesign"} style={{ fontSize: 30, marginRight: 0, color: 'red' }} >
 
-                        </Icon>
-                        :
-                        <Icon name="filter" type={"AntDesign"} style={{ fontSize: 30, marginRight: 0, color: '#1f4598' }} >
+                    </Icon>
+                    :
+                    <Icon name="filter" type={"AntDesign"} style={{ fontSize: 30, marginRight: 0, color: '#1f4598' }} >
 
-                        </Icon>
-                    }
-                </Button>
+                    </Icon>
+                }
+            </Button>
 
-            </View>
-        } else {
-            rightHeader = <View style={{ flexDirection: 'row' }}>
-                <Button
-                    transparent
-                    onPress={async () => {
-                        navigation.openDrawer();
+        </View>
 
-                    }}
-                >
-                    <Icon name="menu" type={"MaterialIcons"} style={{ fontSize: 30, color: '#1f4598' }} />
-                </Button>
-
-            </View>
-        }
 
 
 
@@ -313,10 +336,10 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
                 </Header>
 
                 <DateSlider
-                    onViewUpdate={(date: { month: number; year: number }) => {
+                    onViewUpdate={async (date: { month: number; year: number }) => {
                         timeStore.setMonth(date.month);
                         timeStore.setYear(date.year);
-                        getRefreshData();
+                        await getRefreshData();
                     }}
                     noEmptyDates={notEmptyDates}
                     month={timeStore.activeMonth}
@@ -360,42 +383,13 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
                         />
                     }
                 >
-                    {SyncStorage.get('typeAccount') == 0 && dataOnDateEmploye.length === 0 ? (
-                        <Text style={styles.noItemText}>Aucune entrée de temps ne correspond à la date sélectionnée</Text>
-                    ) : null}
 
 
-                    {SyncStorage.get('typeAccount') == 0 && dataOnDateEmploye.length > 0 ?
-                        (
-                            dataOnDateEmploye.map((record) => (
-                                <TouchableOpacity
-                                    onPress={() => {
-                                        // crud.updateEditionMode("update");
-                                        // alert("YER LA");
-                                        navigation.navigate("TempsDetails", { pk_ID: record.pk_ID, editionMode: "update" });
-                                    }}
-                                    style={styles.item}
-                                    key={record.pk_ID}
-                                >
-                                    <Text>{record.AM_PM}</Text>
-                                    <Text>{record.Nom_projet}</Text>
-                                    <Text>{record.Minutes == "-1" ? "Durée : À venir" : record.Minutes + "h"}</Text>
-                                </TouchableOpacity>
-                            ))
-                        )
-                        :
-                        null
-                    }
-
-                    {SyncStorage.get('typeAccount') == 1 && dataOnDateClient.length === 0 ? (
+                    {dataOnDate.length === 0 ? (
                         <Text style={styles.noItemText}>Aucune entrée de temps ne correspond à la date sélectionnée</Text>
 
-                    ) : null}
-
-
-                    {SyncStorage.get('typeAccount') == 1 && dataOnDateClient.length > 0 ? (
-
-                        dataOnDateClient.map((record) => (
+                    ) :
+                        (dataOnDate.map((record) => (
                             <TouchableOpacity
                                 onPress={() => {
                                     // crud.updateEditionMode("update");
@@ -408,16 +402,16 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
 
                                 <Text>{record.Nom_assignation}</Text>
                                 <Text>{getActivitiesNameWithPkId(record.fk_activites)}</Text>
-                                <Text>{record.Minutes == "-1" ? "Durée : À venir" : record.Minutes + "h"} </Text>
+                                <Text>{record.Minutes + "h"} </Text>
 
                             </TouchableOpacity>
                         ))
-                    )
-                        :
-
-                        null
+                        )
 
                     }
+
+
+
 
                 </ScrollView>
             </Container>
@@ -428,7 +422,7 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
     );
 
 };
-export default inject("timeStore")(observer(MainScreen));
+export default inject("timeStore")(observer(MainLecture));
 
 const styles = StyleSheet.create({
     container: {

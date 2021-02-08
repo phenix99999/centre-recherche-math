@@ -206,10 +206,7 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
             getDataOnDateClient(username, password, global.fmServer, global.fmDatabase, month, year, nbJourMois, timeStore.selectedDate);
             setDataClient(username, password, global.fmServer, global.fmDatabase, month, year, nbJourMois, timeStore);
             setListActivities();
-
-            // alert(SyncStorage.get('pk_ID'));
         } else {
-            // alert("ICI");
             getDataOnDateEmploye(username, password, global.fmServer, global.fmDatabase, month, year, nbJourMois, timeStore.selectedDate);
             setDataEmploye(username, password, global.fmServer, global.fmDatabase, month, year, nbJourMois, timeStore);
             selectDate(timeStore.selectedDate);

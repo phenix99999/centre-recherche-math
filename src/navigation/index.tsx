@@ -16,7 +16,9 @@ import Entypo from "react-native-vector-icons/Entypo";
 import { EventRegister } from 'react-native-event-listeners'
 
 
-import FilterLecture from "../screens/planificateur/FilterLecture";
+import FilterPlanification from "../screens/planificateur/FilterPlanification";
+import UneJourneeEmploye from "../screens/planificateur/UneJourneeEmploye";
+
 import MainLecture from "../screens/planificateur/MainLecture";
 import MainPlanification from "../screens/planificateur/MainPlanification";
 import Planification from "../screens/planificateur/Planification";
@@ -42,6 +44,7 @@ import SolutionScreen from "../screens/SolutionScreen";
 
 import AccueilScreen from "../screens/AccueilScreen";
 import SolutionInformatiqueDecisionnelScreen from "../screens/SolutionInformatiqueDecisionnelScreen";
+import FilterModeLecture from "../screens/planificateur/FilterModeLecture";
 
 
 // If you are not familiar with React Navigation, we recommend going through the
@@ -212,6 +215,7 @@ export default class App extends Component {
                     <Stack.Screen name="Planification" component={Planification} />
                     <Stack.Screen name="SauvegarderPlanification" component={SauvegarderPlanification} />
                     <Stack.Screen name="ConfirmationPlanification" component={ConfirmerPlanification} />
+                    <Stack.Screen name="UneJourneeEmploye" component={UneJourneeEmploye} />
                 </Stack.Navigator>
             );
         }
@@ -220,7 +224,7 @@ export default class App extends Component {
             return (
                 <Stack.Navigator screenOptions={{ headerShown: false }} mode="modal" >
                     <Stack.Screen name="MainLecture" component={MainLecture} />
-                    <Stack.Screen name="FilterLecture" component={FilterLecture} />
+                    <Stack.Screen name="FilterModeLecture" component={FilterModeLecture} />
                 </Stack.Navigator>
             );
         }
@@ -330,7 +334,6 @@ export default class App extends Component {
             initialRoute = "Calendrier"
         }
 
-        // console.log("Connected " + SyncStorage.get('connected'));
 
 
 

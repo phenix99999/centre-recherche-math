@@ -237,8 +237,7 @@ const TempsDetailsClient = ({ route,navigation, timeStore }: Props) => {
             let db = "vhmsoft";
            
             let layoutTemps = "mobile_TEMPS2";
-            console.log(addAndUpdateQuery());
-           await add(username,password,global.fmServer,global.fmDatabase,layoutTemps,addAndUpdateQuery());
+            await add(username,password,global.fmServer,global.fmDatabase,layoutTemps,addAndUpdateQuery());
            navigation.goBack('Main');
         } 
     }

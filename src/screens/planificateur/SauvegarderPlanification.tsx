@@ -81,7 +81,6 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
 
         let planification = SyncStorage.get('planification');
         if (planification) {
-            console.log("#####");
 
             let dateWeAreOn = route.params.date.getFullYear() + "-" + route.params.date.getMonth() + "-" + route.params.date.getDate();
             let datePlanification = new Date(planification[0].date).getFullYear() + "-" + new Date(planification[0].date).getMonth() + "-" + new Date(planification[0].date).getDate();

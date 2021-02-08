@@ -52,7 +52,7 @@ export function formatData(records) {
 
 export async function authentification(username, password, server, db, layout, query) {
     const authHeader = 'Basic ' + base64.encode(`${username}:${password}`);
-    console.log("INSIDE AUTHENTIFICATION");
+
     let data = await get(username, password, server, db, layout, query);
     return data;
 }
