@@ -38,12 +38,27 @@ type Props = {
 
 const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
     const [heure, setHeure] = React.useState<Number>(0);
+    const [tache, setTache] = React.useState<String>("");
 
 
     if (!NetworkUtils.isNetworkAvailable()) {
         alert("Erreur de connexion.");
     }
 
+    let formatedTaches = [
+        "Analyse",
+        "Gestion de projet",
+        "Programmation",
+        "Support",
+        "Rencontre",
+        "Appel téléphonique",
+        "Améliorations continues",
+        "Suivis",
+        "Rédaction",
+        "Pilotage",
+        "Recherche",
+        "Design",
+    ];
 
 
     React.useEffect(() => {
@@ -62,6 +77,25 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
         //     setActivity(SyncStorage.get('filterActivity'));
 
         // }
+
+
+        let planification = SyncStorage.get('planification');
+        if (planification) {
+            console.log("#####");
+
+            let dateWeAreOn = route.params.date.getFullYear() + "-" + route.params.date.getMonth() + "-" + route.params.date.getDate();
+            let datePlanification = new Date(planification[0].date).getFullYear() + "-" + new Date(planification[0].date).getMonth() + "-" + new Date(planification[0].date).getDate();
+
+            for (let i = 0; i < planification.length; i++) {
+                if (dateWeAreOn == datePlanification && planification[i].employerPkId == route.params.pk_ID && planification[i].periode == route.params.periode) {
+                    setHeure(planification[i].duree);
+                    setTache(planification[i].tache);
+                }
+            }
+        } else {
+
+        }
+
 
         const setData = async (username, password, server, db, layoutClient, layoutProjet, layoutActivite) => {
             // setFormatedClients(await get(username, password, server, db, layoutClient));
@@ -114,13 +148,22 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
                 <View style={styles.inputWrapper}>
 
 
+                    <Text>Date :  </Text>
+                    <View style={{ marginLeft: 'auto' }}>
+                        <Text> {dateToFrench(new Date(route.params.date))} </Text>
+                    </View>
+                </View>
+
+                <View style={styles.inputWrapper}>
+
+
                     <Text>Nom Employé assigné :  </Text>
                     <View style={{ marginLeft: 'auto' }}>
                         <Text> {route.params.nomComplet} </Text>
                     </View>
                 </View>
 
-                <View style={styles.inputWrapper}>
+                <View style={{ padding: 30 }}>
 
                     <Text>Client :  </Text>
                     <View style={{ marginLeft: 'auto' }}>
@@ -147,8 +190,6 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
 
                 </View>
 
-
-
                 <View style={{ flexDirection: 'row', padding: 20 }}>
                     <Text>Nb d'heure :</Text>
                     <View style={{ marginLeft: 'auto' }}>
@@ -159,6 +200,21 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
                             placeholder="Nombre d'heure"
                         />
                     </View>
+                </View>
+
+                <View style={{ padding: 20 }}>
+                    <DetachedCustomPickerRow
+
+                        name={"Sélectionner Tâches"}
+                        values={formatedTaches}
+                        label={(tache: Record<Activite>) => tache.name}
+                        selectedValue={tache}
+                        onChange={(value) => {
+                            setTache(value);
+                            // setRecord({ ...record, "Taches": value })
+                        }}
+                        placeholder={"Tâches"}
+                    />
                 </View>
             </Content>
 
@@ -181,6 +237,7 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
                         planification[0].activity = SyncStorage.get('filterActivity');
                         planification[0].periode = route.params.periode;
                         planification[0].date = route.params.date;
+                        planification[0].tache = tache;
                     } else {
                         let planificationLength = (planification.length);
                         planification[planificationLength] = {};
@@ -196,6 +253,7 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
                         planification[planificationLength].projet = SyncStorage.get('filterProject');
                         planification[planificationLength].activity = SyncStorage.get('filterActivity');
                         planification[planificationLength].date = route.params.date;
+                        planification[planificationLength].tache = tache;
                     }
                     SyncStorage.set('planification', planification);
 
@@ -213,6 +271,7 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
 
             <Button style={{ width: '100%', justifyContent: 'center', marginTop: 25, backgroundColor: 'red' }}
                 onPress={async () => {
+
                     navigation.goBack();
                 }}
             >

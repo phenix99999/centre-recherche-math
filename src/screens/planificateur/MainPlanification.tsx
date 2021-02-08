@@ -108,11 +108,7 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
 
         for (let i = 0; i < feuilleTemps.length; i++) {
             // employeListe[findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation)].AM_PM = feuilleTemps[i].AM_PM;
-            if (feuilleTemps[i].fk_assignation == 68) {
-                console.log("Voici la fueille de temps");
-                console.log(feuilleTemps[i]);
-                console.log(findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation, employeListe));
-            }
+
             // console.log(feuilleTemps[i]);
 
             if (feuilleTemps[i].AM_PM == "AM") {
@@ -132,7 +128,7 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
         // console.log("Planification");
         // console.log(planification);
 
-        if (planification) {
+        if (planification && SyncStorage.get('budject')) {
             for (let j = 0; j < planification.length; j++) {
                 let month = parseInt(timeStore.selectedDate.getMonth()) + 1;
                 // console.log("Month" + month);
@@ -163,19 +159,23 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
                 console.log(dateTimeStore);
                 if (datePlanification == dateTimeStore) {
                     console.log("index ", findIndexOfEmployePk_ID(planification[j].employerPkId, employeListe));
-                    // if (findIndexOfEmployePk_ID(planification[j].employerPkId, employeListe) != -1) {
-                    employeListe[findIndexOfEmployePk_ID(planification[j].employerPkId, employeListe)][planification[j].periode] = "green";
+                    if (findIndexOfEmployePk_ID(planification[j].employerPkId, employeListe) != -1) {
+                        employeListe[findIndexOfEmployePk_ID(planification[j].employerPkId, employeListe)][planification[j].periode] = "green";
 
-                    // }
+                    }
                 }
             }
 
         }
+
         // console.log(" Main planification");
         // console.log(employeListe[0]);
         // console.log("################");
+        if (SyncStorage.get('budject')) {
+            setModeRemplir(true);
+        }
+
         setEmployeList(employeListe);
-        setModeRemplir(true);
     }
 
 
@@ -274,11 +274,11 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
         // console.log("Planification");
         // console.log(SyncStorage.get('planification'));
         // alert(SyncStorage.get('modeRemplir'));
-        // if (SyncStorage.get('modeRemplir') == true) {
-        //     setModeRemplir(true);
-        // } else {
-        //     setModeRemplir(false);
-        // }
+        if (SyncStorage.get('budject')) {
+            setModeRemplir(true);
+        }
+
+        // setModeRemplir(false);
 
         let username = SyncStorage.get('username');
         let password = SyncStorage.get('password');

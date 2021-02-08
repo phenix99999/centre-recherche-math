@@ -45,15 +45,14 @@ const ConfirmerPlanification = ({ route, navigation, timeStore }: Props) => {
     }
 
     async function addAndUpdateQuery(records) {
-        console.log("INSIDE ADD");
-        console.log(records);
+
         let query = "";
         let layout = "mobile_TEMPS2";
         for (let i = 0; i < records.length; i++) {
             let username = SyncStorage.get('username');
             let password = SyncStorage.get('password');
-            query = "&StartDate=" + records[i].StartDate + "&fk_assignation=" + records[i].fk_assignation + "&fk_client=" + records[i].fk_client + "&fk_projet=" + records[i].fk_projet + "&Taches=" + "Programmation"
-                + "&Minutes_planifie=" + records[i].Minutes_planifie + "&AM_PM=" + records[i].AM_PM + "&fk_activites=" + records[i].fk_activities + "&flag_actif=" + 1;
+            query = "&StartDate=" + records[i].StartDate + "&fk_assignation=" + records[i].fk_assignation + "&fk_client=" + records[i].fk_client + "&fk_projet=" + records[i].fk_projet
+                + "&Minutes_planifie=" + records[i].Minutes_planifie + "&AM_PM=" + records[i].AM_PM + "&fk_activites=" + records[i].fk_activities + "&flag_actif=" + 1 + "&Taches=" + records[i].Taches;
             await add(username, password, global.fmServer, global.fmDatabase, layout, query);
 
         }
@@ -135,15 +134,19 @@ const ConfirmerPlanification = ({ route, navigation, timeStore }: Props) => {
                     {SyncStorage.get('planification').map((planification) => (
                         <View>
                             <View style={styles.inputWrapper}>
-
-
+                                <Text>Date: </Text>
+                                <View style={{ marginLeft: 'auto' }}>
+                                    <Text> {dateToFrench(new Date(planification.date))} </Text>
+                                </View>
+                            </View>
+                            <View style={styles.inputWrapper}>
                                 <Text>Nom Employé assigné :  </Text>
                                 <View style={{ marginLeft: 'auto' }}>
                                     <Text> {planification.nom} </Text>
                                 </View>
                             </View>
 
-                            <View style={styles.inputWrapper}>
+                            <View style={{ padding: 30 }}>
 
                                 <Text>Client :  </Text>
                                 <View style={{ marginLeft: 'auto' }}>
@@ -178,6 +181,12 @@ const ConfirmerPlanification = ({ route, navigation, timeStore }: Props) => {
                                     <Text style={{ fontSize: 13, fontWeight: 'bold' }}>{planification.duree} </Text>
                                 </View>
                             </View>
+                            <View style={{ flexDirection: 'row', padding: 20 }}>
+                                <Text>Tache</Text>
+                                <View style={{ marginLeft: 'auto', }}>
+                                    <Text style={{ fontSize: 13, fontWeight: 'bold' }}>{planification.tache} </Text>
+                                </View>
+                            </View>
                             <View style={{ borderBottomWidth: 1, borderColor: 'black' }}>
 
                             </View>
@@ -192,7 +201,7 @@ const ConfirmerPlanification = ({ route, navigation, timeStore }: Props) => {
             <Button style={{ width: '100%', justifyContent: 'center', backgroundColor: '#1f4598' }}
                 onPress={async () => {
 
-                    console.log(SyncStorage.get('planification'));
+                    // console.log(SyncStorage.get('planification'));
                     // alert("a venir!")
                     let planification = SyncStorage.get('planification');
                     let StartDate = "";
@@ -207,6 +216,7 @@ const ConfirmerPlanification = ({ route, navigation, timeStore }: Props) => {
                     let records = [];
                     for (let i = 0; i < planification.length; i++) {
                         records[i] = {};
+                        records[i].Taches = planification[i].tache;
                         records[i].StartDate = dateToFMDate(new Date(planification[i].date));
                         records[i].fk_assignation = planification[i].employerPkId;
                         records[i].fk_client = planification[i].client;
@@ -216,7 +226,7 @@ const ConfirmerPlanification = ({ route, navigation, timeStore }: Props) => {
                         records[i].fk_actif = "1";
                         records[i].AM_PM = planification[i].periode;
                     }
-                    console.log(records);
+                    // console.log(records);
                     await addAndUpdateQuery(records);
                     SyncStorage.remove('planification');
                     SyncStorage.remove('budject');
@@ -234,6 +244,7 @@ const ConfirmerPlanification = ({ route, navigation, timeStore }: Props) => {
 
             <Button style={{ width: '100%', justifyContent: 'center', marginTop: 25, backgroundColor: 'red' }}
                 onPress={async () => {
+                    SyncStorage.remove('planification');
                     navigation.goBack();
                 }}
             >

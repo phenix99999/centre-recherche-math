@@ -110,6 +110,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
         let layoutActivite = "mobile_ACTIVITES2";
         let activity = await get(username, password,   global.fmServer,  global.fmDatabase, layoutActivite,"&pk_ID=" + fk_activites);
         setActivity(activity[0]);
+;
         setActivityName(activity[0].Nom || "");
     }
 
@@ -151,7 +152,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
       
                 let theRecord = (await get(username, password, global.fmServer, global.fmDatabase, layoutTemps,"&pk_ID="+pk_ID));
        
-               if(theRecord[0].fk_activities){
+               if(theRecord[0].fk_activites){
                 setActivityData(theRecord[0].fk_activites);
 
                }
