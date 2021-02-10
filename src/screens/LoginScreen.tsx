@@ -135,59 +135,71 @@ const LoginScreen = ({ navigation, authStore }: Props) => {
 
 
                 :
-                <Container style={{ flexGrow: 1, flex: 1 }}>
-                    <ScrollView style={{ width: "100%" }} contentContainerStyle={styles.content}>
-                        <Content style={{ flexGrow: 1, flex: 1, flexDirection: "row" }}>
-                            <Title style={{ margin: 30 }}>Connexion</Title>
+                <ImageBackground
+                    source={require("../assets/images/accueil.png")}
+                    style={styles.imgBackground}
+                    imageStyle={{ opacity: 1 }}
+                >
+                    <Container style={{ flexGrow: 1, flex: 1, backgroundColor: 'transparent' }}>
 
-                            <View style={[styles.subContainer, { justifyContent: "flex-start" }]}>
-                                <Form style={styles.form}>
-                                    <Item>
+                        <ScrollView style={{ width: "100%" }} contentContainerStyle={styles.content}>
+                            <Content style={{ flexGrow: 1, flex: 1, flexDirection: "row" }}>
+                                <Title style={{ margin: 30 }}>Portail V-hicule Média</Title>
+
+                                <View style={[styles.subContainer, { justifyContent: "flex-start" }]}>
+                                    <Form style={styles.form}>
+                                        <Image
+                                            style={{ width: '100%' }}
+                                            resizeMode={"contain"}
+                                            source={require("../assets/images/vhiculeMedia.png")}
+                                        />
+
                                         <TextInput
-                                            style={{ height: 50 }}
+                                            placeholderTextColor="#404040"
+                                            style={{ height: 44, width: '90%', borderWidth: 0.5, borderColor: '#303030', padding: 15 }}
                                             value={authStore.username}
                                             onChange={(e) => (authStore.username = e.nativeEvent.text)}
                                             placeholder="Nom d'utilisateur"
                                         />
-                                    </Item>
-                                    <Item bordered={false}>
+
+
+
                                         <TextInput
+                                            placeholderTextColor="#404040"
+
                                             secureTextEntry={true}
                                             value={authStore.password}
                                             placeholder="Mot de passe"
                                             onChange={(e) => (authStore.password = e.nativeEvent.text)}
-                                            style={{ height: 50 }}
+                                            style={{ height: 44, width: '90%', borderWidth: 0.5, borderColor: '#303030', padding: 15, marginTop: 10 }}
 
                                         />
-                                    </Item>
-                                </Form>
 
-                                <Button
-                                    onPress={async () => {
-                                        await onLogin()
-                                    }}
-                                    style={[styles.button]}
-                                >
-                                    <Text> Se connecter</Text>
-                                </Button>
+                                    </Form>
 
-                                <Button
-                                    transparent
-                                    onPress={() => {
-                                        navigation.goBack();
-                                    }}
-                                    style={{
-                                        justifyContent: "center",
-                                        alignItems: "center",
-                                        alignSelf: "center",
-                                    }}
-                                >
-                                    <Text>Annuler</Text>
-                                </Button>
-                            </View>
-                        </Content>
-                    </ScrollView>
-                </Container>
+                                    <Button
+                                        onPress={async () => {
+                                            await onLogin()
+                                        }}
+                                        style={[styles.button]}
+                                    >
+                                        <Text> Se connecter</Text>
+                                    </Button>
+
+                                    <Button
+
+                                        onPress={() => {
+                                            navigation.goBack();
+                                        }}
+                                        style={[styles.button]}
+                                    >
+                                        <Text style={{ color: 'white' }}>Annuler</Text>
+                                    </Button>
+                                </View>
+                            </Content>
+                        </ScrollView>
+                    </Container>
+                </ImageBackground>
             }
 
 
@@ -235,7 +247,7 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     form: {
-        backgroundColor: "white",
+        backgroundColor: "transparent",
     },
     subContainer: {
         flex: 1,
