@@ -6,7 +6,7 @@ import { RefreshControl, StyleSheet, View } from "react-native";
 import TimeStore from "../stores/TimeStore";
 import { MainStackParamList } from "../types";
 import DateSlider from "../components/DateSlider";
-import { ScrollView, TouchableOpacity } from "react-native";
+import { ScrollView, TouchableOpacity, Platform } from "react-native";
 import { Container, Header, Button, Left, Icon, Text, Right, Body } from "native-base";
 import { setNavigationState } from "../utils/PersistState";
 import { dateToFrench, getNotEmptyDates, getDaysInMonth } from "../utils/date";
@@ -245,6 +245,7 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
                         navigation.openDrawer();
 
                     }}
+
                 >
                     <Icon name="menu" type={"MaterialIcons"} style={{ fontSize: 30, color: '#1f4598' }} />
                 </Button>
@@ -279,6 +280,7 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
                         navigation.openDrawer();
 
                     }}
+                    style={{ top: 10 }}
                 >
                     <Icon name="menu" type={"MaterialIcons"} style={{ fontSize: 30, color: '#1f4598' }} />
                 </Button>
@@ -290,10 +292,14 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
 
         render = (
             <Container style={{ flex: 1 }}>
-                <Header>
-                    <Left>
+
+                <Header
+                    style={Platform.OS != 'ios' ? { backgroundColor: 'white', height: 80, justifyContent: 'center' } : null}
+                >
+                    <Left style={{ justifyContent: 'center' }}>
                         <Button
                             transparent
+                            style={{ top: 10 }}
                             onPress={async () => {
                                 navigation.goBack();
 

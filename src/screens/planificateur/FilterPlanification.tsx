@@ -87,7 +87,10 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
 
 
         <Container>
-            <Header>
+            <Header
+                style={Platform.OS != 'ios' ? { backgroundColor: 'transparent', height: 80, justifyContent: 'center', top: 15 } : { backgroundColor: 'transparent' }}
+
+            >
                 <Left>
                     <Button
                         onPress={() => {

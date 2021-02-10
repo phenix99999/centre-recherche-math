@@ -1,7 +1,7 @@
 import { inject } from "mobx-react";
 import { Icon, Picker, Text, View, Left, Body, Right, Header, Button } from "native-base";
 import * as React from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, Platform } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Record } from "../stores/FMObjectTypes";
 
@@ -18,7 +18,7 @@ interface CustomPickerProps<Fields> {
 export const CustomPicker = inject("timeStore")(<Fields,>(props: CustomPickerProps<Fields>) => {
     return (
         <Picker
-            style={{ height: 40 }}
+            style={Platform.OS != 'ios' ? { flex: 1, width: '100%', height: 50 } : null}
             selectedValue={props.selectedValue}
             onValueChange={(itemValue, itemIndex) => {
                 props.onChange(itemValue);
@@ -89,7 +89,8 @@ export const DetachedCustomPickerRow = (props: DetachedCustomPickerProps) => (
         </View>
         <View style={{ flexGrow: 1, flex: 1, alignItems: "flex-end" }}>
             <Picker
-                style={{ height: 40 }}
+                style={Platform.OS != 'ios' ? { flex: 1, width: '100%', height: 50 } : null}
+
                 selectedValue={props.selectedValue}
                 onValueChange={(itemValue, itemIndex) => {
                     props.onChange(itemValue);
@@ -130,12 +131,12 @@ export const DetachedCustomPickerRow = (props: DetachedCustomPickerProps) => (
                     ))}
             </Picker>
         </View>
-    </View>
+    </View >
 );
 
 const styles = StyleSheet.create({
     pickerRow: {
-        flexDirection: "row",
+
         padding: 0,
     },
     pickerText: {

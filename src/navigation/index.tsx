@@ -277,10 +277,9 @@ export default class App extends Component {
                     tabBarOptions={{
                         activeTintColor: '#1f4598',
                         inactiveTintColor: 'gray',
+
                     }}
-                    style={{
-                        backgroundColor: 'blue',
-                    }}
+
 
                 >
                     <Stack.Screen options=

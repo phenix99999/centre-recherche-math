@@ -33,66 +33,69 @@ class AccueilScreen extends Component {
 
   render() {
     return (
-  
 
-        <ImageBackground
-          source={require("../assets/images/accueil.png")}
-          style={styles.imgBackground}
-          imageStyle={{ opacity: 1 }}
+
+      <ImageBackground
+        source={require("../assets/images/accueil.png")}
+        style={styles.imgBackground}
+        imageStyle={{ opacity: 1 }}
+      >
+
+
+        <Header
+          style={Platform.OS != 'ios' ? { backgroundColor: 'transparent', height: 80, justifyContent: 'center', top: 15 } : { backgroundColor: 'transparent' }}
         >
- 
- <Header style={{ backgroundColor: 'transparent' }}>
-                    <Left>
-                        <Button
-                            transparent
-                            onPress={async () => {
-                                this.props.navigation.goBack();
+          <Left>
+            <Button
+              transparent
+              onPress={async () => {
+                this.props.navigation.goBack();
 
-                            }}
-                        >
+              }}
+            >
 
-                            <Icon name="back" type="AntDesign" style={{ fontSize: 30, marginLeft: 2, color: '#1f4598' }} />
-                        </Button>
-                    </Left>
+              <Icon name="back" type="AntDesign" style={{ fontSize: 30, marginLeft: 2, color: '#1f4598' }} />
+            </Button>
+          </Left>
 
-                    <Body>
-                        <Text style={{ fontFamily: 'Arial', fontWeight: 'bold', color: '#1f4598' }}> Accueil </Text>
-                    </Body>
+          <Body>
+            <Text style={{ fontFamily: 'Arial', fontWeight: 'bold', color: '#1f4598' }}> Accueil </Text>
+          </Body>
 
-                    <Right>
-                      
-                        <Button
-                            transparent
-                            onPress={async () => {
-                                this.props.navigation.openDrawer();
+          <Right>
 
-                            }}
-                        >
-                            <Icon name="menu" type={"MaterialIcons"} style={{ fontSize: 30, marginLeft: 2, color: 'white' }} />
-                        </Button>
-                    </Right>
-                </Header>
+            <Button
+              transparent
+              onPress={async () => {
+                this.props.navigation.openDrawer();
 
-                <View>
-                           
-                        <View style={{marginleft:30,marginTop:25}}>
+              }}
+            >
+              <Icon name="menu" type={"MaterialIcons"} style={{ fontSize: 30, marginLeft: 2, color: 'white' }} />
+            </Button>
+          </Right>
+        </Header>
 
-                          <Text style={{marginLeft:20,fontWeight:'bold',fontSize:24,textDecorationLine: 'underline'}}>PROPOSITIONS ET ESTIMATION</Text>
-                        
-                            <Text style={{marginLeft:20,fontSize:16,marginTop:15,fontSize:20}}>Nous vous proposons des solutions adaptées à vos besoins et à votre budget pour donner vie à tous vos projets.</Text>
-                            <Text style={{marginLeft:20,fontWeight:'bold',fontSize:24,marginTop:15,textDecorationLine: 'underline'}}>DÉVELOPPEMENT SUR MESURE</Text>
-                            <Text style={{marginLeft:20,marginTop:8,fontSize:20,marginTop:15,marginRight:15}}>Nous développons des solutions personnalisées et des applications sur mesure répondant à vos critères et vos enjeux de productivité.</Text>
-                           
-                           <Text style={{marginLeft:20,marginTop:10,fontWeight:'bold',fontSize:24,textDecorationLine: 'underline'}}>SUPPORT 7 JOURS / 24H</Text>
-                           
-                           
-                            <Text style={{marginTop:6,fontSize:20,marginLeft:20,marginTop:15,marginRight:15}}>Nous vous accompagnons bien au-delà de l'acquisition de votre nouveau système et nous vous offrons le support technique 7 jours par semaine, 24 heures sur 24, de façon à régler sur-le-champ tout problème ponctuel afin de faciliter le déploiement et l’adoption de notre solution.</Text>
-                        </View> 
-                </View>
+        <View>
 
-        </ImageBackground>
+          <View style={{ marginleft: 30, marginTop: 25 }}>
 
- 
+            <Text style={{ marginLeft: 20, fontWeight: 'bold', fontSize: 24, textDecorationLine: 'underline' }}>PROPOSITIONS ET ESTIMATION</Text>
+
+            <Text style={{ marginLeft: 20, fontSize: 16, marginTop: 15, fontSize: 20 }}>Nous vous proposons des solutions adaptées à vos besoins et à votre budget pour donner vie à tous vos projets.</Text>
+            <Text style={{ marginLeft: 20, fontWeight: 'bold', fontSize: 24, marginTop: 15, textDecorationLine: 'underline' }}>DÉVELOPPEMENT SUR MESURE</Text>
+            <Text style={{ marginLeft: 20, marginTop: 8, fontSize: 20, marginTop: 15, marginRight: 15 }}>Nous développons des solutions personnalisées et des applications sur mesure répondant à vos critères et vos enjeux de productivité.</Text>
+
+            <Text style={{ marginLeft: 20, marginTop: 10, fontWeight: 'bold', fontSize: 24, textDecorationLine: 'underline' }}>SUPPORT 7 JOURS / 24H</Text>
+
+
+            <Text style={{ marginTop: 6, fontSize: 20, marginLeft: 20, marginTop: 15, marginRight: 15 }}>Nous vous accompagnons bien au-delà de l'acquisition de votre nouveau système et nous vous offrons le support technique 7 jours par semaine, 24 heures sur 24, de façon à régler sur-le-champ tout problème ponctuel afin de faciliter le déploiement et l’adoption de notre solution.</Text>
+          </View>
+        </View>
+
+      </ImageBackground>
+
+
     );
   }
 

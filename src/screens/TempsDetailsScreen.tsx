@@ -21,7 +21,7 @@ import SyncStorage from 'sync-storage';
 import { dateToFrench, getNotEmptyDates, getDaysInMonth,dateToFMDate } from "../utils/date";
 
 import * as React from "react";
-import { Alert, StyleSheet, unstable_batchedUpdates, View } from "react-native";
+import { Alert, StyleSheet, Platform, View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { CustomPickerRow, DetachedCustomPickerRow } from "../components/CustomPicker";
 import { Record, Client, Activite, Projet, Type_de_projet } from "../stores/FMObjectTypes";
@@ -303,7 +303,12 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
     
 
         <Container>
-            <Header>
+        
+    <Header
+            style={Platform.OS != 'ios' ? { backgroundColor: 'transparent', height: 80, justifyContent: 'center', top: 15 } : { backgroundColor: 'transparent' }}
+            >
+          
+    
                 <Left>
                     <Button
                         onPress={() => {
@@ -317,7 +322,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                     </Button>
                 </Left>
 
-                <Body>
+                <Body style={{alignItems:'center'}}>
                     <Text>{editionMode === "create" ? "Nouvelle entrée" : "Modifier"}</Text>
                 </Body>
                 <Right>
@@ -349,6 +354,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
      
            
                 </Right>
+          
             </Header>
 
             <Content style={{ flex: 1, flexDirection: "column" }}>
@@ -460,7 +466,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                 <View style={styles.inputWrapper}>
               
                     <DetachedCustomPickerRow
-                         name={"Sélectionner Période"}
+                        name={"Sélectionner Période"}
                         values={["AM", "PM"]}
                         label={(activite: Record<Activite>) => activite.fields.Nom}
                         selectedValue={record.AM_PM}

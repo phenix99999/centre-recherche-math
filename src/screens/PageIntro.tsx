@@ -231,7 +231,8 @@ const styles = StyleSheet.create({
   },
 
   buttonLogin: {
-    top: 250,
+    top: '90%',
+    position: 'absolute',
     backgroundColor: '#1C1E53',
     marginTop: 10,
     width: '75%',

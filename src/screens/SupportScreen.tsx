@@ -10,7 +10,7 @@ import React, { Component } from "react";
 import SyncStorage from 'sync-storage';
 
 import { useFonts } from 'expo-font';
-import { Container, Header, Button, Right, Left, Body, Icon, Text,Textarea } from "native-base";
+import { Container, Header, Button, Right, Left, Body, Icon, Text, Textarea } from "native-base";
 
 
 import {
@@ -18,6 +18,7 @@ import {
     StyleSheet,
     ImageBackground,
     Picker,
+    Platform,
     SafeAreaView,
     View,
     TextInput,
@@ -30,6 +31,9 @@ class SupportScreen extends Component {
 
     constructor(props) {
         super(props);
+        this.state = {
+            priority: 0,
+        };
     }
 
     render() {
@@ -39,7 +43,8 @@ class SupportScreen extends Component {
                 style={styles.imgBackground}
                 imageStyle={{ opacity: 1 }}
             >
-                <Header style={{ backgroundColor: 'transparent' }}>
+                <Header style={Platform.OS != 'ios' ? { backgroundColor: 'transparent', height: 80, justifyContent: 'center', top: 15 } : { backgroundColor: 'transparent' }}
+                >
                     <Left>
                         <Button
                             transparent
@@ -77,54 +82,60 @@ class SupportScreen extends Component {
 
                             </Text>
 
-             
-                    <View style={{ flexDirection: 'row',zIndex:500, alignItems: 'center', marginTop: 10 }}>
+
+                    <View style={{ flexDirection: 'row', zIndex: 500, alignItems: 'center', marginTop: 10 }}>
                         <Text style={{ fontSize: 14 }}>
                             Nom
                 </Text>
                         <TextInput
-                            style={{ height: 30, width: '70%', padding: 2, borderColor: 'black', borderWidth: 1, marginLeft: 'auto', marginRight: 25,backgroundColor:'white' }}
+                            style={{ height: 30, width: '70%', padding: 2, borderColor: 'black', borderWidth: 1, marginLeft: 'auto', marginRight: 25, backgroundColor: 'white' }}
 
                         />
                     </View>
-                    <View style={{flexDirection:'row',height:10,zIndex:500}}>
+                    <View style={{ flexDirection: 'row', height: 10, zIndex: 500 }}>
 
                     </View>
 
-                    <View style={{ flexDirection: 'row',zIndex:500, alignItems: 'center' }}>
+                    <View style={{ flexDirection: 'row', zIndex: 500, alignItems: 'center' }}>
                         <Text style={{ fontSize: 14 }}>
                             Courriel
                 </Text>
                         <TextInput
-                            style={{ height: 30, width: '70%', padding: 2, borderColor: 'black',backgroundColor:'white', borderWidth: 1, marginLeft: 'auto', marginRight: 25 }}
+                            style={{ height: 30, width: '70%', padding: 2, borderColor: 'black', backgroundColor: 'white', borderWidth: 1, marginLeft: 'auto', marginRight: 25 }}
 
                         />
                     </View>
 
 
 
-                    <View style={{ flexDirection: 'row', alignItems: 'center' ,marginTop: 13 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 13 }}>
                         <Text style={{ fontSize: 14 }}>
                             Priorité
                 </Text>
-                 <Picker
-                        selectedValue={""}
-                        style={{height: 25, width: 25,top:-100,left:50}}
-                        onValueChange={(itemValue, itemIndex) =>
-                            this.setState({language: itemValue})
-                        }>
-                        <Picker.Item label="1" value="1" />
-                        <Picker.Item label="2" value="2" />
-                        <Picker.Item label="3" value="3" />
-                        <Picker.Item label="4" value="4" />
-                        <Picker.Item label="5" value="5" />
+                        <Picker
+
+                            selectedValue={this.state.priority}
+                            style={Platform.OS == 'ios' ? { height: 25, width: 55, left: 50, top: -100 } : { height: 25, width: 55, left: 50 }}
+                            onValueChange={(itemValue, itemIndex) =>
+                                this.setState({ priority: itemValue })
+                            }>
+                            <Picker.Item label="1" value="1" />
+                            <Picker.Item label="2" value="2" />
+                            <Picker.Item label="3" value="3" />
+                            <Picker.Item label="4" value="4" />
+                            <Picker.Item label="5" value="5" />
                         </Picker>
-                </View>
-                    
+                        {Platform.OS != 'ios' ?
+                            <Text>{this.state.priority}</Text>
+                            :
+                            null}
+
+                    </View>
 
 
 
-                    <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10,zIndex:5000 }}>
+
+                    <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10, zIndex: 5000 }}>
                         <Text style={{ fontSize: 14 }}>
                             Description
                 </Text>
@@ -133,34 +144,31 @@ class SupportScreen extends Component {
 
                         /> */}
 
-                    <Textarea
-                        placeholder={"Écrivez la description ici"}
-                        bordered
-                        underline
-                        style={{ width: '70%', padding: 2, borderColor: 'black',backgroundColor:'white', borderWidth: 1, marginLeft: 'auto', marginRight: 25 }}
-                        rowSpan={5}
-                     
-                        value={""}
-                        onChangeText={(text) => {
+                        <Textarea
+                            placeholder={"Écrivez la description ici"}
+                            bordered
+                            underline
+                            style={{ width: '70%', padding: 2, borderColor: 'black', backgroundColor: 'white', borderWidth: 1, marginLeft: 'auto', marginRight: 25 }}
+                            rowSpan={5}
 
-                            // setRecord({...record,"Description": text});
-                        }}
-                    />
+                            value={""}
+                            onChangeText={(text) => {
+
+                                // setRecord({...record,"Description": text});
+                            }}
+                        />
 
                     </View>
 
 
                     <View style={{ alignItems: 'center', marginTop: 25 }}>
-
-
-
                         <TouchableOpacity onPress={() => alert("A venir!")} style={{ padding: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#1f4598', width: "60%" }}>
                             <Text style={{ color: 'white' }}> Envoyer </Text>
                         </TouchableOpacity>
                     </View>
                 </SafeAreaView>
 
-            </ImageBackground>
+            </ImageBackground >
 
 
         );

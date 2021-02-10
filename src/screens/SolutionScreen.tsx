@@ -41,7 +41,7 @@ class AccueilScreen extends Component {
         imageStyle={{ opacity: 1 }}
       >
 
-        <Header style={{ backgroundColor: 'transparent' }}>
+        <Header style={Platform.OS != 'ios' ? { backgroundColor: 'transparent', height: 80, justifyContent: 'center', top: 15 } : { backgroundColor: 'transparent' }}>
           <Left>
             <Button
               transparent
@@ -75,71 +75,71 @@ class AccueilScreen extends Component {
 
         <View style={{ width: '100%' }}>
 
-          <Button style={{ width: '100%', height: 125,backgroundColor: '#1f4598' }} onPress={() => this.props.navigation.navigate('SolutionMobile')}>
+          <Button style={{ width: '100%', height: 125, backgroundColor: '#1f4598' }} onPress={() => this.props.navigation.navigate('SolutionMobile')}>
             <View style={{ width: '50%' }}>
-              <Text style={{color:'white',fontWeight:'bold',fontSize:17,marginLeft:10}}>
+              <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 17, marginLeft: 10 }}>
                 DÉVELOPPEMENT
           MOBILE NATIF IOS ET ANDROID</Text>
             </View>
-            <View style={{ width: '50%',backgroundColor:'white' }}>
+            <View style={{ width: '50%', backgroundColor: 'white' }}>
               <Image source={require("../assets/images/developpementnatif.png")} style={{ width: 200, maxHeight: 125 }} resizeMode={'contain'} />
             </View>
           </Button>
 
         </View>
-        <View style={{ width: '100%',marginTop:25 }}>
+        <View style={{ width: '100%', marginTop: 25 }}>
 
-<Button style={{ width: '100%', height: 100,backgroundColor: '#1f4598' }} onPress={() => this.props.navigation.navigate('SolutionPortail')}>
-  <View style={{ width: '50%' }}>
-    <Text style={{color:'white',fontWeight:'bold',fontSize:17,marginLeft:10}}>
-    DÉVELOPPEMENT
-DE PORTAIL WEB
+          <Button style={{ width: '100%', height: 100, backgroundColor: '#1f4598' }} onPress={() => this.props.navigation.navigate('SolutionPortail')}>
+            <View style={{ width: '50%' }}>
+              <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 17, marginLeft: 10 }}>
+                DÉVELOPPEMENT
+                DE PORTAIL WEB
 POUR FILEMAKER</Text>
-  </View>
-  <View style={{ width: '50%',backgroundColor:'white' }}>
-    <Image source={require("../assets/images/portailfilemaker.png")} style={{ width: 200, maxHeight: 100 }} resizeMode={'contain'} />
-  </View>
-</Button>
+            </View>
+            <View style={{ width: '50%', backgroundColor: 'white' }}>
+              <Image source={require("../assets/images/portailfilemaker.png")} style={{ width: 200, maxHeight: 100 }} resizeMode={'contain'} />
+            </View>
+          </Button>
 
-</View>
- 
-        <View style={{ width: '100%',marginTop:25 }}>
+        </View>
 
-<Button style={{ width: '100%', height: 125,backgroundColor: 'white',marginTop:5 }} onPress={() => this.props.navigation.navigate('SolutionSante')}>
-  <View style={{ width: '32%' }}>
-    <Text style={{color:'black',fontWeight:'bold',fontSize:14,marginLeft:10}}>
-INFORMATIQUE EN SANTÉ</Text>
-  </View>
-  <View style={{ width: '68%' }}>
-    <Image source={require("../assets/images/clientssantes.png")} style={{ width: 294, maxHeight: 100 }}  />
-  </View>
-</Button>
+        <View style={{ width: '100%', marginTop: 25 }}>
 
-</View>
+          <Button style={{ width: '100%', height: 125, backgroundColor: 'white', marginTop: 5 }} onPress={() => this.props.navigation.navigate('SolutionSante')}>
+            <View style={{ width: '32%' }}>
+              <Text style={{ color: 'black', fontWeight: 'bold', fontSize: 14, marginLeft: 10 }}>
+                INFORMATIQUE EN SANTÉ</Text>
+            </View>
+            <View style={{ width: '68%' }}>
+              <Image source={require("../assets/images/clientssantes.png")} style={{ width: 294, maxHeight: 100 }} />
+            </View>
+          </Button>
 
-<View style={{ width: '100%',marginTop:25 }}>
+        </View>
 
-<Button style={{ width: '100%', height: 100,backgroundColor: 'white' }} onPress={() => this.props.navigation.navigate('SolutionB2b')}>
+        <View style={{ width: '100%', marginTop: 25 }}>
 
-  <View style={{ width: '100%' }}>
-    <Image source={require("../assets/images/b2b.png")} style={{ width: '100%', maxHeight: 100 }} resizeMode={'contain'} />
-  </View>
-</Button>
+          <Button style={{ width: '100%', height: 100, backgroundColor: 'white' }} onPress={() => this.props.navigation.navigate('SolutionB2b')}>
 
-</View>
-<View style={{ width: '100%',marginTop:25 }}>
+            <View style={{ width: '100%' }}>
+              <Image source={require("../assets/images/b2b.png")} style={{ width: '100%', maxHeight: 100 }} resizeMode={'contain'} />
+            </View>
+          </Button>
 
-<Button style={{ width: '100%', height: 100,backgroundColor: '#1f4598' }} onPress={() => this.props.navigation.navigate('SolutionVhmClasses')} >
- 
-  <View style={{ width: '100%',backgroundColor:'white' }}>
-    <Image source={require("../assets/images/vhmclasses.png")} style={{ width: '100%', maxHeight: 100 }} resizeMode={'contain'} />
-  </View>
-</Button>
+        </View>
+        <View style={{ width: '100%', marginTop: 25 }}>
 
-</View>
+          <Button style={{ width: '100%', height: 100, backgroundColor: '#1f4598' }} onPress={() => this.props.navigation.navigate('SolutionVhmClasses')} >
+
+            <View style={{ width: '100%', backgroundColor: 'white' }}>
+              <Image source={require("../assets/images/vhmclasses.png")} style={{ width: '100%', maxHeight: 100 }} resizeMode={'contain'} />
+            </View>
+          </Button>
+
+        </View>
 
 
- 
+
 
 
       </ImageBackground>

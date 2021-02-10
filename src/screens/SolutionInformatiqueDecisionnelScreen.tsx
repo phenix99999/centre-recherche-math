@@ -42,7 +42,9 @@ class SolutionMobileScreen extends Component {
           style={styles.imgBackground}
           imageStyle={{ opacity: 1 }}
         >
-          <Header style={{ backgroundColor: 'transparent' }}>
+          <Header
+            style={Platform.OS != 'ios' ? { backgroundColor: 'transparent', height: 80, justifyContent: 'center', top: 15 } : { backgroundColor: 'transparent' }}
+          >
             <Left>
               <Button
                 transparent
@@ -104,7 +106,7 @@ class SolutionMobileScreen extends Component {
 
               </Button>
             </View>
- 
+
           </View>
 
 

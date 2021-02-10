@@ -344,7 +344,9 @@ const CalendarModeList = ({ navigation, timeStore }: Props) => {
 
 
         >
-            <Header>
+            <Header
+                style={Platform.OS != 'ios' ? { backgroundColor: 'transparent', height: 80, justifyContent: 'center', top: 15 } : { backgroundColor: 'transparent' }}
+            >
                 <Left>
                     <Button
                         transparent

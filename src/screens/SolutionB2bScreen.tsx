@@ -40,7 +40,9 @@ class SolutionB2bScreen extends Component {
           style={styles.imgBackground}
           imageStyle={{ opacity: 1 }}
         >
-          <Header style={{ backgroundColor: 'transparent' }}>
+          <Header
+            style={Platform.OS != 'ios' ? { backgroundColor: 'transparent', height: 80, justifyContent: 'center', top: 15 } : { backgroundColor: 'transparent' }}
+          >
             <Left>
               <Button
                 transparent
@@ -73,13 +75,13 @@ class SolutionB2bScreen extends Component {
           <View style={{ flex: 1 }}>
             <View style={{ flexDirection: 'row', marginLeft: 5, marginRight: 2, marginBottom: 4 }}>
               <Text style={{ fontSize: 24, fontWeight: 'bold' }}>
-              Vous êtes un programmeur ?
-              Faites profiter vos clients
-              de notre expertise.
+                Vous êtes un programmeur ?
+                Faites profiter vos clients
+                de notre expertise.
               </Text>
             </View>
             <View style={{ maxHeight: 100, padding: 8 }}>
-              <Text>Vous avez des projets avec vos clients qui dépassent votre expertise? Nous offrons nos services à tarification B2B de façon transparente ou non. 
+              <Text>Vous avez des projets avec vos clients qui dépassent votre expertise? Nous offrons nos services à tarification B2B de façon transparente ou non.
               </Text>
 
             </View>
@@ -101,7 +103,7 @@ class SolutionB2bScreen extends Component {
 
               </Button>
             </View>
- 
+
           </View>
 
 

@@ -42,7 +42,7 @@ class SolutionMobileScreen extends Component {
           style={styles.imgBackground}
           imageStyle={{ opacity: 1 }}
         >
-          <Header style={{ backgroundColor: 'transparent' }}>
+          <Header style={Platform.OS != 'ios' ? { backgroundColor: 'transparent', height: 80, justifyContent: 'center', top: 15 } : { backgroundColor: 'transparent' }}>
             <Left>
               <Button
                 transparent
@@ -57,8 +57,8 @@ class SolutionMobileScreen extends Component {
             </Left>
 
             <Body>
-              <Text style={{ fontSize:15,fontFamily: 'Arial', fontWeight: 'bold', color: '#1f4598' }}>
-                  Android & Ios
+              <Text style={{ fontSize: 15, fontFamily: 'Arial', fontWeight: 'bold', color: '#1f4598' }}>
+                Android & Ios
               </Text>
             </Body>
 
@@ -82,23 +82,23 @@ class SolutionMobileScreen extends Component {
                 IOS ET ANDROID
               </Text>
             </View>
-            <View style={{ height:125, padding: 8 }}>
-              <Text style={{fontSize:20}}>Nous développons des solutions mobiles natives reliées à votre FileMaker...
+            <View style={{ height: 125, padding: 8 }}>
+              <Text style={{ fontSize: 20 }}>Nous développons des solutions mobiles natives reliées à votre FileMaker...
               sans nécessiter de licence concurente
               </Text>
 
             </View>
-            <View style={{ alignItems: 'center', maxHeight: 150,backgroundColor:'white' }}>
+            <View style={{ alignItems: 'center', maxHeight: 150, backgroundColor: 'white' }}>
               <Image source={require("../assets/images/developpementnatif.png")} style={{ width: 400, maxHeight: 150 }} resizeMode={'contain'} />
 
             </View>
-            <View style={{ padding: 8,marginTop:24 }}>
+            <View style={{ padding: 8, marginTop: 24 }}>
 
-              <Unorderedlist><Text style={{ fontWeight: 'bold',fontSize:20 }}>IOS et Android</Text></Unorderedlist>
-              <Unorderedlist><Text style={{ fontWeight: 'bold',fontSize:20 }}>Aucune licence concurrente</Text></Unorderedlist>
-              <Unorderedlist><Text style={{ fontWeight: 'bold',fontSize:20 }}>Supporte 200 usagers simultanés</Text></Unorderedlist>
+              <Unorderedlist><Text style={{ fontWeight: 'bold', fontSize: 20 }}>IOS et Android</Text></Unorderedlist>
+              <Unorderedlist><Text style={{ fontWeight: 'bold', fontSize: 20 }}>Aucune licence concurrente</Text></Unorderedlist>
+              <Unorderedlist><Text style={{ fontWeight: 'bold', fontSize: 20 }}>Supporte 200 usagers simultanés</Text></Unorderedlist>
             </View>
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center',marginTop:50 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 50 }}>
               <Button style={{ backgroundColor: '#1f4598' }}>
                 <Text>
                   Plus d'infos
@@ -106,7 +106,7 @@ class SolutionMobileScreen extends Component {
 
               </Button>
             </View>
- 
+
           </View>
 
 
