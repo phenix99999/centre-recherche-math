@@ -39,10 +39,19 @@ type Props = {
 const UneJourneeEmploye = ({ route, navigation, timeStore }: Props) => {
     const [heure, setHeure] = React.useState<Number>(0);
     const [data, setData] = React.useState<Object>([]);
+    const [activitesList, setActivitesList] = React.useState<Object>([]);
 
 
     if (!NetworkUtils.isNetworkAvailable()) {
         alert("Erreur de connexion.");
+    }
+    function getActivitiesNameWithPkId(pk_id) {
+        for (let i = 0; i < activitesList.length; i++) {
+            if (activitesList[i].pk_ID == pk_id) {
+                return activitesList[i].Nom;
+            }
+        }
+        return "";
     }
 
     React.useEffect(() => {
@@ -57,41 +66,56 @@ const UneJourneeEmploye = ({ route, navigation, timeStore }: Props) => {
         let date = route.params.date;
         let pk_id = route.params.pk_ID;
 
-
-
-        const getData = async () => {
-            let month = route.params.date.getMonth() + 1;
-            let day = route.params.date.getDate() + 1;
-            // alert(month);
-
-            if (day < 10) {
-                day = "0" + day;
+        let feuilleTempsTemp = route.params.feuilleTemps;
+        let feuilleTemps = [];
+        let indexFeuilleTemps = 0;
+        for (let i = 0; i < feuilleTempsTemp.length; i++) {
+            if (feuilleTempsTemp[i].fk_assignation == route.params.pk_ID) {
+                feuilleTemps[indexFeuilleTemps] = feuilleTempsTemp[i];
+                feuilleTemps[indexFeuilleTemps].planification = false;
+                indexFeuilleTemps++;
             }
+        }
+        let planification = SyncStorage.get('planification');
+        // console.log(planification);
+
+        let year = timeStore.selectedDate.getFullYear();
+        let month = timeStore.selectedDate.getMonth();
+        let day = timeStore.selectedDate.getDate();
+        if (planification) {
 
 
-
-
-            if (month < 10) {
-                month = "0" + month;
+            for (let i = 0; i < planification.length; i++) {
+                let monthPlanification = new Date(planification[i].date).getMonth();
+                let dayPlanification = new Date(planification[i].date).getDate();
+                let yearPlanification = new Date(planification[i].date).getFullYear();
+                console.log(planification[i]);
+                if (yearPlanification == year && dayPlanification == day && monthPlanification == month && planification[i].employerPkId == route.params.pk_ID) {
+                    feuilleTemps[indexFeuilleTemps] = { planification: true, StartDate: (timeStore.selectedDate), Nom_projet: planification[i].clientName + " | " + planification[i].projectName, fk_activites: planification[i].activity, "AM_PM": planification[i].periode, "Minutes": planification[i].duree, Taches: planification[i].tache };
+                }
+                // feuilleTemps[index] = planification;
             }
-            // setFormatedClients(await get(username, password, server, db, layoutClient));
-            let query = "&StartDate=" + month + "/" + day + "/" + timeStore.selectedDate.getFullYear();
-            let theData = await get(username, password, global.fmServer, global.fmDatabase, layoutTemps,
-                query);
+        }
+        const setListActivities = async () => {
+            setActivitesList(await get(username, password, global.fmServer, global.fmDatabase, "mobile_ACTIVITES2"
+                , "&flag_actif=1"));
 
-            console.log("Voici les datas");
-            console.log(theData);
+        }
+        setListActivities();
+        setData(feuilleTemps);
 
-
-            setData(theData);
-
-        };
-
-        getData();
+        // getData();
     }, []);
 
 
-
+    function getActivitiesNameWithPkId(pk_id) {
+        for (let i = 0; i < activitesList.length; i++) {
+            if (activitesList[i].pk_ID == pk_id) {
+                return activitesList[i].Nom;
+            }
+        }
+        return "";
+    }
     return (
 
 
@@ -122,60 +146,54 @@ const UneJourneeEmploye = ({ route, navigation, timeStore }: Props) => {
             <Content style={{ flex: 1, flexDirection: "column" }}>
                 <ScrollView>
 
-                    {/* {SyncStorage.get('planification').map((planification) => (
+                    {data.map((feuilleTemps) => (
                         <View>
                             <View style={styles.inputWrapper}>
-                                <Text>Date: </Text>
+                                <Text style={{ color: feuilleTemps.planification ? "green" : "black" }}>Date: </Text>
                                 <View style={{ marginLeft: 'auto' }}>
-                                    <Text> {dateToFrench(new Date(planification.date))} </Text>
-                                </View>
-                            </View>
-                            <View style={styles.inputWrapper}>
-                                <Text>Nom Employé assigné :  </Text>
-                                <View style={{ marginLeft: 'auto' }}>
-                                    <Text> {planification.nom} </Text>
+                                    <Text style={{ color: feuilleTemps.planification ? "green" : "black" }}> {dateToFrench(new Date(feuilleTemps.StartDate))} </Text>
                                 </View>
                             </View>
 
-                            <View style={{ padding: 30 }}>
 
-                                <Text>Client :  </Text>
+                            <View style={{ padding: 20 }}>
+
+                                <Text style={{ color: feuilleTemps.planification ? "green" : "black" }}>Client & Projet :  </Text>
                                 <View style={{ marginLeft: 'auto' }}>
-                                    <Text style={{ fontWeight: 'bold' }}>{planification.clientName} </Text>
+                                    <Text style={{ color: feuilleTemps.planification ? "green" : "black" }}>{feuilleTemps.Nom_projet} </Text>
                                 </View>
 
                             </View>
 
 
 
-                            <View style={{ padding: 30 }}>
-                                <Text>Projet :  </Text>
-                                <View style={{ marginLeft: 'auto' }}>
-                                    <Text style={{ fontSize: 13, fontWeight: 'bold' }}>{planification.projectName} </Text>
-                                </View>
 
-                            </View>
 
-                            <View style={{ padding: 30 }}>
-                                <Text>Activité :  </Text>
+                            <View style={{ padding: 20 }}>
+                                <Text style={{ color: feuilleTemps.planification ? "green" : "black" }}>Activité :  </Text>
                                 <View style={{ marginLeft: 'auto', }}>
-                                    <Text numberOfLines={0.5} ellipsizeMode='tail' style={{ fontSize: 12, fontWeight: 'bold' }}>{planification.activityName} </Text>
+                                    <Text numberOfLines={0.5} ellipsizeMode='tail' style={{ color: feuilleTemps.planification ? "green" : "black" }}>{getActivitiesNameWithPkId(feuilleTemps.fk_activites)} </Text>
                                 </View>
 
                             </View>
-
-
 
                             <View style={{ flexDirection: 'row', padding: 20 }}>
-                                <Text>Nb d'heure :</Text>
+                                <Text style={{ color: feuilleTemps.planification ? "green" : "black" }}>Période </Text>
                                 <View style={{ marginLeft: 'auto', }}>
-                                    <Text style={{ fontSize: 13, fontWeight: 'bold' }}>{planification.duree} </Text>
+                                    <Text style={{ color: feuilleTemps.planification ? "green" : "black" }}>{feuilleTemps.AM_PM} </Text>
+                                </View>
+                            </View>
+
+                            <View style={{ flexDirection: 'row', padding: 20 }}>
+                                <Text style={{ color: feuilleTemps.planification ? "green" : "black" }}>Nb d'heure :</Text>
+                                <View style={{ marginLeft: 'auto', }}>
+                                    <Text style={{ color: feuilleTemps.planification ? "green" : "black" }}>{feuilleTemps.Minutes} </Text>
                                 </View>
                             </View>
                             <View style={{ flexDirection: 'row', padding: 20 }}>
-                                <Text>Tache</Text>
+                                <Text style={{ color: feuilleTemps.planification ? "green" : "black" }}>Tache</Text>
                                 <View style={{ marginLeft: 'auto', }}>
-                                    <Text style={{ fontSize: 13, fontWeight: 'bold' }}>{planification.tache} </Text>
+                                    <Text style={{ color: feuilleTemps.planification ? "green" : "black" }}>{feuilleTemps.Taches} </Text>
                                 </View>
                             </View>
                             <View style={{ borderBottomWidth: 1, borderColor: 'black' }}>
@@ -184,66 +202,20 @@ const UneJourneeEmploye = ({ route, navigation, timeStore }: Props) => {
                         </View>
 
                     ))
-                    } */}
+                    }
                 </ScrollView>
             </Content>
 
 
             <Button style={{ width: '100%', justifyContent: 'center', backgroundColor: '#1f4598' }}
                 onPress={async () => {
-
-
-                    let planification = SyncStorage.get('planification');
-                    let StartDate = "";
-                    let fk_assignation = "";
-                    let fk_client = "";
-                    let fk_projet = "";
-                    let Minutes_planifie = "";
-                    let AM_PM = "";
-                    let fk_actif = 1;
-
-                    let records = [];
-                    for (let i = 0; i < planification.length; i++) {
-                        records[i] = {};
-                        records[i].Taches = planification[i].tache;
-                        records[i].StartDate = dateToFMDate(new Date(planification[i].date));
-                        records[i].fk_assignation = planification[i].employerPkId;
-                        records[i].fk_client = planification[i].client;
-                        records[i].fk_projet = planification[i].projet;
-                        records[i].fk_activities = planification[i].activity;
-                        records[i].Minutes_planifie = planification[i].duree;
-                        records[i].fk_actif = "1";
-                        records[i].AM_PM = planification[i].periode;
-                    }
-
-                    await addAndUpdateQuery(records);
-                    SyncStorage.remove('planification');
-                    SyncStorage.remove('budject');
-                    SyncStorage.remove('modeRemplir');
-
                     navigation.goBack();
                 }}
             >
-
                 <Text style={{ textAlign: 'center' }}>
-                    Confirmer planification
+                    Retour
                 </Text>
             </Button>
-
-
-            <Button style={{ width: '100%', justifyContent: 'center', marginTop: 25, backgroundColor: 'red' }}
-                onPress={async () => {
-                    SyncStorage.remove('planification');
-                    navigation.goBack();
-                }}
-            >
-
-                <Text style={{ textAlign: 'center' }}>
-                    Annuler planification
-                </Text>
-            </Button>
-
-
         </Container>
     );
 };

@@ -403,16 +403,13 @@ const MainLecture = ({ route, navigation, timeStore }: Props) => {
                                 <Text>{record.Nom_assignation}</Text>
                                 <Text>{getActivitiesNameWithPkId(record.fk_activites)}</Text>
                                 <Text>{record.Minutes + "h"} </Text>
+                                <Text>{record.pk_ID}</Text>
 
                             </TouchableOpacity>
                         ))
                         )
 
                     }
-
-
-
-
                 </ScrollView>
             </Container>
         );

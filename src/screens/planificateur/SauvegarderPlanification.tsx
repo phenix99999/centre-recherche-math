@@ -79,8 +79,9 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
         // }
 
 
+
         let planification = SyncStorage.get('planification');
-        if (planification) {
+        if (planification && planification.length > 0) {
 
             let dateWeAreOn = route.params.date.getFullYear() + "-" + route.params.date.getMonth() + "-" + route.params.date.getDate();
             let datePlanification = new Date(planification[0].date).getFullYear() + "-" + new Date(planification[0].date).getMonth() + "-" + new Date(planification[0].date).getDate();
@@ -134,7 +135,7 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
                 </Left>
 
                 <Body>
-                    <Text style={{ color: '#1f4598', fontWeight: 'bold' }}>Confirmation planification</Text>
+                    <Text style={{ color: '#1f4598', fontWeight: 'bold' }}>Sauvegarder planification</Text>
                 </Body>
                 <Right>
 
@@ -153,7 +154,7 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
                     </View>
                 </View>
 
-                <View style={styles.inputWrapper}>
+                <View style={{ flexDirection: 'row', marginTop: 25 }}>
 
 
                     <Text>Nom Employé assigné :  </Text>
@@ -162,7 +163,7 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
                     </View>
                 </View>
 
-                <View style={{ padding: 30 }}>
+                <View style={{ flexDirection: 'row', marginTop: 25 }}>
 
                     <Text>Client :  </Text>
                     <View style={{ marginLeft: 'auto' }}>
@@ -173,7 +174,7 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
 
 
 
-                <View style={{ padding: 30 }}>
+                <View style={{ flexDirection: 'row', marginTop: 25 }}>
                     <Text>Projet :  </Text>
                     <View style={{ marginLeft: 'auto' }}>
                         <Text style={{ fontSize: 13, fontWeight: 'bold' }}>{SyncStorage.get('filterProjectName')} </Text>
@@ -181,7 +182,7 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
 
                 </View>
 
-                <View style={{ padding: 30 }}>
+                <View style={{ flexDirection: 'row', marginTop: 25 }}>
                     <Text>Activité :  </Text>
                     <View style={{ marginLeft: 'auto', }}>
                         <Text style={{ fontSize: 13, fontWeight: 'bold' }}>{SyncStorage.get('filterActivityName')} </Text>
@@ -189,7 +190,7 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
 
                 </View>
 
-                <View style={{ flexDirection: 'row', padding: 20 }}>
+                <View style={{ flexDirection: 'row', marginTop: 25 }}>
                     <Text>Nb d'heure :</Text>
                     <View style={{ marginLeft: 'auto' }}>
                         <TextInput
@@ -201,7 +202,7 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
                     </View>
                 </View>
 
-                <View style={{ padding: 20 }}>
+                <View style={{ marginTop: 25 }}>
                     <DetachedCustomPickerRow
 
                         name={"Sélectionner Tâches"}
@@ -237,6 +238,7 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
                         planification[0].periode = route.params.periode;
                         planification[0].date = route.params.date;
                         planification[0].tache = tache;
+                        planification[0].index = 0;
                     } else {
                         let planificationLength = (planification.length);
                         planification[planificationLength] = {};
@@ -253,6 +255,7 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
                         planification[planificationLength].activity = SyncStorage.get('filterActivity');
                         planification[planificationLength].date = route.params.date;
                         planification[planificationLength].tache = tache;
+                        planification[planificationLength].index = planificationLength;
                     }
                     SyncStorage.set('planification', planification);
 
@@ -292,7 +295,7 @@ const styles = StyleSheet.create({
     },
 
     inputWrapper: {
-        padding: 20,
+        // padding: 20,
         flexDirection: 'row'
     },
     inputBorder: {

@@ -22,7 +22,7 @@ import { dateToFrench, getNotEmptyDates, getDaysInMonth, dateToFMDate } from "..
 import NetworkUtils from '../../utils/NetworkUtils';
 
 import * as React from "react";
-import { Alert, StyleSheet, unstable_batchedUpdates, View, ScrollView } from "react-native";
+import { Alert, StyleSheet, TouchableOpacity, View, ScrollView } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { CustomPickerRow, DetachedCustomPickerRow } from "../../components/CustomPicker";
 import { Record, Client, Activite, Projet, Type_de_projet } from "../../stores/FMObjectTypes";
@@ -38,7 +38,8 @@ type Props = {
 
 const ConfirmerPlanification = ({ route, navigation, timeStore }: Props) => {
     const [heure, setHeure] = React.useState<Number>(0);
-
+    const [planification, setPlanification] = React.useState<Object>([]);
+    const [temp, setTemp] = React.useState<Number>(0);
 
     if (!NetworkUtils.isNetworkAvailable()) {
         alert("Erreur de connexion.");
@@ -79,7 +80,8 @@ const ConfirmerPlanification = ({ route, navigation, timeStore }: Props) => {
         // if (SyncStorage.get('filterActivity')) {
         //     setActivity(SyncStorage.get('filterActivity'));
 
-        // }
+        // }    
+        setPlanification(SyncStorage.get('planification'));
 
         const setData = async (username, password, server, db, layoutClient, layoutProjet, layoutActivite) => {
             // setFormatedClients(await get(username, password, server, db, layoutClient));
@@ -131,7 +133,7 @@ const ConfirmerPlanification = ({ route, navigation, timeStore }: Props) => {
             <Content style={{ flex: 1, flexDirection: "column" }}>
                 <ScrollView>
 
-                    {SyncStorage.get('planification').map((planification) => (
+                    {planification.map((planification) => (
                         <View>
                             <View style={styles.inputWrapper}>
                                 <Text>Date: </Text>
@@ -139,54 +141,78 @@ const ConfirmerPlanification = ({ route, navigation, timeStore }: Props) => {
                                     <Text> {dateToFrench(new Date(planification.date))} </Text>
                                 </View>
                             </View>
-                            <View style={styles.inputWrapper}>
+                            <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <Text>Nom Employé assigné :  </Text>
                                 <View style={{ marginLeft: 'auto' }}>
                                     <Text> {planification.nom} </Text>
                                 </View>
                             </View>
 
-                            <View style={{ padding: 30 }}>
+                            <View style={{ flexDirection: 'row', marginTop: 10 }}>
 
                                 <Text>Client :  </Text>
                                 <View style={{ marginLeft: 'auto' }}>
-                                    <Text style={{ fontWeight: 'bold' }}>{planification.clientName} </Text>
+                                    <Text>{planification.clientName} </Text>
                                 </View>
 
                             </View>
 
 
 
-                            <View style={{ padding: 30 }}>
+                            <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <Text>Projet :  </Text>
                                 <View style={{ marginLeft: 'auto' }}>
-                                    <Text style={{ fontSize: 13, fontWeight: 'bold' }}>{planification.projectName} </Text>
+                                    <Text>{planification.projectName} </Text>
                                 </View>
 
                             </View>
 
-                            <View style={{ padding: 30 }}>
+                            <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <Text>Activité :  </Text>
                                 <View style={{ marginLeft: 'auto', }}>
-                                    <Text numberOfLines={0.5} ellipsizeMode='tail' style={{ fontSize: 12, fontWeight: 'bold' }}>{planification.activityName} </Text>
+                                    <Text>{planification.activityName} </Text>
                                 </View>
 
                             </View>
 
 
-
-                            <View style={{ flexDirection: 'row', padding: 20 }}>
+                            <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <Text>Nb d'heure :</Text>
                                 <View style={{ marginLeft: 'auto', }}>
-                                    <Text style={{ fontSize: 13, fontWeight: 'bold' }}>{planification.duree} </Text>
+                                    <Text>{planification.duree} </Text>
                                 </View>
                             </View>
-                            <View style={{ flexDirection: 'row', padding: 20 }}>
+                            <View style={{ flexDirection: 'row', marginTop: 5 }}>
                                 <Text>Tache</Text>
                                 <View style={{ marginLeft: 'auto', }}>
                                     <Text style={{ fontSize: 13, fontWeight: 'bold' }}>{planification.tache} </Text>
                                 </View>
                             </View>
+                            <View style={{ marginTop: 25, marginBottom: 25 }}>
+                                <TouchableOpacity
+                                    onPress={() => {
+
+                                        let planificationStorage = SyncStorage.get('planification');
+                                        let newPlanification = [];
+                                        let indexNewPlanification = 0;
+                                        for (let i = 0; i < planificationStorage.length; i++) {
+                                            if (planificationStorage[i].index != planification.index) {
+                                                newPlanification[indexNewPlanification] = planificationStorage[i];
+                                                indexNewPlanification++;
+                                            }
+                                        }
+
+                                        SyncStorage.set('planification', newPlanification);
+                                        setPlanification(newPlanification)
+                                        if (newPlanification.length == 0) {
+                                            navigation.goBack();
+                                        }
+                                    }}
+                                    style={{ width: '100%', backgroundColor: 'red', alignItems: 'center' }}>
+                                    <Text style={{ color: 'white' }}>Effacer</Text>
+                                </TouchableOpacity>
+                            </View>
+
                             <View style={{ borderBottomWidth: 1, borderColor: 'black' }}>
 
                             </View>
@@ -264,7 +290,7 @@ const styles = StyleSheet.create({
     },
 
     inputWrapper: {
-        padding: 20,
+
         flexDirection: 'row'
     },
     inputBorder: {
