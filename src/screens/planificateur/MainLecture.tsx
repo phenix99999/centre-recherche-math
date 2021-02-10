@@ -98,17 +98,17 @@ const MainLecture = ({ route, navigation, timeStore }: Props) => {
 
 
 
-        if (SyncStorage.get("filterCalendrier_employe") != 0) {
+        if (SyncStorage.get("filterCalendrier_employe") && SyncStorage.get("filterCalendrier_employe") != 0) {
             query = query + "&fk_assignation=" + SyncStorage.get("filterCalendrier_employe");
         }
 
-        if (SyncStorage.get("filterCalendrier_client") != 0) {
+        if (SyncStorage.get("filterCalendrier_client") && SyncStorage.get("filterCalendrier_client") != 0) {
             query = query + "&fk_client=" + SyncStorage.get("filterCalendrier_client");
         }
-        if (SyncStorage.get("filterCalendrier_projet") != 0) {
+        if (SyncStorage.get("filterCalendrier_projet") && SyncStorage.get("filterCalendrier_projet") != 0) {
             query = query + "&fk_projet=" + SyncStorage.get("filterCalendrier_projet");
         }
-        if (SyncStorage.get("filterCalendrier_activite") != 0) {
+        if (SyncStorage.get("filterCalendrier_activite") && SyncStorage.get("filterCalendrier_activite") != 0) {
             query = query + "&fk_activites=" + SyncStorage.get("filterCalendrier_activite");
         }
 
@@ -377,8 +377,9 @@ const MainLecture = ({ route, navigation, timeStore }: Props) => {
                     refreshControl={
                         <RefreshControl
                             refreshing={false}
-                            onRefresh={() => {
-
+                            onRefresh={async () => {
+                                getRefreshData();
+                                selectDate(timeStore.selectedDate);
                             }}
                         />
                     }
@@ -394,16 +395,28 @@ const MainLecture = ({ route, navigation, timeStore }: Props) => {
                                 onPress={() => {
                                     // crud.updateEditionMode("update");
 
-                                    navigation.navigate("TempsDetailsClient", { pk_ID: record.pk_ID, editionMode: "read", comeFrom: 'Main' });
+                                    navigation.navigate("TempsDetailsClient", { pk_ID: record.pk_ID, editionMode: "read" });
                                 }}
                                 style={styles.item}
                                 key={record.pk_ID}
                             >
-
-                                <Text>{record.Nom_assignation}</Text>
+                                <View style={{ flexDirection: 'row' }}>
+                                    <View style={{ width: '90%' }}>
+                                        <Text>{record.Nom_assignation}</Text>
+                                    </View>
+                                    <View style={{ width: '15%' }}>
+                                        <Text>
+                                            <Text style={{ fontWeight: 'bold', color: "red" }}>
+                                                {record.Flag_replanif == 1 ? "R " : null}
+                                            </Text>
+                                            <Text style={{ fontWeight: 'bold', color: "black" }}>
+                                                {record.flag_planif == 1 ? "P" : null}
+                                            </Text>
+                                        </Text>
+                                    </View>
+                                </View>
                                 <Text>{getActivitiesNameWithPkId(record.fk_activites)}</Text>
-                                <Text>{record.Minutes + "h"} </Text>
-                                <Text>{record.pk_ID}</Text>
+                                <Text>{record.Minutes ? record.Minutes : record.Minutes_planifie + "h"} </Text>
 
                             </TouchableOpacity>
                         ))

@@ -53,7 +53,7 @@ const ConfirmerPlanification = ({ route, navigation, timeStore }: Props) => {
             let username = SyncStorage.get('username');
             let password = SyncStorage.get('password');
             query = "&StartDate=" + records[i].StartDate + "&fk_assignation=" + records[i].fk_assignation + "&fk_client=" + records[i].fk_client + "&fk_projet=" + records[i].fk_projet
-                + "&Minutes_planifie=" + records[i].Minutes_planifie + "&AM_PM=" + records[i].AM_PM + "&fk_activites=" + records[i].fk_activities + "&flag_actif=" + 1 + "&Taches=" + records[i].Taches;
+                + "&Minutes_planifie=" + records[i].Minutes_planifie + "&AM_PM=" + records[i].AM_PM + "&fk_activites=" + records[i].fk_activities + "&flag_actif=" + 1 + "&Taches=" + records[i].Taches + "&flag_entre_planif=1";
             await add(username, password, global.fmServer, global.fmDatabase, layout, query);
 
         }

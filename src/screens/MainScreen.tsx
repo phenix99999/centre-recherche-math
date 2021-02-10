@@ -46,6 +46,7 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
         return "";
     }
     function selectDate(date) {
+        // console.log(formatedDataEmploye);
         let dateObj = new Date(date);
         let month = ("0" + parseInt(dateObj.getMonth() + 1)).slice(-2);
 
@@ -352,7 +353,8 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
                         <RefreshControl
                             refreshing={false}
                             onRefresh={() => {
-
+                                getRefreshData();
+                                selectDate(timeStore.selectedDate);
                             }}
                         />
                     }
@@ -374,9 +376,26 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
                                     style={styles.item}
                                     key={record.pk_ID}
                                 >
-                                    <Text>{record.AM_PM}</Text>
+                                    <View style={{ flexDirection: 'row' }}>
+                                        <View style={{ width: '95%' }}>
+                                            <Text>{record.AM_PM}</Text>
+
+                                        </View>
+                                        <View style={{ width: '15%' }}>
+                                            <Text>
+                                                <Text style={{ fontWeight: 'bold', color: "red" }}>
+                                                    {record.Flag_replanif == 1 ? "R " : null}
+                                                </Text>
+                                                <Text style={{ fontWeight: 'bold', color: "black" }}>
+                                                    {record.flag_planif == 1 ? "P" : null}
+                                                </Text>
+                                            </Text>
+                                        </View>
+
+                                    </View>
+
                                     <Text>{record.Nom_projet}</Text>
-                                    <Text>{record.Minutes == "-1" ? "Durée : À venir" : record.Minutes + "h"}</Text>
+                                    <Text>{record.Minutes == "" ? record.Minutes_planifie + "h" : record.Minutes + "h"}</Text>
                                 </TouchableOpacity>
                             ))
                         )
@@ -406,7 +425,7 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
                                 <Text>{record.Nom_assignation}</Text>
                                 <Text>{getActivitiesNameWithPkId(record.fk_activites)}</Text>
                                 <Text>{record.Minutes == "-1" ? "Durée : À venir" : record.Minutes + "h"} </Text>
-
+                                <Text>{record.pk_ID}</Text>
                             </TouchableOpacity>
                         ))
                     )

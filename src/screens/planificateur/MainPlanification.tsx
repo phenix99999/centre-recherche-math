@@ -404,22 +404,26 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
 
 
                 </View>
-                <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderBottomWidth: 1, height: 60, borderColor: '#1f4598' }}>
-                    <View style={{ width: '50%' }}>
+                {modeRemplir ?
+                    <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderBottomWidth: 1, height: 60, borderColor: '#1f4598' }}>
+                        <View style={{ width: '50%' }}>
+
+                        </View>
+
+                        <View style={{ width: '12%' }}>
+                            <Text> AM</Text>
+                        </View>
+                        <View style={{ width: '12%' }}>
+                            <Text>PM</Text>
+                        </View>
+                        <View style={{ width: '26%' }}>
+                            <Text>Total Dispo</Text>
+                        </View>
 
                     </View>
 
-                    <View style={{ width: '12%' }}>
-                        <Text> AM</Text>
-                    </View>
-                    <View style={{ width: '12%' }}>
-                        <Text>PM</Text>
-                    </View>
-                    <View style={{ width: '26%' }}>
-                        <Text>Total Dispo</Text>
-                    </View>
+                    : null}
 
-                </View>
                 <ScrollView
                     style={styles.scrollview}
                     refreshControl={

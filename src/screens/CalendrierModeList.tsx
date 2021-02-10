@@ -147,8 +147,6 @@ const CalendarModeList = ({ navigation, timeStore }: Props) => {
     let year = timeStore.activeYear;
     let nbJourMois = (getDaysInMonth(timeStore.activeMonth, year).length);
 
-    let fk_assignation = SyncStorage.get('user').pk_ID;
-
 
     React.useEffect(() => {
         // alert("set effect");

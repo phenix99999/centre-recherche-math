@@ -225,6 +225,7 @@ export default class App extends Component {
                 <Stack.Navigator screenOptions={{ headerShown: false }} mode="modal" >
                     <Stack.Screen name="MainLecture" component={MainLecture} />
                     <Stack.Screen name="FilterModeLecture" component={FilterModeLecture} />
+                    <Stack.Screen name="TempsDetailsClient" component={TempsDetailsClient} />
                 </Stack.Navigator>
             );
         }
