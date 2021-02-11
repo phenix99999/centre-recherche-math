@@ -406,7 +406,7 @@ const MainLecture = ({ route, navigation, timeStore }: Props) => {
                                     <View style={{ width: '90%' }}>
                                         <Text>{record.Nom_assignation}</Text>
                                     </View>
-                                    <View style={{ width: '15%' }}>
+                                    <View style={{ width: '10%' }}>
                                         <Text>
                                             <Text style={{ fontWeight: 'bold', color: "red" }}>
                                                 {record.Flag_replanif == 1 ? "R " : null}

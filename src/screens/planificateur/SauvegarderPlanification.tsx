@@ -39,6 +39,7 @@ type Props = {
 const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
     const [heure, setHeure] = React.useState<Number>(0);
     const [tache, setTache] = React.useState<String>("");
+    const [description, setDescription] = React.useState<String>("");
 
 
     if (!NetworkUtils.isNetworkAvailable()) {
@@ -115,6 +116,18 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
     }, []);
 
 
+    function getNbHeuresAssigner() {
+
+        let planification = SyncStorage.get('planification');
+        let nbHeures = 0;
+        if (planification) {
+            for (let i = 0; i < planification.length; i++) {
+                nbHeures = parseFloat(planification[i].duree) + parseInt(nbHeures);
+            }
+        }
+
+        return nbHeures;
+    }
 
     return (
 
@@ -138,61 +151,74 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
                     <Text style={{ color: '#1f4598', fontWeight: 'bold' }}>Sauvegarder planification</Text>
                 </Body>
                 <Right>
+                    <View style={{ flexDirection: 'row' }}>
 
+                        <Icon name="clockcircle" type="AntDesign" style={{ fontSize: 30, marginLeft: 2, color: '#1f4598' }} />
+                        <View style={{ justifyContent: 'center' }}>
+                            <Text style={{ marginLeft: 5, color: 'black', fontSize: 15, fontWeight: 'bold' }}>
+                                {(SyncStorage.get('heureFacturable').toFixed(2) + "/" + SyncStorage.get('budject'))}
+                            </Text>
+
+                        </View>
+
+                    </View>
 
                 </Right>
             </Header>
 
 
             <Content style={{ flex: 1, flexDirection: "column" }}>
-                <View style={styles.inputWrapper}>
+                <View style={{ flexDirection: 'row', marginLeft: 20, marginRight: 20, marginTop: 5 }}>
 
 
-                    <Text>Date :  </Text>
-                    <View style={{ marginLeft: 'auto' }}>
+                    <Text>Date : </Text>
+                    <View style={{ marginLeft: 'auto', width: '80%' }}>
                         <Text> {dateToFrench(new Date(route.params.date))} </Text>
                     </View>
                 </View>
 
-                <View style={{ flexDirection: 'row', marginTop: 25 }}>
+                <View style={{ flexDirection: 'row', marginLeft: 20, marginRight: 20, marginTop: 25 }}>
 
 
-                    <Text>Nom Employé assigné :  </Text>
-                    <View style={{ marginLeft: 'auto' }}>
+                    <Text>Employé : </Text>
+                    <View style={{ width: '80%', marginLeft: 'auto' }}>
                         <Text> {route.params.nomComplet} </Text>
                     </View>
                 </View>
 
-                <View style={{ flexDirection: 'row', marginTop: 25 }}>
+                <View style={{ flexDirection: 'row', marginLeft: 20, marginRight: 20, marginTop: 25 }}>
+                    <View style={{ width: '15%' }}>
 
-                    <Text>Client :  </Text>
-                    <View style={{ marginLeft: 'auto' }}>
-                        <Text style={{ fontWeight: 'bold' }}>{SyncStorage.get('filterClientName')} </Text>
+
+                        <Text>Client : </Text>
+                    </View>
+                    <View style={{ width: '80%', marginLeft: 'auto' }}>
+                        <Text>{SyncStorage.get('filterClientName')} </Text>
                     </View>
 
                 </View>
 
 
 
-                <View style={{ flexDirection: 'row', marginTop: 25 }}>
-                    <Text>Projet :  </Text>
-                    <View style={{ marginLeft: 'auto' }}>
-                        <Text style={{ fontSize: 13, fontWeight: 'bold' }}>{SyncStorage.get('filterProjectName')} </Text>
+                <View style={{ flexDirection: 'row', marginLeft: 20, marginRight: 20, marginTop: 25 }}>
+                    <Text>Projet : </Text>
+                    <View style={{ width: '80%', marginLeft: 'auto' }}>
+                        <Text>{SyncStorage.get('filterProjectName')} </Text>
                     </View>
 
                 </View>
 
-                <View style={{ flexDirection: 'row', marginTop: 25 }}>
+                <View style={{ flexDirection: 'row', marginLeft: 20, marginRight: 20, marginTop: 25 }}>
                     <Text>Activité :  </Text>
-                    <View style={{ marginLeft: 'auto', }}>
-                        <Text style={{ fontSize: 13, fontWeight: 'bold' }}>{SyncStorage.get('filterActivityName')} </Text>
+                    <View style={{ width: '80%', marginLeft: 'auto' }}>
+                        <Text>{SyncStorage.get('filterActivityName')} </Text>
                     </View>
 
                 </View>
 
-                <View style={{ flexDirection: 'row', marginTop: 25 }}>
-                    <Text>Nb d'heure :</Text>
-                    <View style={{ marginLeft: 'auto' }}>
+                <View style={{ flexDirection: 'row', marginLeft: 20, marginRight: 20, marginTop: 25 }}>
+                    <Text>Durée</Text>
+                    <View style={{ width: '80%', marginLeft: 'auto' }}>
                         <TextInput
                             keyboardType='numeric'
                             value={heure}
@@ -202,7 +228,7 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
                     </View>
                 </View>
 
-                <View style={{ marginTop: 25 }}>
+                <View style={{ marginLeft: 20, marginRight: 20, marginTop: 25 }}>
                     <DetachedCustomPickerRow
 
                         name={"Sélectionner Tâches"}
@@ -214,6 +240,21 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
                             // setRecord({ ...record, "Taches": value })
                         }}
                         placeholder={"Tâches"}
+                    />
+                </View>
+
+                <View style={{ marginLeft: 20, marginRight: 20, marginTop: 25 }}>
+                    <Text>Description du travail à faire:</Text>
+                    <Textarea
+                        placeholder={"Écrivez la description ici"}
+                        bordered
+                        underline
+                        style={styles.inputBorder}
+                        rowSpan={5}
+                        value={description}
+                        onChangeText={(text) => {
+                            setDescription(text);
+                        }}
                     />
                 </View>
             </Content>
@@ -238,7 +279,9 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
                         planification[0].periode = route.params.periode;
                         planification[0].date = route.params.date;
                         planification[0].tache = tache;
+                        planification[0].description = description;
                         planification[0].index = 0;
+                        SyncStorage.set('heureFacturable', (parseFloat(SyncStorage.get('heureFacturable') + parseFloat(heure))));
                     } else {
                         let planificationLength = (planification.length);
                         planification[planificationLength] = {};
@@ -255,7 +298,10 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
                         planification[planificationLength].activity = SyncStorage.get('filterActivity');
                         planification[planificationLength].date = route.params.date;
                         planification[planificationLength].tache = tache;
+                        planification[planificationLength].description = description;
                         planification[planificationLength].index = planificationLength;
+                        SyncStorage.set('heureFacturable', (parseFloat(SyncStorage.get('heureFacturable') + parseFloat(heure))));
+
                     }
                     SyncStorage.set('planification', planification);
 
@@ -295,7 +341,7 @@ const styles = StyleSheet.create({
     },
 
     inputWrapper: {
-        // padding: 20,
+        padding: 20,
         flexDirection: 'row'
     },
     inputBorder: {

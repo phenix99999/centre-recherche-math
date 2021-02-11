@@ -291,29 +291,34 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
 
                 </View>
 
-                <Button style={{ width: '100%', alignItems: 'center', justifyContent: 'center' }}
+                <Button style={{ width: '100%', alignItems: 'center', justifyContent: 'center', padding: 40 }}
                     onPress={() => {
                         if (!client || !project || !activity) {
                             alert("Veuillez entrez un client,projet et activite");
                         } else {
-                            SyncStorage.set('filterClient', client);
-                            SyncStorage.set('filterProject', project);
-                            SyncStorage.set('filterActivity', activity);
-
-                            SyncStorage.set('filterClientName', clientName);
-                            SyncStorage.set('filterProjectName', projectName);
-                            SyncStorage.set('filterActivityName', activityName);
-
-                            SyncStorage.set('pasDeBudget', pasDeBudject);
-                            SyncStorage.set('budject', budject)
-                            SyncStorage.set('heureFacturable', heureFacturable);
-                            SyncStorage.set('modeRemplir', true);
-
-                            if (client && formatedProjects.length == 0) {
-                                alert("Ce client n'a aucun projet actif.")
+                            if (!pasDeBudject && heureFacturable / budject > 0.75) {
+                                alert("Il est impossible d'ajouter des heures pour ce client le budget a été atteint a plus de 75%");
                             } else {
-                                navigation.goBack();
+                                SyncStorage.set('filterClient', client);
+                                SyncStorage.set('filterProject', project);
+                                SyncStorage.set('filterActivity', activity);
+
+                                SyncStorage.set('filterClientName', clientName);
+                                SyncStorage.set('filterProjectName', projectName);
+                                SyncStorage.set('filterActivityName', activityName);
+
+                                SyncStorage.set('pasDeBudget', pasDeBudject);
+                                SyncStorage.set('budject', budject)
+                                SyncStorage.set('heureFacturable', parseFloat(heureFacturable).toFixed(2));
+                                SyncStorage.set('modeRemplir', true);
+
+                                if (client && formatedProjects.length == 0) {
+                                    alert("Ce client n'a aucun projet actif.")
+                                } else {
+                                    navigation.goBack();
+                                }
                             }
+
                         }
                     }
 
@@ -329,10 +334,13 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
 
                 <Button style={{ width: '100%', top: '1%', justifyContent: 'center', backgroundColor: 'red' }}
                     onPress={async () => {
+                        SyncStorage.remove("filterClient");
                         SyncStorage.remove("filterProject");
                         SyncStorage.remove("filterActivity");
                         setProject("");
+                        setClient("");
                         setActivity("");
+                        navigation.goBack();
                     }}
                 >
                     <Text style={{ textAlign: 'center' }}>
@@ -356,11 +364,11 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
                                         percent={parseFloat(((heureFacturable / budject) * 100))}
                                         radius={50}
                                         borderWidth={8}
-                                        color="#1f4598"
+                                        color={parseFloat(heureFacturable / budject) > 0.75 ? 'red' : 'black'}
                                         shadowColor="#999"
                                         bgColor="#fff"
                                     >
-                                        <Text style={{ fontSize: 18 }}>{((heureFacturable / budject)).toFixed(2) * 100}%</Text>
+                                        <Text style={{ fontSize: 18 }}>{((heureFacturable / budject) * 100).toFixed(2)}%</Text>
                                     </ProgressCircle>
                                 </View>
                             </View>
@@ -380,7 +388,7 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
                                         {pasDeBudject ?
                                             <Text> Nombre d'heures restantes : Pas de budget déterminé </Text>
                                             :
-                                            <Text> Nombre d'heures restantes : {parseFloat(budject - heureFacturable)} </Text>
+                                            <Text> Nombre d'heures restantes : {(parseFloat(budject - heureFacturable)).toFixed(2)} </Text>
                                         }
 
                                     </Text>
@@ -420,11 +428,11 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
                                     percent={parseFloat(((heureFacturable / budject) * 100))}
                                     radius={50}
                                     borderWidth={8}
-                                    color="#1f4598"
+                                    color={parseFloat(heureFacturable / budject) > 0.75 ? 'red' : 'black'}
                                     shadowColor="#999"
                                     bgColor="#fff"
                                 >
-                                    <Text style={{ fontSize: 18 }}>{((heureFacturable / budject)).toFixed(2) * 100}%</Text>
+                                    <Text style={{ fontSize: 18 }}>{(((heureFacturable / budject)) * 100).toFixed(2)}%</Text>
                                 </ProgressCircle>
                             </View>
                             :
@@ -438,11 +446,11 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
                                     percent={parseFloat(((heureFacturable / budject) * 100))}
                                     radius={50}
                                     borderWidth={8}
-                                    color="#1f4598"
+                                    color={parseFloat(heureFacturable / budject) > 0.75 ? 'red' : 'black'}
                                     shadowColor="#999"
                                     bgColor="#fff"
                                 >
-                                    <Text style={{ fontSize: 18 }}>{((heureFacturable / budject)).toFixed(2) * 100}%</Text>
+                                    <Text style={{ fontSize: 18 }}>{(((heureFacturable / budject)) * 100).toFixed(2)}%</Text>
                                 </ProgressCircle>
                             </View>
 

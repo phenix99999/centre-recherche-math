@@ -45,6 +45,18 @@ const ConfirmerPlanification = ({ route, navigation, timeStore }: Props) => {
         alert("Erreur de connexion.");
     }
 
+    function getNbHeuresAssigner() {
+
+        let planification = SyncStorage.get('planification');
+        let nbHeures = 0;
+        if (planification) {
+            for (let i = 0; i < planification.length; i++) {
+                nbHeures = parseFloat(planification[i].duree) + parseInt(nbHeures);
+            }
+        }
+
+        return nbHeures;
+    }
     async function addAndUpdateQuery(records) {
 
         let query = "";
@@ -53,7 +65,7 @@ const ConfirmerPlanification = ({ route, navigation, timeStore }: Props) => {
             let username = SyncStorage.get('username');
             let password = SyncStorage.get('password');
             query = "&StartDate=" + records[i].StartDate + "&fk_assignation=" + records[i].fk_assignation + "&fk_client=" + records[i].fk_client + "&fk_projet=" + records[i].fk_projet
-                + "&Minutes_planifie=" + records[i].Minutes_planifie + "&AM_PM=" + records[i].AM_PM + "&fk_activites=" + records[i].fk_activities + "&flag_actif=" + 1 + "&Taches=" + records[i].Taches + "&flag_entre_planif=1";
+                + "&Minutes_planifie=" + records[i].Minutes_planifie + "&AM_PM=" + records[i].AM_PM + "&fk_activites=" + records[i].fk_activities + "&flag_actif=" + 1 + "&Taches=" + records[i].Taches + "&flag_entre_planif=1" + "&Description=" + records[i].Description;
             await add(username, password, global.fmServer, global.fmDatabase, layout, query);
 
         }
@@ -128,7 +140,15 @@ const ConfirmerPlanification = ({ route, navigation, timeStore }: Props) => {
                 </Body>
                 <Right>
 
+                    <View style={{ flexDirection: 'row' }}>
+                        <Icon name="clockcircle" type="AntDesign" style={{ fontSize: 30, marginLeft: 2, color: '#1f4598' }} />
+                        <View style={{ justifyContent: 'center' }}>
+                            <Text style={{ marginLeft: 5, color: 'black', fontSize: 15, fontWeight: 'bold' }}>
+                                {(SyncStorage.get('heureFacturable').toFixed(2) + "/" + SyncStorage.get('budject'))}
+                            </Text>
 
+                        </View>
+                    </View>
                 </Right>
             </Header>
 
@@ -138,57 +158,64 @@ const ConfirmerPlanification = ({ route, navigation, timeStore }: Props) => {
 
                     {planification.map((planification) => (
                         <View>
-                            <View style={styles.inputWrapper}>
-                                <Text>Date: </Text>
-                                <View style={{ marginLeft: 'auto' }}>
+                            <View style={{ flexDirection: 'row', marginLeft: 20, marginRight: 20, marginTop: 25 }}>
+                                <Text>Date : </Text>
+                                <View style={{ width: '80%', marginLeft: 'auto' }}>
                                     <Text> {dateToFrench(new Date(planification.date))} </Text>
                                 </View>
                             </View>
-                            <View style={{ flexDirection: 'row', marginTop: 10 }}>
-                                <Text>Nom Employé assigné :  </Text>
-                                <View style={{ marginLeft: 'auto' }}>
+                            <View style={{ flexDirection: 'row', marginLeft: 20, marginRight: 20, marginTop: 25 }}>
+                                <Text>Employé : </Text>
+                                <View style={{ width: '80%', marginLeft: 'auto' }}>
                                     <Text> {planification.nom} </Text>
                                 </View>
                             </View>
 
-                            <View style={{ flexDirection: 'row', marginTop: 10 }}>
+                            <View style={{ flexDirection: 'row', marginLeft: 20, marginRight: 20, marginTop: 25 }}>
 
-                                <Text>Client :  </Text>
-                                <View style={{ marginLeft: 'auto' }}>
-                                    <Text>{planification.clientName} </Text>
+                                <Text>Client : </Text>
+                                <View style={{ width: '80%', marginLeft: 'auto' }}>
+                                    <Text style={{ fontWeight: 'bold' }}>{planification.clientName} </Text>
                                 </View>
 
                             </View>
 
 
 
-                            <View style={{ flexDirection: 'row', marginTop: 10 }}>
-                                <Text>Projet :  </Text>
-                                <View style={{ marginLeft: 'auto' }}>
-                                    <Text>{planification.projectName} </Text>
+                            <View style={{ flexDirection: 'row', marginLeft: 20, marginRight: 20, marginTop: 25 }}>
+                                <Text>Projet : </Text>
+                                <View style={{ width: '80%', marginLeft: 'auto' }}>
+                                    <Text style={{ fontWeight: 'bold' }}>{planification.projectName} </Text>
                                 </View>
 
                             </View>
 
-                            <View style={{ flexDirection: 'row', marginTop: 10 }}>
-                                <Text>Activité :  </Text>
-                                <View style={{ marginLeft: 'auto', }}>
-                                    <Text>{planification.activityName} </Text>
+                            <View style={{ flexDirection: 'row', marginLeft: 20, marginRight: 20, marginTop: 25 }}>
+                                <Text>Activité : </Text>
+                                <View style={{ width: '80%', marginLeft: 'auto' }}>
+
+                                    <Text style={{ fontWeight: 'bold' }}>{planification.activityName} </Text>
                                 </View>
 
                             </View>
 
 
-                            <View style={{ flexDirection: 'row', marginTop: 10 }}>
-                                <Text>Nb d'heure :</Text>
-                                <View style={{ marginLeft: 'auto', }}>
+                            <View style={{ flexDirection: 'row', marginLeft: 20, marginRight: 20, marginTop: 25 }}>
+                                <Text>Durée : </Text>
+                                <View style={{ marginLeft: 'auto', width: '80%' }}>
                                     <Text>{planification.duree} </Text>
                                 </View>
                             </View>
-                            <View style={{ flexDirection: 'row', marginTop: 5 }}>
-                                <Text>Tache</Text>
-                                <View style={{ marginLeft: 'auto', }}>
-                                    <Text style={{ fontSize: 13, fontWeight: 'bold' }}>{planification.tache} </Text>
+                            <View style={{ flexDirection: 'row', marginLeft: 20, marginRight: 20, marginTop: 25 }}>
+                                <Text>Tache : </Text>
+                                <View style={{ marginLeft: 'auto', width: '80%' }}>
+                                    <Text>{planification.tache} </Text>
+                                </View>
+                            </View>
+                            <View style={{ flexDirection: 'row', marginLeft: 20, marginRight: 20, marginTop: 25 }}>
+                                <Text>Description : </Text>
+                                <View style={{ marginLeft: 'auto', width: '75%' }}>
+                                    <Text>{planification.description} </Text>
                                 </View>
                             </View>
                             <View style={{ marginTop: 25, marginBottom: 25 }}>
@@ -248,6 +275,7 @@ const ConfirmerPlanification = ({ route, navigation, timeStore }: Props) => {
                         records[i].fk_assignation = planification[i].employerPkId;
                         records[i].fk_client = planification[i].client;
                         records[i].fk_projet = planification[i].projet;
+                        records[i].Description = planification[i].description;
                         records[i].fk_activities = planification[i].activity;
                         records[i].Minutes_planifie = planification[i].duree;
                         records[i].fk_actif = "1";
@@ -271,6 +299,13 @@ const ConfirmerPlanification = ({ route, navigation, timeStore }: Props) => {
 
             <Button style={{ width: '100%', justifyContent: 'center', marginTop: 25, backgroundColor: 'red' }}
                 onPress={async () => {
+                    let heureFacturable = 0;
+                    for (let i = 0; i < SyncStorage.get('planification'); i++) {
+                        heureFacturable = parseFloat(heureFacturable) + parseFloat(SyncStorage.get('planification')[i].duree);
+                    }
+
+                    SyncStorage.set('heureFacturable', SyncStorage.get('heureFacturable') - heureFacturable)
+
                     SyncStorage.remove('planification');
                     navigation.goBack();
                 }}

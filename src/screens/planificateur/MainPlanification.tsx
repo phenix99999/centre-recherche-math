@@ -354,10 +354,10 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
                                         <Icon name="clockcircle" type="AntDesign" style={{ fontSize: 30, marginLeft: 2, color: '#1f4598' }} />
                                         <View>
                                             <Text style={{ marginLeft: 5, color: 'black', fontSize: 15, fontWeight: 'bold' }}>
-                                                {(SyncStorage.get('heureFacturable') + "/" + SyncStorage.get('budject'))}
+                                                {(SyncStorage.get('heureFacturable').toFixed(2) + "/" + SyncStorage.get('budject'))}
                                             </Text>
                                             <Text style={{ marginLeft: 5, color: parseFloat(SyncStorage.get('budject') - SyncStorage.get('heureFacturable')) > 0 ? 'green' : 'red', fontSize: 15, fontWeight: 'bold' }}>
-                                                Restant :  {parseFloat(SyncStorage.get('budject') - SyncStorage.get('heureFacturable') - getNbHeuresAssigner())}
+                                                Restant :  {(parseFloat(SyncStorage.get('budject') - SyncStorage.get('heureFacturable') - getNbHeuresAssigner())).toFixed(2)}
                                             </Text>
                                         </View>
 

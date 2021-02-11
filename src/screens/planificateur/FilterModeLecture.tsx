@@ -356,6 +356,7 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
                     setClient(0);
                     setProject(0);
                     setActivity(0);
+                    navigation.goBack();
                 }}
             >
                 <Text style={{ textAlign: 'center' }}>

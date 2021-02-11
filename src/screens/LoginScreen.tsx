@@ -138,13 +138,34 @@ const LoginScreen = ({ navigation, authStore }: Props) => {
                 <ImageBackground
                     source={require("../assets/images/accueil.png")}
                     style={styles.imgBackground}
-                    imageStyle={{ opacity: 1 }}
+                    imageStyle={{ opacity: '50%' }}
                 >
+                    <Header style={{ width: '100%', backgroundColor: 'transparent' }}>
+                        <Left>
+                            <Button
+                                onPress={() => {
+                                    navigation.goBack();
+                                }}
+                                transparent
+                            >
+                                <Icon name="back" type="AntDesign" style={{ fontSize: 30, marginLeft: 2, color: '#1f4598' }} >
+                                </Icon>
+                            </Button>
+                        </Left>
+                        <Body>
+                            <Text style={{ fontWeight: 'bold' }}> Portail </Text>
+                        </Body>
+                        <Right>
+
+                        </Right>
+                    </Header>
+
+
                     <Container style={{ flexGrow: 1, flex: 1, backgroundColor: 'transparent' }}>
 
                         <ScrollView style={{ width: "100%" }} contentContainerStyle={styles.content}>
                             <Content style={{ flexGrow: 1, flex: 1, flexDirection: "row" }}>
-                                <Title style={{ margin: 30 }}>Portail V-hicule Média</Title>
+
 
                                 <View style={[styles.subContainer, { justifyContent: "flex-start" }]}>
                                     <Form style={styles.form}>
@@ -156,7 +177,7 @@ const LoginScreen = ({ navigation, authStore }: Props) => {
 
                                         <TextInput
                                             placeholderTextColor="#404040"
-                                            style={{ height: 44, width: '90%', borderWidth: 0.5, borderColor: '#303030', padding: 15 }}
+                                            style={{ height: 45, width: 200, borderWidth: 0.5, borderColor: '#303030', padding: 7 }}
                                             value={authStore.username}
                                             onChange={(e) => (authStore.username = e.nativeEvent.text)}
                                             placeholder="Nom d'utilisateur"
@@ -171,7 +192,7 @@ const LoginScreen = ({ navigation, authStore }: Props) => {
                                             value={authStore.password}
                                             placeholder="Mot de passe"
                                             onChange={(e) => (authStore.password = e.nativeEvent.text)}
-                                            style={{ height: 44, width: '90%', borderWidth: 0.5, borderColor: '#303030', padding: 15, marginTop: 10 }}
+                                            style={{ marginTop: 10, height: 45, width: 200, borderWidth: 0.5, borderColor: '#303030', padding: 7 }}
 
                                         />
 
@@ -181,20 +202,12 @@ const LoginScreen = ({ navigation, authStore }: Props) => {
                                         onPress={async () => {
                                             await onLogin()
                                         }}
-                                        style={[styles.button]}
+
+                                        style={{ marginTop: 52, backgroundColor: "#1f4598", height: 40, width: '100%', borderWidth: 0.5, borderColor: '#303030', padding: 15 }}
                                     >
-                                        <Text> Se connecter</Text>
+                                        <Text> Connexion</Text>
                                     </Button>
 
-                                    <Button
-
-                                        onPress={() => {
-                                            navigation.goBack();
-                                        }}
-                                        style={[styles.button]}
-                                    >
-                                        <Text style={{ color: 'white' }}>Annuler</Text>
-                                    </Button>
                                 </View>
                             </Content>
                         </ScrollView>
@@ -203,7 +216,7 @@ const LoginScreen = ({ navigation, authStore }: Props) => {
             }
 
 
-        </Root>
+        </Root >
     );
 };
 export default inject("authStore")(observer(LoginScreen));
@@ -222,7 +235,7 @@ const styles = StyleSheet.create({
     imgBackground: {
         width: "100%",
         height: "100%",
-        alignItems: "center",
+
     },
     content: {
         flexDirection: "column",

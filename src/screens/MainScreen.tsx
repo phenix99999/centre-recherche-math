@@ -383,11 +383,11 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
                                     key={record.pk_ID}
                                 >
                                     <View style={{ flexDirection: 'row' }}>
-                                        <View style={{ width: '95%' }}>
+                                        <View style={{ width: '90%' }}>
                                             <Text>{record.AM_PM}</Text>
 
                                         </View>
-                                        <View style={{ width: '15%' }}>
+                                        <View >
                                             <Text>
                                                 <Text style={{ fontWeight: 'bold', color: "red" }}>
                                                     {record.Flag_replanif == 1 ? "R " : null}
