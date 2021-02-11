@@ -10,13 +10,14 @@ import React, { Component } from "react";
 import SyncStorage from 'sync-storage';
 import { Icon } from 'native-base';
 import { useFonts } from 'expo-font';
+import * as Font from 'expo-font';
 
 import {
   Modal,
   StyleSheet,
   ImageBackground,
   Text,
-
+  StatusBar,
   View,
   TextInput,
   TouchableOpacity,
@@ -31,6 +32,11 @@ class PageIntro extends Component {
   }
 
   componentDidMount() {
+    (async () => await Font.loadAsync({
+      Roboto: require('native-base/Fonts/Roboto.ttf'),
+      Roboto_medium: require('native-base/Fonts/Roboto_medium.ttf'),
+    }))();
+
     // alert("Component did mount");
   }
 
@@ -41,6 +47,7 @@ class PageIntro extends Component {
     return (
       <View style={{ height: '100%' }}>
 
+        <StatusBar hidden />
 
         <ImageBackground
           source={require("../assets/images/accueil.png")}

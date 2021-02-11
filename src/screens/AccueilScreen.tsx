@@ -43,7 +43,7 @@ class AccueilScreen extends Component {
 
 
         <Header
-          style={Platform.OS != 'ios' ? { backgroundColor: 'transparent', height: 80, justifyContent: 'center', top: 15 } : { backgroundColor: 'transparent' }}
+          style={Platform.OS != 'ios' ? { backgroundColor: 'transparent', height: 80, justifyContent: 'center' } : { backgroundColor: 'transparent' }}
         >
           <Left>
             <Button
@@ -59,7 +59,7 @@ class AccueilScreen extends Component {
           </Left>
 
           <Body>
-            <Text style={{ fontFamily: 'Arial', fontWeight: 'bold', color: '#1f4598' }}> Accueil </Text>
+            <Text style={{ fontWeight: 'bold', color: '#1f4598' }}> Accueil </Text>
           </Body>
 
           <Right>
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
 
   imgBackground: {
     flex: 1,
-    flexDirection: "column",
+    // flexDirection: "column",
   },
 
 });

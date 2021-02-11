@@ -97,14 +97,18 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
 
         let planification = SyncStorage.get("planification");
         for (let i = 0; i < feuilleTemps.length; i++) {
+            let minutes = feuilleTemps[i].Minutes;
+            if (!minutes) {
+                minutes = feuilleTemps[i].Minutes_planifie;
+            }
             if (feuilleTemps[i].AM_PM == "AM") {
                 if (findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation, employeListe) != -1) {
-                    employeListe[findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation, employeListe)].AM -= parseFloat(feuilleTemps[i].Minutes || 0);
+                    employeListe[findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation, employeListe)].AM -= parseFloat(minutes);
                 }
             } else {
                 if (findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation, employeListe) != -1) {
 
-                    employeListe[findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation, employeListe)].PM -= parseFloat(feuilleTemps[i].Minutes || 0);
+                    employeListe[findIndexOfEmployePk_ID(feuilleTemps[i].fk_assignation, employeListe)].PM -= parseFloat(minutes);
                 }
             }
         }
@@ -213,19 +217,30 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
                 </TouchableOpacity>
 
                 <TouchableOpacity onPress={() => {
-                    navigation.navigate("SauvegarderPlanification", { date: timeStore.selectedDate, nomComplet: item._C_nomComplet, pk_ID: item.pk_ID, periode: "AM" })
+                    if (item.AM > 0) {
+                        navigation.navigate("SauvegarderPlanification", { reste: item.AM, date: timeStore.selectedDate, nomComplet: item._C_nomComplet, pk_ID: item.pk_ID, periode: "AM" })
+                    } else {
+                        alert("Cet employé n'a plus de disponibilité en avant-midi");
+                    }
 
                 }
                 } style={{ width: '12%', backgroundColor: 'transparent' }}>
-                    <Text style={{ color: 'black' }}>{item.AM}</Text>
+                    <Text style={{ color: 'black' }}>{item.AM.toFixed(1)}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     onPress={() => {
-                        navigation.navigate("SauvegarderPlanification", { date: timeStore.selectedDate, nomComplet: item._C_nomComplet, pk_ID: item.pk_ID, periode: "PM" })
+
+                        if (item.PM > 0) {
+                            navigation.navigate("SauvegarderPlanification", { reste: item.PM, date: timeStore.selectedDate, nomComplet: item._C_nomComplet, pk_ID: item.pk_ID, periode: "PM" })
+                        } else {
+                            alert("Cet employé n'a plus de disponibilité en avant-midi");
+                        }
+
+
 
                     }}
                     style={{ width: '12%', backgroundColor: 'transparent' }}>
-                    <Text style={{ color: 'black' }}>{item.PM}</Text>
+                    <Text style={{ color: 'black' }}>{item.PM.toFixed(1)}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     onPress={() => {
@@ -233,7 +248,7 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
 
                     }}
                     style={{ width: '25%', backgroundColor: 'transparent' }}>
-                    <Text style={{ color: item.AM == "red" && item.PM == "red" ? "red" : "black" }} >{(item.AM + item.PM)}</Text>
+                    <Text style={{ color: item.AM == "red" && item.PM == "red" ? "red" : "black" }} >{(item.AM + item.PM).toFixed(1)}</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -325,7 +340,7 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
         render = (
             <Container style={{ flex: 1 }}>
                 <Header
-                    style={Platform.OS != 'ios' ? { backgroundColor: 'transparent', height: 80, justifyContent: 'center', top: 15 } : { backgroundColor: 'transparent' }}
+                    style={Platform.OS != 'ios' ? { backgroundColor: 'transparent', height: 80, justifyContent: 'center' } : { backgroundColor: 'transparent' }}
 
                 >
                     <Left>
@@ -354,10 +369,10 @@ const MainPlanification = ({ navigation, timeStore }: Props) => {
                                         <Icon name="clockcircle" type="AntDesign" style={{ fontSize: 30, marginLeft: 2, color: '#1f4598' }} />
                                         <View>
                                             <Text style={{ marginLeft: 5, color: 'black', fontSize: 15, fontWeight: 'bold' }}>
-                                                {(SyncStorage.get('heureFacturable').toFixed(2) + "/" + SyncStorage.get('budject'))}
+                                                {(parseFloat(SyncStorage.get('heureFacturable')).toFixed(2) + "/" + SyncStorage.get('budject'))}
                                             </Text>
                                             <Text style={{ marginLeft: 5, color: parseFloat(SyncStorage.get('budject') - SyncStorage.get('heureFacturable')) > 0 ? 'green' : 'red', fontSize: 15, fontWeight: 'bold' }}>
-                                                Restant :  {(parseFloat(SyncStorage.get('budject') - SyncStorage.get('heureFacturable') - getNbHeuresAssigner())).toFixed(2)}
+                                                Restant :  {(parseFloat(SyncStorage.get('budject') - SyncStorage.get('heureFacturable'))).toFixed(2)}
                                             </Text>
                                         </View>
 

@@ -71,6 +71,7 @@ const UneJourneeEmploye = ({ route, navigation, timeStore }: Props) => {
         let indexFeuilleTemps = 0;
         for (let i = 0; i < feuilleTempsTemp.length; i++) {
             if (feuilleTempsTemp[i].fk_assignation == route.params.pk_ID) {
+                console.log(feuilleTempsTemp[i]);
                 feuilleTemps[indexFeuilleTemps] = feuilleTempsTemp[i];
                 feuilleTemps[indexFeuilleTemps].planification = false;
                 indexFeuilleTemps++;
@@ -153,16 +154,16 @@ const UneJourneeEmploye = ({ route, navigation, timeStore }: Props) => {
                         <View>
                             <View style={styles.inputWrapper}>
                                 <Text style={{ color: feuilleTemps.planification ? "green" : "black" }}>Date: </Text>
-                                <View style={{ marginLeft: 'auto' }}>
+                                <View style={{ marginLeft: 'auto', width: '70%' }}>
                                     <Text style={{ color: feuilleTemps.planification ? "green" : "black" }}> {dateToFrench(new Date(feuilleTemps.StartDate))} </Text>
                                 </View>
                             </View>
 
 
-                            <View style={{ padding: 20 }}>
+                            <View style={styles.inputWrapper}>
 
                                 <Text style={{ color: feuilleTemps.planification ? "green" : "black" }}>Client & Projet :  </Text>
-                                <View style={{ marginLeft: 'auto' }}>
+                                <View style={{ marginLeft: 'auto', width: '70%' }}>
                                     <Text style={{ color: feuilleTemps.planification ? "green" : "black" }}>{feuilleTemps.Nom_projet} </Text>
                                 </View>
 
@@ -172,30 +173,37 @@ const UneJourneeEmploye = ({ route, navigation, timeStore }: Props) => {
 
 
 
-                            <View style={{ padding: 20 }}>
+                            <View style={styles.inputWrapper}>
                                 <Text style={{ color: feuilleTemps.planification ? "green" : "black" }}>Activité :  </Text>
-                                <View style={{ marginLeft: 'auto', }}>
-                                    <Text numberOfLines={0.5} ellipsizeMode='tail' style={{ color: feuilleTemps.planification ? "green" : "black" }}>{getActivitiesNameWithPkId(feuilleTemps.fk_activites)} </Text>
+                                <View style={{ marginLeft: 'auto', width: '70%' }}>
+                                    <Text numberOfLines={0.5} ellipsizeMode='tail' style={{ color: feuilleTemps.planification ? "green" : "black" }}>{feuilleTemps.Nom_activite} </Text>
                                 </View>
 
                             </View>
 
-                            <View style={{ flexDirection: 'row', padding: 20 }}>
+                            <View style={styles.inputWrapper}>
                                 <Text style={{ color: feuilleTemps.planification ? "green" : "black" }}>Période </Text>
-                                <View style={{ marginLeft: 'auto', }}>
+                                <View style={{ marginLeft: 'auto', width: '70%' }}>
                                     <Text style={{ color: feuilleTemps.planification ? "green" : "black" }}>{feuilleTemps.AM_PM} </Text>
                                 </View>
                             </View>
 
-                            <View style={{ flexDirection: 'row', padding: 20 }}>
+                            <View style={styles.inputWrapper}>
                                 <Text style={{ color: feuilleTemps.planification ? "green" : "black" }}>Nb d'heure :</Text>
-                                <View style={{ marginLeft: 'auto', }}>
+                                <View style={{ marginLeft: 'auto', width: '70%' }}>
                                     <Text style={{ color: feuilleTemps.planification ? "green" : "black" }}>{feuilleTemps.Minutes} </Text>
                                 </View>
                             </View>
-                            <View style={{ flexDirection: 'row', padding: 20 }}>
+
+                            <View style={styles.inputWrapper}>
+                                <Text style={{ color: feuilleTemps.planification ? "green" : "black" }}>Nb d'heure planifié :</Text>
+                                <View style={{ marginLeft: 'auto', width: '60%' }}>
+                                    <Text style={{ color: feuilleTemps.planification ? "green" : "black" }}>{feuilleTemps.Minutes_planifie} </Text>
+                                </View>
+                            </View>
+                            <View style={styles.inputWrapper}>
                                 <Text style={{ color: feuilleTemps.planification ? "green" : "black" }}>Tache</Text>
-                                <View style={{ marginLeft: 'auto', }}>
+                                <View style={{ marginLeft: 'auto', width: '70%' }}>
                                     <Text style={{ color: feuilleTemps.planification ? "green" : "black" }}>{feuilleTemps.Taches} </Text>
                                 </View>
                             </View>
@@ -230,7 +238,8 @@ const styles = StyleSheet.create({
     },
 
     inputWrapper: {
-        padding: 20,
+        marginLeft: 10,
+        marginTop: 5,
         flexDirection: 'row'
     },
     inputBorder: {

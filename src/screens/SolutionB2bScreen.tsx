@@ -41,7 +41,7 @@ class SolutionB2bScreen extends Component {
           imageStyle={{ opacity: 1 }}
         >
           <Header
-            style={Platform.OS != 'ios' ? { backgroundColor: 'transparent', height: 80, justifyContent: 'center', top: 15 } : { backgroundColor: 'transparent' }}
+            style={Platform.OS != 'ios' ? { backgroundColor: 'transparent', height: 80, justifyContent: 'center' } : { backgroundColor: 'transparent' }}
           >
             <Left>
               <Button
@@ -57,7 +57,7 @@ class SolutionB2bScreen extends Component {
             </Left>
 
             <Body>
-              <Text style={{ fontFamily: 'Arial', fontWeight: 'bold', color: '#1f4598' }}>B2B</Text>
+              <Text style={{ fontWeight: 'bold', color: '#1f4598' }}>B2B</Text>
             </Body>
 
             <Right>

@@ -18,49 +18,50 @@ import {
 } from "native-base";
 import RadioForm, { RadioButton, RadioButtonInput, RadioButtonLabel } from 'react-native-simple-radio-button';
 import SyncStorage from 'sync-storage';
-import { dateToFrench, getNotEmptyDates, getDaysInMonth,dateToFMDate } from "../utils/date";
+import { dateToFrench, getNotEmptyDates, getDaysInMonth, dateToFMDate } from "../utils/date";
 
 import * as React from "react";
-import { Alert, StyleSheet, Platform, View } from "react-native";
+import { Alert, StyleSheet, Platform, View,ActivityIndicator } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { CustomPickerRow, DetachedCustomPickerRow } from "../components/CustomPicker";
 import { Record, Client, Activite, Projet, Type_de_projet } from "../stores/FMObjectTypes";
 import TimeStore from "../stores/TimeStore";
 import { MainStackParamList } from "../types";
 import CrudResource from "../stores/FMMobxResource";
-import { get,add,edit,execScript } from '../utils/connectorFileMaker';
+import { get, add, edit, execScript } from '../utils/connectorFileMaker';
 import { create } from "mobx-persist";
 import { extendObservableObjectWithProperties } from "mobx/lib/internal";
 type Props = {
     timeStore: TimeStore;
 } & StackScreenProps<MainStackParamList, "Main">;
 
- 
+
 var radio_props = [
     { label: 'Oui', value: 1 },
     { label: 'Non', value: 0 },
 ];
 
 let formatedTaches = [
-"Analyse",
-"Gestion de projet",
-"Programmation",
-"Support",
-"Rencontre",
-"Appel téléphonique",
-"Améliorations continues",
-"Suivis",
-"Rédaction",
-"Pilotage",
-"Recherche",
-"Design",
+    "Analyse",
+    "Gestion de projet",
+    "Programmation",
+    "Support",
+    "Rencontre",
+    "Appel téléphonique",
+    "Améliorations continues",
+    "Suivis",
+    "Rédaction",
+    "Pilotage",
+    "Recherche",
+    "Design",
 ];
- 
 
-const TempsDetails = ({ route,navigation, timeStore }: Props) => {
+
+const TempsDetails = ({ route, navigation, timeStore }: Props) => {
     const editionMode = route.params.editionMode;
 
-    const [record,setRecord] = React.useState<Object>({});
+    const [record, setRecord] = React.useState<Object>({});
+    const [isLoading, setLoading] = React.useState<Boolean>(false);
 
     const [formatedActivities, setFormatedActivities] = React.useState<Object>([]);
     const [formatedClients, setFormatedClients] = React.useState<Object>([]);
@@ -71,68 +72,66 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
     const [activity, setActivity] = React.useState<Object>({});
     const [projectName, setProjectName] = React.useState<String>("");
     const [project, setProject] = React.useState<Object>({});
-    
+
     const [initialeValueFlagComplet, setInitialeValueFlagComplet] = React.useState<String>("");
     const [initialJobComplete, setInitialJobComplete] = React.useState<Number>();
     const [initialFacturable, setInitialFacturable] = React.useState<Number>();
     const [initialRd, setInitialRd] = React.useState<Number>();
 
 
-    
 
 
-    async function getProjects(fk_client){
+
+    async function getProjects(fk_client) {
         let username = SyncStorage.get('username');
         let password = SyncStorage.get('password');
-  
+
         let layoutProjet = "mobile_PROJETS2";
-               
+        
 
-        setFormatedProjects(await get(username, password,   global.fmServer, global.fmDatabase, layoutProjet,"&fk_client=" + fk_client  + "&flag_actif=1&-sortfield.1=Nom&-sortorder.1=ascend"));
+        setFormatedProjects(await get(username, password, global.fmServer, global.fmDatabase, layoutProjet, "&fk_client=" + fk_client + "&flag_actif=1&-sortfield.1=Nom&-sortorder.1=ascend"));
     }
 
-    async function getActivities(fk_projet){
+    async function getActivities(fk_projet) {
         let username = SyncStorage.get('username');
         let password = SyncStorage.get('password');
-    
+
         let db = "vhmsoft";
         let layoutActivite = "mobile_ACTIVITES2";
 
-        setFormatedActivities(await get(username, password,   global.fmServer,  global.fmDatabase, layoutActivite,"&flag_actif=1&fk_projet=" + fk_projet+"&-sortfield.1=Nom&-sortorder.1=ascend"));
+        setFormatedActivities(await get(username, password, global.fmServer, global.fmDatabase, layoutActivite, "&flag_actif=1&fk_projet=" + fk_projet + "&-sortfield.1=Nom&-sortorder.1=ascend"));
     }
 
 
-    async function setActivityData(fk_activites){
+    async function setActivityData(fk_activites,nomActivite) {
         let username = SyncStorage.get('username');
         let password = SyncStorage.get('password');
- 
+
         let db = "vhmsoft";
         let layoutActivite = "mobile_ACTIVITES2";
-        let activity = await get(username, password,   global.fmServer,  global.fmDatabase, layoutActivite,"&pk_ID=" + fk_activites);
-        setActivity(activity[0]);
-;
-        setActivityName(activity[0].Nom || "");
+      
+        setActivityName(nomActivite);
     }
 
 
-    async function setProjectData(fk_project){
+    async function setProjectData(fk_project) {
         let username = SyncStorage.get('username');
         let password = SyncStorage.get('password');
- 
+
         let db = "vhmsoft";
         let layoutActivite = "mobile_PROJETS2";
-  
-        let project = await get(username, password,   global.fmServer,  global.fmDatabase, layoutActivite,"&pk_ID=" + fk_project);
+
+        let project = await get(username, password, global.fmServer, global.fmDatabase, layoutActivite, "&pk_ID=" + fk_project);
         setProject(project[0]);
         setProjectName(project[0].Nom);
     }
 
     React.useEffect(() => {
         // alert(route.params.pk_ID);
-
+        setLoading(true);
         let username = SyncStorage.get('username');
         let password = SyncStorage.get('password');
-  
+
         let db = "vhmsoft";
 
         let layoutClient = "mobile_CLIENTS2";
@@ -140,137 +139,144 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
         let layoutActivite = "mobile_ACTIVITES2";
         let layoutTemps = "mobile_TEMPS2";
         let pk_ID;
-        if(editionMode == "update"){
- 
-             pk_ID = route.params.pk_ID;
-          
+        if (editionMode == "update") {
+
+            pk_ID = route.params.pk_ID;
+
         }
 
         const setDataToUpdate = async (pk_ID) => {
-      
-            if(editionMode == "update"){
-      
-                let theRecord = (await get(username, password, global.fmServer, global.fmDatabase, layoutTemps,"&pk_ID="+pk_ID));
-       
-               if(theRecord[0].fk_activites){
-                setActivityData(theRecord[0].fk_activites);
 
-               }
-                
-      
-                if(theRecord[0].Flag_termine == "1"){
-            
+            if (editionMode == "update") {
+
+                let theRecord = (await get(username, password, global.fmServer, global.fmDatabase, layoutTemps, "&pk_ID=" + pk_ID));
+
+                if (theRecord[0].fk_activites) {
+                    setActivityData(theRecord[0].fk_activites,theRecord[0].Nom_activite);
+
+                }
+
+
+                if (theRecord[0].Flag_termine == "1") {
+
                     setInitialJobComplete(0);
-           
-                } else if(theRecord[0].Flag_termine == "0"){
+
+                } else if (theRecord[0].Flag_termine == "0") {
                     setInitialJobComplete(1);
                 }
-    
-                if(theRecord[0].Flag_facturable == 1){
+
+                if (theRecord[0].Flag_facturable == 1) {
                     setInitialFacturable(0);
-                } else if(theRecord[0].Flag_facturable == 0){
+                } else if (theRecord[0].Flag_facturable == 0) {
                     setInitialFacturable(1);
                 }
 
 
-                if(theRecord[0].flag_R_et_D == "1"){
+                if (theRecord[0].flag_R_et_D == "1") {
                     setInitialRd(0);
-                } else if(theRecord[0].flag_R_et_D == "0"){
+                } else if (theRecord[0].flag_R_et_D == "0") {
                     setInitialRd(1);
-                } 
-   
+                }
+
                 setRecord(theRecord[0]);
-            } 
+            }
         };
 
-        const setData = async (username,password,server,db,layoutClient,layoutProjet,layoutActivite) => {
-            setFormatedClients(await get(username, password, server, db, layoutClient,"&pk_ID=>0&-sortfield.1=Nom&-sortorder.1=ascend"));
-            setFormatedProjects(await get(username, password, server, db, layoutProjet,"&flag_actif=1&-sortfield.1=Nom&-sortorder.1=ascend"));
+        const setData = async (username, password, server, db, layoutClient, layoutProjet, layoutActivite) => {
+            if(Platform.OS != "ios"){
+                setFormatedClients([{pk_ID:-1,Nom:'Choisissez un client',fk_client:-1}].concat(await get(username, password, server, db, layoutClient, "&pk_ID=>0&-sortfield.1=Nom&-sortorder.1=ascend")));
+            }else{
+                setFormatedClients((await get(username, password, server, db, layoutClient, "&pk_ID=>0&-sortfield.1=Nom&-sortorder.1=ascend")));
+
+            }
+            // setFormatedProjects(await get(username, password, server, db, layoutProjet, "&flag_actif=1&-sortfield.1=Nom&-sortorder.1=ascend"));
         };
-    
 
-        setData(username,password,  global.fmServer, global.fmDatabase,layoutClient,layoutProjet,layoutActivite);
-        if(editionMode == "update"){
-             setDataToUpdate(pk_ID);
 
-        }else {
-            setRecord({flag_R_et_D:0,Flag_facturable:1,Flag_termine:'1'});
+        setData(username, password, global.fmServer, global.fmDatabase, layoutClient, layoutProjet, layoutActivite);
+        if (editionMode == "update") {
+            setDataToUpdate(pk_ID);
+
+        } else {
+            setRecord({ flag_R_et_D: 0, Flag_facturable: 1, Flag_termine: '1' });
         }
+        setLoading(false);
+       
     }, []);
 
-    function addAndUpdateQuery(deleteVar=false){
-     let StartDate = dateToFMDate(timeStore.selectedDate);
-     let fk_assignation = SyncStorage.get('user').pk_ID;
-     let fk_client = record.fk_client;
-     let fk_projet = record.fk_projet;
-     let Minutes  = record.Minutes || "";
-     let Minutes_planifie = record.Minutes_planifie || "";
-     
-     let AM_PM = record.AM_PM || "";
-     let fk_activites = record.fk_activites || "";
-     let flag_actif = deleteVar == true ? 0 : 1;
-     let Description = record.Description || "";
-     let Flag_termine = record.Flag_termine;
+    function addAndUpdateQuery(deleteVar = false) {
+        let StartDate = dateToFMDate(timeStore.selectedDate);
+        let fk_assignation = SyncStorage.get('user').pk_ID;
+        let fk_client = record.fk_client;
+        let fk_projet = record.fk_projet;
+        let Minutes = record.Minutes || "";
+        let Minutes_planifie = record.Minutes_planifie || "";
 
-     let facturable = record.Flag_facturable;
-     let rd = record.flag_R_et_D;
-     let tache = record.Taches
-     let Minutes_restantes = record.Minutes_restantes || "";
-     let Minutes_restantes_tache = record.Minutes_restantes_tache || "";
+        let AM_PM = record.AM_PM || "";
+        let fk_activites = record.fk_activites || "";
+        let flag_actif = deleteVar == true ? 0 : 1;
+        let Description = record.Description || "";
+        let Flag_termine = record.Flag_termine;
 
-     return "&StartDate=" + StartDate + "&fk_assignation=" + fk_assignation +"&fk_client=" + fk_client +"&fk_projet=" + fk_projet+"&Taches=" + tache +"&Flag_facturable="+facturable+"&flag_R_et_D=" + rd
-     + "&Minutes="+Minutes+"&Minutes_planifie="+Minutes_planifie+"&AM_PM="+AM_PM+"&fk_activites="+fk_activites+"&flag_actif="+flag_actif+"&Description="+Description+"&Flag_termine=" + Flag_termine + "&Minutes_restantes=" + Minutes_restantes + "&Minutes_restantes_tache="+Minutes_restantes_tache;
+        let facturable = record.Flag_facturable;
+        let rd = record.flag_R_et_D;
+        let tache = record.Taches
+        let Minutes_restantes = record.Minutes_restantes || "";
+        let Minutes_restantes_tache = record.Minutes_restantes_tache || "";
+
+        return "&StartDate=" + StartDate + "&fk_assignation=" + fk_assignation + "&fk_client=" + fk_client + "&fk_projet=" + fk_projet + "&Taches=" + tache + "&Flag_facturable=" + facturable + "&flag_R_et_D=" + rd
+            + "&Minutes=" + Minutes + "&Minutes_planifie=" + Minutes_planifie + "&AM_PM=" + AM_PM + "&fk_activites=" + fk_activites + "&flag_actif=" + flag_actif + "&Description=" + Description + "&Flag_termine=" + Flag_termine + "&Minutes_restantes=" + Minutes_restantes + "&Minutes_restantes_tache=" + Minutes_restantes_tache;
 
     }
 
-  
 
-    async function create(){
+
+    async function create() {
         //  POUR AJOUTER
-     
 
-        if(!record.fk_client || !record.fk_projet || !record.fk_activites ){
+
+        if (!record.fk_client || !record.fk_projet || !record.fk_activites) {
             alert("Veuillez remplir le client,projet et activites s.v.p");
-        }else{
+        } else {
             let username = SyncStorage.get('username');
             let password = SyncStorage.get('password');
-            
- 
+
+
             let db = "vhmsoft";
-           
+
             let layoutTemps = "mobile_TEMPS2";
 
-           await add(username,password,global.fmServer,global.fmDatabase,layoutTemps,addAndUpdateQuery());
-           navigation.goBack();
-        } 
+            await add(username, password, global.fmServer, global.fmDatabase, layoutTemps, addAndUpdateQuery());
+            navigation.goBack();
+        }
     }
 
-    async function update(){
-         let username = SyncStorage.get('username');
-         let password = SyncStorage.get('password');
-         let db = "vhmsoft";
- 
-         let layoutTemps = "mobile_TEMPS2";
+    async function update() {
+        let username = SyncStorage.get('username');
+        let password = SyncStorage.get('password');
+        let db = "vhmsoft";
+
+        let layoutTemps = "mobile_TEMPS2";
         //  alert(record.Minutes_restantes_tache.length);
-        if(record.Minutes_restantes_tache.length < 5  && record.Flag_termine == 0){
+        if (record.Minutes_restantes_tache.length < 5 && record.Flag_termine == 0) {
             alert("Veuillez entrez une description de ce qui reste à accomplir s.v.p.")
             return false;
         } else {
-            await edit(username,password,global.fmServer,global.fmDatabase,layoutTemps,record['record-id'],addAndUpdateQuery());
-            if(record.Flag_termine == 0 && initialJobComplete == 1){
+            await edit(username, password, global.fmServer, global.fmDatabase, layoutTemps, record['record-id'], addAndUpdateQuery());
+            if (record.Flag_termine == 0 && initialJobComplete == 1) {
                 let scriptName = "replanification";
                 let scriptParam = record.pk_ID;
                 let username = SyncStorage.get('username');
                 let password = SyncStorage.get('password');
                 let layoutClient = "mobile_CLIENTS2";
 
-                execScript(username,password,global.fmServer,global.fmDatabase,layoutClient,scriptName,scriptParam);
-           
+                execScript(username, password, global.fmServer, global.fmDatabase, layoutClient, scriptName, scriptParam);
+
             }
             return true;
         }
     }
- 
+
     const computeColor = (activite?: Record<Activite>) => {
         //rouge si
         //Activite::Heures_budget_auto  >  Activite::Heures_budget
@@ -300,12 +306,23 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
 
 
     return (
-    
+
 
         <Container>
-        
-    <Header
-            style={Platform.OS != 'ios' ? { backgroundColor: 'transparent', height: 80, justifyContent: 'center', top: 15 } : { backgroundColor: 'transparent' }}
+            { isLoading ?
+                <View style={[styles.container, styles.horizontal]}>
+
+                    <ActivityIndicator size="large" color="black" />
+
+                </View>
+
+
+                :
+                <View style={{flex:1}}>
+
+     
+        <Header
+            style={Platform.OS != 'ios' ? { backgroundColor: 'transparent', height: 80, justifyContent: 'center' } : { backgroundColor: 'transparent' }}
             >
           
     
@@ -361,9 +378,9 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                 <View style={styles.inputWrapper}>
                     {editionMode == "update"  ? 
                     <Text>
-                Clients  :&nbsp;&nbsp;&nbsp;&nbsp;
-               
-                {formatedClients.find(client => client.pk_ID == record.fk_client)?.Nom}
+                                Clients  :&nbsp;&nbsp;&nbsp;&nbsp;
+                                 
+                {record.Nom_client}
             
                             </Text>
                        
@@ -371,14 +388,20 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                     :   
                     
                     <CustomPickerRow<Client>
+         
                     records={formatedClients}
                     valueKey={"pk_ID"}
                     getLabel={(client: Record<Client>) => client.Nom}
                     selectedValue={Number(record.fk_client)}
                     name={"Sélectionner Client"}
                     onChange={(value) => {
-                        setRecord({...record,"fk_client":value});
-                        getProjects(value);
+
+                        if(value !=-1){
+                            setRecord({...record,"fk_client":value});
+                            getProjects(value);
+                        }
+                     
+              
                      
                     }}
                     placeholder={"Client"}
@@ -389,9 +412,9 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
                    
                 {editionMode == "update" ? 
                <Text>
-               Projets  :&nbsp;&nbsp;&nbsp;&nbsp;
-     
-               {formatedProjects.find(project => project.pk_ID == record.fk_projet)?.Nom}
+                                Projets  :&nbsp;&nbsp;&nbsp;&nbsp;
+                                 
+               {record.Nom_projet}
 
                        </Text>
                 : 
@@ -416,9 +439,9 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
 
                 {editionMode == "update" ? 
                <Text>
-               Activités  :&nbsp;&nbsp;&nbsp;&nbsp;  
-   
-             {activityName}
+                                Activités  :&nbsp;&nbsp;&nbsp;&nbsp;  
+                                 
+          {record.Nom_activite}
                        </Text>
                 : 
 
@@ -442,7 +465,7 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
  
                     {editionMode == "update" ?
                         <Text>
-                            Tâches  :&nbsp;&nbsp;&nbsp;&nbsp;
+                                Tâches  :&nbsp;&nbsp;&nbsp;&nbsp;
 
                         {record.Taches}
                         </Text>
@@ -761,6 +784,9 @@ const TempsDetails = ({ route,navigation, timeStore }: Props) => {
             </View>
                 }
             </Content>
+            </View>
+            }
+            
         </Container>
     );
 };
@@ -773,7 +799,7 @@ const styles = StyleSheet.create({
 
     inputWrapper: {
         padding: 20,
-   
+
     },
     inputBorder: {
         borderWidth: 1,

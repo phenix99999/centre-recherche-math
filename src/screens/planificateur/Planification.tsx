@@ -81,9 +81,16 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
         // }
 
         const setData = async (username, password, server, db, layoutClient, layoutProjet, layoutActivite) => {
-            setFormatedClient(await get(username, password, server, db, layoutClient, "&pk_ID=>0&-sortfield.1=Nom&-sortorder.1=ascend"));
-            setFormatedProjects(await get(username, password, server, db, layoutProjet, "&flag_actif=1" + "&-sortfield.1=Nom&-sortorder.1=ascend"));
-            setFormatedActivities(await get(username, password, server, db, layoutActivite, "&flag_actif=1" + "&-sortfield.1=Nom&-sortorder.1=ascend"));
+            if (Platform.OS != "ios") {
+
+                setFormatedClient([{ pk_ID: -1, Nom: 'Choisissez un client', fk_client: -1 }].concat(await get(username, password, server, db, layoutClient, "&pk_ID=>0&-sortfield.1=Nom&-sortorder.1=ascend")));
+
+            } else {
+                setFormatedClient(await get(username, password, server, db, layoutClient, "&pk_ID=>0&-sortfield.1=Nom&-sortorder.1=ascend"));
+
+            }
+            // setFormatedProjects(await get(username, password, server, db, layoutProjet, "&flag_actif=1" + "&-sortfield.1=Nom&-sortorder.1=ascend"));
+            // setFormatedActivities(await get(username, password, server, db, layoutActivite, "&flag_actif=1" + "&-sortfield.1=Nom&-sortorder.1=ascend"));
         }
         setData(username, password, global.fmServer, global.fmDatabase, layoutClient, layoutProjet, layoutActivite);
 
@@ -200,7 +207,7 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
 
         setBudject(budgetTemp);
 
-        setFormatedProjects(tempFormatedProjects);
+        // setFormatedProjects(tempFormatedProjects);
 
         setFormatedActivities(tempFormatedActivities);
         setProject(Number(value));
@@ -227,7 +234,7 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
 
         <Container>
             <Header
-                style={Platform.OS != 'ios' ? { backgroundColor: 'transparent', height: 80, justifyContent: 'center', top: 15 } : { backgroundColor: 'transparent' }}
+                style={Platform.OS != 'ios' ? { backgroundColor: 'transparent', height: 80, justifyContent: 'center' } : { backgroundColor: 'transparent' }}
 
             >
                 <Left>
@@ -293,35 +300,41 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
 
                 <Button style={{ width: '100%', alignItems: 'center', justifyContent: 'center', padding: 40 }}
                     onPress={() => {
-                        if (!client || !project || !activity) {
-                            alert("Veuillez entrez un client,projet et activite");
+
+                        if (!budject || !heureFacturable) {
+                            alert("Ce client n'a pas d'heure disponible actuellement.");
                         } else {
-                            if (!pasDeBudject && heureFacturable / budject > 0.75) {
-                                alert("Il est impossible d'ajouter des heures pour ce client le budget a été atteint a plus de 75%");
+
+                            if (!client || !project || !activity) {
+                                alert("Veuillez entrez un client,projet et activite");
                             } else {
-                                SyncStorage.set('filterClient', client);
-                                SyncStorage.set('filterProject', project);
-                                SyncStorage.set('filterActivity', activity);
-
-                                SyncStorage.set('filterClientName', clientName);
-                                SyncStorage.set('filterProjectName', projectName);
-                                SyncStorage.set('filterActivityName', activityName);
-
-                                SyncStorage.set('pasDeBudget', pasDeBudject);
-                                SyncStorage.set('budject', budject)
-                                SyncStorage.set('heureFacturable', parseFloat(heureFacturable).toFixed(2));
-                                SyncStorage.set('modeRemplir', true);
-
-                                if (client && formatedProjects.length == 0) {
-                                    alert("Ce client n'a aucun projet actif.")
+                                if (!pasDeBudject && heureFacturable / budject > 0.75) {
+                                    alert("Il est impossible d'ajouter des heures pour ce client le budget a été atteint a plus de 75%");
                                 } else {
-                                    navigation.goBack();
+                                    SyncStorage.set('filterClient', client);
+                                    SyncStorage.set('filterProject', project);
+                                    SyncStorage.set('filterActivity', activity);
+
+                                    SyncStorage.set('filterClientName', clientName);
+                                    SyncStorage.set('filterProjectName', projectName);
+                                    SyncStorage.set('filterActivityName', activityName);
+
+                                    SyncStorage.set('pasDeBudget', pasDeBudject);
+                                    SyncStorage.set('budject', budject)
+                                    SyncStorage.set('heureFacturable', parseFloat(heureFacturable).toFixed(2));
+                                    SyncStorage.set('modeRemplir', true);
+
+                                    if (client && formatedProjects.length == 0) {
+                                        alert("Ce client n'a aucun projet actif.")
+                                    } else {
+                                        navigation.goBack();
+                                    }
                                 }
+
                             }
-
                         }
-                    }
 
+                    }
 
 
                     }

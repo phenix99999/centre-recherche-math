@@ -42,7 +42,7 @@ class SolutionScreen extends Component {
           imageStyle={{ opacity: 1 }}
         >
           <Header
-            style={Platform.OS != 'ios' ? { backgroundColor: 'transparent', height: 80, justifyContent: 'center', top: 15 } : { backgroundColor: 'transparent' }}
+            style={Platform.OS != 'ios' ? { backgroundColor: 'transparent', height: 80, justifyContent: 'center', borderWidth: 0 } : { backgroundColor: 'transparent' }}
 
           >
             <Left>
@@ -59,7 +59,7 @@ class SolutionScreen extends Component {
             </Left>
 
             <Body>
-              <Text style={{ fontFamily: 'Arial', fontWeight: 'bold', color: '#1f4598' }}>Clients</Text>
+              <Text style={{ fontWeight: 'bold', color: '#1f4598' }}>Clients</Text>
             </Body>
 
             <Right>
@@ -79,10 +79,10 @@ class SolutionScreen extends Component {
 
             <View style={{ width: '100%', height: 60, backgroundColor: '#1f4598' }}>
               <View style={{ padding: 10 }}>
-                <Text style={{ color: 'white', fontFamily: "Arial", fontSize: 15, fontWeight: 'bold' }}>
+                <Text style={{ color: 'white', fontSize: 15, fontWeight: 'bold' }}>
                   V-hicule Média dessert une clientèle variée dans les secteurs public et privé.
 </Text>
-                <Text style={{ color: 'white', fontFamily: "Arial", fontSize: 15 }}>
+                <Text style={{ color: 'white', fontSize: 15 }}>
 
                 </Text>
               </View>

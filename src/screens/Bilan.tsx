@@ -114,7 +114,7 @@ const Bilan = ({ navigation, timeStore }: Props) => {
         render = (
             <Container style={{ flex: 1 }}>
                 <Header
-                    style={Platform.OS != 'ios' ? { backgroundColor: 'transparent', height: 80, justifyContent: 'center', top: 15 } : { backgroundColor: 'transparent' }}
+                    style={Platform.OS != 'ios' ? { backgroundColor: 'transparent', height: 80, justifyContent: 'center' } : { backgroundColor: 'transparent' }}
                 >
                     <Left>
                         <Button

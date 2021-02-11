@@ -144,7 +144,7 @@ const ConfirmerPlanification = ({ route, navigation, timeStore }: Props) => {
                         <Icon name="clockcircle" type="AntDesign" style={{ fontSize: 30, marginLeft: 2, color: '#1f4598' }} />
                         <View style={{ justifyContent: 'center' }}>
                             <Text style={{ marginLeft: 5, color: 'black', fontSize: 15, fontWeight: 'bold' }}>
-                                {(SyncStorage.get('heureFacturable').toFixed(2) + "/" + SyncStorage.get('budject'))}
+                                {(parseFloat(SyncStorage.get('heureFacturable')).toFixed(2) + "/" + SyncStorage.get('budject'))}
                             </Text>
 
                         </View>
@@ -229,6 +229,8 @@ const ConfirmerPlanification = ({ route, navigation, timeStore }: Props) => {
                                             if (planificationStorage[i].index != planification.index) {
                                                 newPlanification[indexNewPlanification] = planificationStorage[i];
                                                 indexNewPlanification++;
+                                            } else {
+                                                SyncStorage.set('heureFacturable', SyncStorage.get('heureFacturable') - planificationStorage[i].duree)
                                             }
                                         }
 
@@ -299,12 +301,15 @@ const ConfirmerPlanification = ({ route, navigation, timeStore }: Props) => {
 
             <Button style={{ width: '100%', justifyContent: 'center', marginTop: 25, backgroundColor: 'red' }}
                 onPress={async () => {
+
                     let heureFacturable = 0;
-                    for (let i = 0; i < SyncStorage.get('planification'); i++) {
+                    for (let i = 0; i < SyncStorage.get('planification').length; i++) {
+                        console.log("DUREE " + SyncStorage.get('planification')[i].duree);
                         heureFacturable = parseFloat(heureFacturable) + parseFloat(SyncStorage.get('planification')[i].duree);
                     }
 
-                    SyncStorage.set('heureFacturable', SyncStorage.get('heureFacturable') - heureFacturable)
+
+                    SyncStorage.set('heureFacturable', parseFloat(SyncStorage.get('heureFacturable') - heureFacturable))
 
                     SyncStorage.remove('planification');
                     navigation.goBack();

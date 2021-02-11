@@ -59,7 +59,7 @@ class SolutionMobileScreen extends Component {
             </Left>
 
             <Body>
-              <Text style={{ fontFamily: 'Arial', fontWeight: 'bold', color: '#1f4598' }}>Solutions</Text>
+              <Text style={{ fontWeight: 'bold', color: '#1f4598' }}>Solutions</Text>
             </Body>
 
             <Right>

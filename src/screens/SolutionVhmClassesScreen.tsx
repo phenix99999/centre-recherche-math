@@ -17,7 +17,7 @@ import {
   Modal,
   StyleSheet,
   ImageBackground,
-
+  Platform,
 
   View,
   TextInput,
@@ -42,7 +42,9 @@ class SolutionMobileScreen extends Component {
           style={styles.imgBackground}
           imageStyle={{ opacity: 1 }}
         >
-          <Header style={{ backgroundColor: 'transparent' }}>
+          <Header
+            style={Platform.OS != 'ios' ? { backgroundColor: 'transparent', height: 80, justifyContent: 'center' } : null}
+          >
             <Left>
               <Button
                 transparent
@@ -57,7 +59,7 @@ class SolutionMobileScreen extends Component {
             </Left>
 
             <Body>
-              <Text style={{ fontFamily: 'Arial', fontWeight: 'bold', color: '#1f4598' }}>VHM Classes</Text>
+              <Text style={{ fontWeight: 'bold', color: '#1f4598' }}>VHM Classes</Text>
             </Body>
 
             <Right>
@@ -75,19 +77,19 @@ class SolutionMobileScreen extends Component {
           <View style={{ flex: 1 }}>
             <View style={{ flexDirection: 'row', marginLeft: 2, marginRight: 2, marginBottom: 4 }}>
               <Text style={{ fontSize: 24, fontWeight: 'bold' }}>
-              Nous développons des modules externes pour les programmeurs
+                Nous développons des modules externes pour les programmeurs
               </Text>
             </View>
             <View style={{ maxHeight: 250, padding: 8 }}>
               <Text>Afin de faciliter le développement rapide, nous avons créé une gamme de modules et applications disponibles pour les plateformes Xojo et Claris FileMaker. Que ce soit pour publier votre base de données Claris rapidement sur le Web , ou pour accéder à des Web services ou encore pour des solutions de LoadBalancing.
               </Text>
-        
+
             </View>
             <View style={{ alignItems: 'center', maxHeight: 150 }}>
               <Image source={require("../assets/images/developpementnatif.png")} style={{ width: 400, maxHeight: 150 }} resizeMode={'contain'} />
 
             </View>
-         
+
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
               <Button style={{ backgroundColor: '#1f4598' }}>
                 <Text>
@@ -95,7 +97,7 @@ class SolutionMobileScreen extends Component {
                   </Text>
               </Button>
             </View>
- 
+
           </View>
 
 

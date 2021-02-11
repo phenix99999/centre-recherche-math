@@ -16,6 +16,7 @@ import { setReactionScheduler } from "mobx/lib/internal";
 import { useIsFocused } from "@react-navigation/native";
 import NetworkUtils from '../utils/NetworkUtils';
 
+
 import { Badge } from 'react-native-paper';
 type Props = {
     timeStore: TimeStore;
@@ -127,7 +128,6 @@ const MainScreen = ({ navigation, timeStore }: Props) => {
     const isFocused = useIsFocused();
 
     React.useEffect(() => {
-
         const setDataEmploye = async (username, password, server, db, month, year, nbJourMois) => {
             setFormatedDataEmploye(await get(username, password, server, db, layoutTemps
                 , "&fk_assignation=" + fk_assignation + "&flag_actif=1&StartDate=" + month + "/1/" + year + "..." + month + "/" + nbJourMois + "/" + year));

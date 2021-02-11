@@ -22,7 +22,7 @@ import { dateToFrench, getNotEmptyDates, getDaysInMonth, dateToFMDate } from "..
 import NetworkUtils from '../../utils/NetworkUtils';
 
 import * as React from "react";
-import { Alert, StyleSheet, unstable_batchedUpdates, View } from "react-native";
+import { Alert, StyleSheet, Platform, View } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { CustomPickerRow, DetachedCustomPickerRow } from "../../components/CustomPicker";
 import { Record, Client, Activite, Projet, Type_de_projet } from "../../stores/FMObjectTypes";
@@ -133,7 +133,9 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
 
 
         <Container>
-            <Header>
+            <Header
+                style={Platform.OS != 'ios' ? { backgroundColor: 'transparent', height: 80, justifyContent: 'center' } : { backgroundColor: 'transparent' }}
+            >
                 <Left>
                     <Button
                         onPress={() => {
@@ -156,7 +158,7 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
                         <Icon name="clockcircle" type="AntDesign" style={{ fontSize: 30, marginLeft: 2, color: '#1f4598' }} />
                         <View style={{ justifyContent: 'center' }}>
                             <Text style={{ marginLeft: 5, color: 'black', fontSize: 15, fontWeight: 'bold' }}>
-                                {(SyncStorage.get('heureFacturable').toFixed(2) + "/" + SyncStorage.get('budject'))}
+                                {(parseFloat(SyncStorage.get('heureFacturable')).toFixed(2) + "/" + SyncStorage.get('budject'))}
                             </Text>
 
                         </View>
@@ -222,7 +224,23 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
                         <TextInput
                             keyboardType='numeric'
                             value={heure}
-                            onChange={(e) => (setHeure(e.nativeEvent.text))}
+                            onChange={(e) => {
+                                // alert(parseFloat(SyncStorage.get('budject') - SyncStorage.get('heureFacturable')));
+                                if (parseFloat(e.nativeEvent.text) > (parseFloat(SyncStorage.get('budject') - SyncStorage.get('heureFacturable')))) {
+                                    alert("Vous pouvez entrez un maximum de " + parseFloat(SyncStorage.get('budject') - SyncStorage.get('heureFacturable')).toFixed(2) + " heure.");
+                                    setHeure(parseFloat(SyncStorage.get('budject') - SyncStorage.get('heureFacturable')).toFixed(2));
+                                } else {
+                                    if (e.nativeEvent.text > route.params.reste) {
+                                        alert("Vous pouvez entrez un maximum de " + route.params.reste + " heure.");
+                                        setHeure("");
+                                    } else {
+                                        (setHeure(e.nativeEvent.text))
+                                    }
+                                }
+
+
+                            }
+                            }
                             placeholder="Nombre d'heure"
                         />
                     </View>
@@ -248,9 +266,9 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
                     <Textarea
                         placeholder={"Écrivez la description ici"}
                         bordered
-                        underline
+
                         style={styles.inputBorder}
-                        rowSpan={5}
+                        rowSpan={3}
                         value={description}
                         onChangeText={(text) => {
                             setDescription(text);
@@ -260,7 +278,7 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
             </Content>
 
 
-            <Button style={{ width: '100%', justifyContent: 'center', backgroundColor: '#1f4598' }}
+            <Button style={{ marginTop: 50, width: '100%', justifyContent: 'center', backgroundColor: '#1f4598' }}
                 onPress={async () => {
                     // SyncStorage.remove('planification');
                     let planification = SyncStorage.get('planification');
@@ -281,7 +299,8 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
                         planification[0].tache = tache;
                         planification[0].description = description;
                         planification[0].index = 0;
-                        SyncStorage.set('heureFacturable', (parseFloat(SyncStorage.get('heureFacturable') + parseFloat(heure))));
+
+                        SyncStorage.set('heureFacturable', parseFloat(parseFloat(SyncStorage.get('heureFacturable')) + parseFloat(heure)));
                     } else {
                         let planificationLength = (planification.length);
                         planification[planificationLength] = {};
@@ -300,7 +319,9 @@ const SauvegarderPlanification = ({ route, navigation, timeStore }: Props) => {
                         planification[planificationLength].tache = tache;
                         planification[planificationLength].description = description;
                         planification[planificationLength].index = planificationLength;
-                        SyncStorage.set('heureFacturable', (parseFloat(SyncStorage.get('heureFacturable') + parseFloat(heure))));
+
+
+                        SyncStorage.set('heureFacturable', parseFloat(parseFloat(SyncStorage.get('heureFacturable')) + parseFloat(heure)));
 
                     }
                     SyncStorage.set('planification', planification);

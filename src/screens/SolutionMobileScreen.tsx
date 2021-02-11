@@ -42,7 +42,7 @@ class SolutionMobileScreen extends Component {
           style={styles.imgBackground}
           imageStyle={{ opacity: 1 }}
         >
-          <Header style={Platform.OS != 'ios' ? { backgroundColor: 'transparent', height: 80, justifyContent: 'center', top: 15 } : { backgroundColor: 'transparent' }}>
+          <Header style={Platform.OS != 'ios' ? { backgroundColor: 'transparent', height: 80, justifyContent: 'center' } : { backgroundColor: 'transparent' }}>
             <Left>
               <Button
                 transparent
@@ -57,7 +57,7 @@ class SolutionMobileScreen extends Component {
             </Left>
 
             <Body>
-              <Text style={{ fontSize: 15, fontFamily: 'Arial', fontWeight: 'bold', color: '#1f4598' }}>
+              <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#1f4598' }}>
                 Android & Ios
               </Text>
             </Body>
@@ -70,7 +70,7 @@ class SolutionMobileScreen extends Component {
 
                 }}
               >
-                <Icon name="menu" type={"MaterialIcons"} style={{ fontSize: 30, marginLeft: 2, color: '#1f4598' }} />
+                <Icon name="menu" type={"MaterialIcons"} style={{ fontSize: 30, marginLeft: 2, color: 'white' }} />
               </Button>
             </Right>
           </Header>

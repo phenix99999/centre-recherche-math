@@ -43,7 +43,7 @@ class SupportScreen extends Component {
                 style={styles.imgBackground}
                 imageStyle={{ opacity: 1 }}
             >
-                <Header style={Platform.OS != 'ios' ? { backgroundColor: 'transparent', height: 80, justifyContent: 'center', top: 15 } : { backgroundColor: 'transparent' }}
+                <Header style={Platform.OS != 'ios' ? { backgroundColor: 'transparent', height: 80, justifyContent: 'center' } : { backgroundColor: 'transparent' }}
                 >
                     <Left>
                         <Button
@@ -59,7 +59,7 @@ class SupportScreen extends Component {
                     </Left>
 
                     <Body>
-                        <Text style={{ fontFamily: 'Arial', fontWeight: 'bold', color: '#1f4598' }}>Support</Text>
+                        <Text style={{ fontWeight: 'bold', color: '#1f4598' }}>Support</Text>
                     </Body>
 
                     <Right>

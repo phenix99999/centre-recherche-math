@@ -23,7 +23,7 @@ import NetworkUtils from '../../utils/NetworkUtils';
 import ProgressCircle from 'react-native-progress-circle'
 
 import * as React from "react";
-import { Alert, StyleSheet, unstable_batchedUpdates, View, ScrollView } from "react-native";
+import { Alert, StyleSheet, unstable_batchedUpdates, View, Platform } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { CustomPickerRow, DetachedCustomPickerRow } from "../../components/CustomPicker";
 import { Record, Client, Activite, Projet, Type_de_projet } from "../../stores/FMObjectTypes";
@@ -80,13 +80,25 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
 
         // }
         const getListEmployes = async () => {
-            setFormatedEmploye(await get(username, password, global.fmServer, global.fmDatabase, layoutAccount, "&PrivilegeSet=0"));
+            if (Platform.OS != "ios") {
+                setFormatedEmploye([{ pk_ID: -1, UserAccountName: 'Choisissez un employé' }].concat(await get(username, password, global.fmServer, global.fmDatabase, layoutAccount, "&PrivilegeSet=0")));
+
+            } else {
+                setFormatedEmploye(await get(username, password, global.fmServer, global.fmDatabase, layoutAccount, "&PrivilegeSet=0"));
+
+            }
+
         }
 
         const setData = async (username, password, server, db, layoutClient, layoutProjet, layoutActivite) => {
-            setFormatedClient(await get(username, password, server, db, layoutClient, "&pk_ID=>0&-sortfield.1=Nom&-sortorder.1=ascend"));
-            setFormatedProjects(await get(username, password, server, db, layoutProjet, "&flag_actif=1" + "&-sortfield.1=Nom&-sortorder.1=ascend"));
-            setFormatedActivities(await get(username, password, server, db, layoutActivite, "&flag_actif=1" + "&-sortfield.1=Nom&-sortorder.1=ascend"));
+            if (Platform.OS != "ios") {
+                setFormatedClient([{ pk_ID: -1, Nom: 'Choisissez un client', fk_client: -1 }].concat(await get(username, password, server, db, layoutClient, "&pk_ID=>0&-sortfield.1=Nom&-sortorder.1=ascend")));
+            } else {
+                setFormatedClient(await get(username, password, server, db, layoutClient, "&pk_ID=>0&-sortfield.1=Nom&-sortorder.1=ascend"));
+
+            }
+            // setFormatedProjects(await get(username, password, server, db, layoutProjet, "&flag_actif=1" + "&-sortfield.1=Nom&-sortorder.1=ascend"));
+            // setFormatedActivities(await get(username, password, server, db, layoutActivite, "&flag_actif=1" + "&-sortfield.1=Nom&-sortorder.1=ascend"));
         }
 
         setData(username, password, global.fmServer, global.fmDatabase, layoutClient, layoutProjet, layoutActivite);
@@ -215,7 +227,6 @@ const TempsDetailsFilter = ({ route, navigation, timeStore }: Props) => {
         }
         setBudject(budgetTemp);
 
-        setFormatedProjects(tempFormatedProjects);
 
         setFormatedActivities(tempFormatedActivities);
         setProject(Number(value));

@@ -16,6 +16,7 @@ import { Container, Header, Button, Right, Left, Body, Icon, Text } from "native
 import {
   Modal,
   StyleSheet,
+  Platform,
   ImageBackground,
   View,
   TextInput,
@@ -40,7 +41,9 @@ class SolutionSanteScreen extends Component {
           style={styles.imgBackground}
           imageStyle={{ opacity: 1 }}
         >
-          <Header style={{ backgroundColor: 'transparent' }}>
+          <Header
+            style={Platform.OS != 'ios' ? { backgroundColor: 'transparent', height: 80, justifyContent: 'center' } : null}
+          >
             <Left>
               <Button
                 transparent
@@ -55,7 +58,7 @@ class SolutionSanteScreen extends Component {
             </Left>
 
             <Body>
-              <Text style={{ fontFamily: 'Arial', fontWeight: 'bold', color: '#1f4598' }}>              Informatique en Santé</Text>
+              <Text style={{ fontWeight: 'bold', color: '#1f4598' }}>Santé</Text>
             </Body>
 
             <Right>
@@ -83,19 +86,19 @@ class SolutionSanteScreen extends Component {
               </Text>
 
             </View>
-            <View style={{ alignItems: 'center', maxHeight: 250,backgroundColor:'white' }}>
+            <View style={{ alignItems: 'center', maxHeight: 250, backgroundColor: 'white' }}>
               <Image source={require("../assets/images/clientssantes.png")} style={{ width: 400, maxHeight: 245 }} resizeMode={'contain'} />
 
             </View>
             <View style={{ padding: 8 }}>
-              <Unorderedlist><Text style={{ fontWeight: 'bold',color:'white' }}>CRDS LLL (Laval-Laurentides-Lanaudière)</Text></Unorderedlist>
-              <Unorderedlist><Text style={{ fontWeight: 'bold',color:'white' }}>CRDS Montérégie</Text></Unorderedlist>
-              <Unorderedlist><Text style={{ fontWeight: 'bold',color:'white' }}>CRDS Gaspésie</Text></Unorderedlist>
-              <Unorderedlist><Text style={{ fontWeight: 'bold',color:'white' }}>
+              <Unorderedlist><Text style={{ fontWeight: 'bold', color: 'black' }}>CRDS LLL (Laval-Laurentides-Lanaudière)</Text></Unorderedlist>
+              <Unorderedlist><Text style={{ fontWeight: 'bold', color: 'black' }}>CRDS Montérégie</Text></Unorderedlist>
+              <Unorderedlist><Text style={{ fontWeight: 'bold', color: 'black' }}>CRDS Gaspésie</Text></Unorderedlist>
+              <Unorderedlist><Text style={{ fontWeight: 'bold', color: 'black' }}>
                 Portail MD répondants</Text></Unorderedlist>
 
             </View>
-       
+
 
           </View>
 

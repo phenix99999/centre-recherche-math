@@ -41,7 +41,7 @@ class AccueilScreen extends Component {
         imageStyle={{ opacity: 1 }}
       >
 
-        <Header style={Platform.OS != 'ios' ? { backgroundColor: 'transparent', height: 80, justifyContent: 'center', top: 15 } : { backgroundColor: 'transparent' }}>
+        <Header style={Platform.OS != 'ios' ? { backgroundColor: 'transparent', height: 80, justifyContent: 'center' } : { backgroundColor: 'transparent' }}>
           <Left>
             <Button
               transparent
@@ -56,7 +56,7 @@ class AccueilScreen extends Component {
           </Left>
 
           <Body>
-            <Text style={{ fontFamily: 'Arial', fontWeight: 'bold', color: '#1f4598' }}> Solutions </Text>
+            <Text style={{ fontWeight: 'bold', color: '#1f4598' }}> Solutions </Text>
           </Body>
 
           <Right>

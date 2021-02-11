@@ -27,10 +27,12 @@ import {
     Input,
     Spinner,
 } from "native-base";
-import { Image, ImageBackground, RefreshControl, ScrollView, View, TextInput, Keyboard, ActivityIndicator } from "react-native";
+import { Image, ImageBackground, RefreshControl, ScrollView, View, TextInput, Keyboard, ActivityIndicator, StatusBar, Platform, NativeModules } from "react-native";
 import AuthStore from "../stores/AuthStore";
 import { authentification, get } from '../utils/connectorFileMaker';
 import NetworkUtils from '../utils/NetworkUtils';
+
+const { StatusBarManager } = NativeModules;
 type Props = {
     authStore: AuthStore;
 } & StackScreenProps<RootStackParamList, "Logout">;
@@ -108,6 +110,10 @@ const LoginScreen = ({ navigation, authStore }: Props) => {
 
 
     React.useEffect(() => {
+        // alert(StatusBarManager.HEIGHT);
+
+
+        // alert(StatusBar.currentHeight);
         if (SyncStorage.get('username')) {
             authStore.username = SyncStorage.get('username');
         }
@@ -138,7 +144,7 @@ const LoginScreen = ({ navigation, authStore }: Props) => {
                 <ImageBackground
                     source={require("../assets/images/accueil.png")}
                     style={styles.imgBackground}
-                    imageStyle={{ opacity: '50%' }}
+
                 >
                     <Header style={{ width: '100%', backgroundColor: 'transparent' }}>
                         <Left>
