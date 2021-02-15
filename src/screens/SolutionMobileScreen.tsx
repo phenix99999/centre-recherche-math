@@ -88,8 +88,8 @@ class SolutionMobileScreen extends Component {
               </Text>
 
             </View>
-            <View style={{ alignItems: 'center', maxHeight: 150, backgroundColor: 'white' }}>
-              <Image source={require("../assets/images/developpementnatif.png")} style={{ width: 400, maxHeight: 150 }} resizeMode={'contain'} />
+            <View style={{ alignItems: 'center', maxHeight: 300, backgroundColor: 'white' }}>
+              <Image source={require("../assets/images/developpementnatif.png")} style={{ width: 400, maxHeight: 300 }} resizeMode={'contain'} />
 
             </View>
             <View style={{ padding: 8, marginTop: 24 }}>

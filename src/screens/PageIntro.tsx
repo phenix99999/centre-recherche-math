@@ -55,10 +55,11 @@ class PageIntro extends Component {
           imageStyle={{ opacity: 1 }}
         >
           <Image
-            style={{ width: '50%' }}
+            style={{ width: '50%', top: 25 }}
             resizeMode={"contain"}
             source={require("../assets/images/vhiculeMedia.png")}
           />
+
           <TouchableOpacity
             style={styles.accueil}
             onPress={() => {
@@ -203,9 +204,10 @@ const styles = StyleSheet.create({
     borderTopColor: "transparent",
   },
   accueil: {
+    top: 50,
     marginTop: 10,
     backgroundColor: '#1C1E53',
-    width: '75%',
+    width: '50%',
     height: 50,
     justifyContent: 'center',
     borderColor: 'black',
@@ -213,9 +215,10 @@ const styles = StyleSheet.create({
   },
 
   support: {
+    top: 50,
     marginTop: 10,
     backgroundColor: 'white',
-    width: '75%',
+    width: '50%',
     height: 50,
     justifyContent: 'center',
     borderColor: 'black',
@@ -223,9 +226,10 @@ const styles = StyleSheet.create({
   },
 
   solutions: {
+    top: 50,
     marginTop: 10,
     backgroundColor: 'white',
-    width: '75%',
+    width: '50%',
     height: 50,
     justifyContent: 'center',
     borderColor: 'black',
@@ -242,7 +246,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     backgroundColor: '#1C1E53',
     marginTop: 10,
-    width: '75%',
+    width: '50%',
     height: 50,
     justifyContent: 'center',
     borderColor: 'black',

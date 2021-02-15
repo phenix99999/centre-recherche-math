@@ -22,6 +22,7 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
+  ScrollView,
 } from "react-native";
 
 
@@ -86,10 +87,6 @@ class SolutionSanteScreen extends Component {
               </Text>
 
             </View>
-            <View style={{ alignItems: 'center', maxHeight: 250, backgroundColor: 'white' }}>
-              <Image source={require("../assets/images/clientssantes.png")} style={{ width: 400, maxHeight: 245 }} resizeMode={'contain'} />
-
-            </View>
             <View style={{ padding: 8 }}>
               <Unorderedlist><Text style={{ fontWeight: 'bold', color: 'black' }}>CRDS LLL (Laval-Laurentides-Lanaudière)</Text></Unorderedlist>
               <Unorderedlist><Text style={{ fontWeight: 'bold', color: 'black' }}>CRDS Montérégie</Text></Unorderedlist>
@@ -98,6 +95,37 @@ class SolutionSanteScreen extends Component {
                 Portail MD répondants</Text></Unorderedlist>
 
             </View>
+            <View>
+
+            </View>
+            <ScrollView contentContainerStyle={{ top: 25, borderWidth: 0, borderColor: '#DDE9F9' }} >
+              <View style={{ flexDirection: 'row', padding: 30, backgroundColor: 'white', alignItems: 'center', justifyContent: 'center' }} >
+                {/* <Text> HEllo</Text> */}
+                <Image source={require('../assets/images/clients/c1.png')} style={{ width: '80%', maxHeight: 300 }} resizeMode={'contain'} />
+
+              </View>
+              <View style={{ flexDirection: 'row', padding: 20, backgroundColor: 'white', alignItems: 'center', justifyContent: 'center' }} >
+                {/* <Text> HEllo</Text> */}
+                <Image source={require('../assets/images/clients/c2.png')} style={{ width: '80%', maxHeight: 300 }} resizeMode={'contain'} />
+              </View>
+
+              <View style={{ flexDirection: 'row', padding: 20, backgroundColor: 'white', alignItems: 'center', justifyContent: 'center' }} >
+                {/* <Text> HEllo</Text> */}
+                <Image source={require('../assets/images/clients/c3.jpg')} style={{ width: '80%', maxHeight: 300 }} resizeMode={'contain'} />
+              </View>
+              <View style={{ flexDirection: 'row', padding: 20, backgroundColor: 'white', alignItems: 'center', justifyContent: 'center' }} >
+                {/* <Text> HEllo</Text> */}
+                <Image source={require('../assets/images/clients/c4.png')} style={{ width: '80%', maxHeight: 300 }} resizeMode={'contain'} />
+              </View>
+              <View style={{ flexDirection: 'row', padding: 20, backgroundColor: 'white', alignItems: 'center', justifyContent: 'center' }} >
+                {/* <Text> HEllo</Text> */}
+                <Image source={require('../assets/images/clients/c5.png')} style={{ width: '80%', maxHeight: 300 }} resizeMode={'contain'} />
+              </View>
+
+
+
+            </ScrollView>
+
 
 
           </View>

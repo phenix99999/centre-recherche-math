@@ -92,35 +92,35 @@ class SolutionScreen extends Component {
             <ScrollView contentContainerStyle={{ paddingBottom: 200, top: 25, borderWidth: 0, borderColor: '#DDE9F9' }} >
               <View style={{ flexDirection: 'row', padding: 30, backgroundColor: 'white', alignItems: 'center', justifyContent: 'center' }} >
                 {/* <Text> HEllo</Text> */}
-                <Image source={require('../assets/images/clients/c1.png')} style={{ width: '80%', maxHeight: 100 }} />
+                <Image source={require('../assets/images/clients/c1.png')} style={{ width: '80%', maxHeight: 300 }} resizeMode={'contain'} />
 
               </View>
               <View style={{ flexDirection: 'row', padding: 20, backgroundColor: 'white', alignItems: 'center', justifyContent: 'center' }} >
                 {/* <Text> HEllo</Text> */}
-                <Image source={require('../assets/images/clients/c2.png')} style={{ width: '80%', maxHeight: 100 }} />
+                <Image source={require('../assets/images/clients/c2.png')} style={{ width: '80%', maxHeight: 300 }} resizeMode={'contain'} />
               </View>
 
               <View style={{ flexDirection: 'row', padding: 20, backgroundColor: 'white', alignItems: 'center', justifyContent: 'center' }} >
                 {/* <Text> HEllo</Text> */}
-                <Image source={require('../assets/images/clients/c3.jpg')} style={{ width: '80%', maxHeight: 100 }} />
+                <Image source={require('../assets/images/clients/c3.jpg')} style={{ width: '80%', maxHeight: 300 }} resizeMode={'contain'} />
               </View>
               <View style={{ flexDirection: 'row', padding: 20, backgroundColor: 'white', alignItems: 'center', justifyContent: 'center' }} >
                 {/* <Text> HEllo</Text> */}
-                <Image source={require('../assets/images/clients/c4.png')} style={{ width: '80%', maxHeight: 100 }} />
+                <Image source={require('../assets/images/clients/c4.png')} style={{ width: '80%', maxHeight: 300 }} resizeMode={'contain'} />
               </View>
               <View style={{ flexDirection: 'row', padding: 20, backgroundColor: 'white', alignItems: 'center', justifyContent: 'center' }} >
                 {/* <Text> HEllo</Text> */}
-                <Image source={require('../assets/images/clients/c5.png')} resizeMode={'contain'} style={{ width: '80%', maxHeight: 100 }} />
-              </View>
-
-              <View style={{ flexDirection: 'row', padding: 20, backgroundColor: 'white', alignItems: 'center', justifyContent: 'center' }} >
-                {/* <Text> HEllo</Text> */}
-                <Image source={require('../assets/images/clients/c6.png')} resizeMode={'contain'} style={{ width: '80%', maxHeight: 100 }} />
+                <Image source={require('../assets/images/clients/c5.png')} style={{ width: '80%', maxHeight: 300 }} resizeMode={'contain'} />
               </View>
 
               <View style={{ flexDirection: 'row', padding: 20, backgroundColor: 'white', alignItems: 'center', justifyContent: 'center' }} >
                 {/* <Text> HEllo</Text> */}
-                <Image source={require('../assets/images/clients/c7.png')} resizeMode={'contain'} style={{ width: '80%', maxHeight: 100 }} />
+                <Image source={require('../assets/images/clients/c6.png')} resizeMode={'contain'} style={{ width: '80%', maxHeight: 300 }} />
+              </View>
+
+              <View style={{ flexDirection: 'row', padding: 20, backgroundColor: 'white', alignItems: 'center', justifyContent: 'center' }} >
+                {/* <Text> HEllo</Text> */}
+                <Image source={require('../assets/images/clients/c7.png')} resizeMode={'contain'} style={{ width: '80%', maxHeight: 300 }} />
               </View>
 
             </ScrollView>

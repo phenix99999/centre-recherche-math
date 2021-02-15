@@ -85,8 +85,8 @@ class SolutionMobileScreen extends Component {
               </Text>
 
             </View>
-            <View style={{ alignItems: 'center', maxHeight: 150 }}>
-              <Image source={require("../assets/images/portailfilemaker.png")} style={{ width: 400, maxHeight: 150 }} resizeMode={'contain'} />
+            <View style={{ alignItems: 'center', maxHeight: 250 }}>
+              <Image source={require("../assets/images/portailfilemaker.png")} style={{ width: 400, maxHeight: 300 }} resizeMode={'contain'} />
 
             </View>
             <View style={{ padding: 8 }}>
